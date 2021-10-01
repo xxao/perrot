@@ -32,7 +32,7 @@ setup(
     long_description_content_type='text/markdown',
     url = 'https://github.com/xxao/perrot',
     author = 'Martin Strohalm',
-    author_email = 'perrot@bymartin.cz',
+    author_email = '',
     license = 'MIT',
     packages = find_packages(),
     package_data = package_data,
