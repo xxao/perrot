@@ -9,3 +9,4 @@ from pero import *
 
 # import modules
 from . import plot
+from . import venn
