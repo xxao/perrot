@@ -60,7 +60,7 @@ series = perrot.plot.Rects(
 plot.plot(series)
 
 # map series z-range to z-axis
-plot.map(series.tag, z_axis.tag, limits=lambda *d: (z_min, z_max))
+plot.map(series.tag, z_axis.tag, limits=lambda *_: (z_min, z_max))
 
 # show plot
 plot.zoom()

@@ -29,7 +29,7 @@ setup(
     version = version,
     description = 'Draw simple plots using Pero drawing library',
     long_description = long_description,
-    long_description_content_type='text/markdown',
+    long_description_content_type = 'text/markdown',
     url = 'https://github.com/xxao/perrot',
     author = 'Martin Strohalm',
     author_email = '',
