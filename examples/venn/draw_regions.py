@@ -105,8 +105,8 @@ class DrawTest(pero.Graphics):
         overlap_path = overlap.path().transformed(matrix)
         
         # get and scale label
-        remains_label = matrix.transform(*remains.label()) if remains.label() else None
-        overlap_label = matrix.transform(*overlap.label()) if overlap.label() else None
+        remains_label = matrix.transform(*remains.anchor()) if remains.anchor() else None
+        overlap_label = matrix.transform(*overlap.anchor()) if overlap.anchor() else None
         
         # scale circle
         radius = scale*radius

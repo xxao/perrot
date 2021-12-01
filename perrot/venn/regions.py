@@ -35,13 +35,13 @@ class Region(object):
         return Path()
     
     
-    def label(self):
+    def anchor(self):
         """
-        Gets the label center XY-coords.
+        Gets the anchor coords.
         
         Returns:
             (float, float)
-                Label coordinates.
+                Anchor coordinates.
         """
         
         return None
@@ -124,13 +124,13 @@ class CircleRegion(Region):
         return path
     
     
-    def label(self):
+    def anchor(self):
         """
-        Gets the label center XY-coords.
+        Gets the anchor coords.
         
         Returns:
             (float, float)
-                Label coordinates.
+                Anchor coordinates.
         """
         
         return self._center
@@ -229,13 +229,13 @@ class RingRegion(Region):
         return path
     
     
-    def label(self):
+    def anchor(self):
         """
-        Gets the label center XY-coords.
+        Gets the anchor coords.
         
         Returns:
             (float, float)
-                Label coordinates.
+                Anchor coordinates.
         """
         
         # calc angle of centers
@@ -451,13 +451,13 @@ class ArcsRegion(Region):
         return path
     
     
-    def label(self):
+    def anchor(self):
         """
-        Gets the label center XY-coords.
+        Gets the anchor coords.
         
         Returns:
             (float, float)
-                Label coordinates.
+                Anchor coordinates.
         """
         
         # get segments

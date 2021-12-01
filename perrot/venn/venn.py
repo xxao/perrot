@@ -4,12 +4,12 @@
 from pero.enums import *
 from pero.properties import *
 from pero import colors
-from pero import Graphics, Frame, Path, Shape
+from pero import Graphics, Frame, Path, TextLabel
 from pero import OrdinalScale
 
 from . enums import *
 from . import utils
-from . patch import Patch
+from . patches import RegionPatch, CirclePatch
 
 # define constants
 _REGIONS = ('a', 'b', 'ab', 'c', 'ac', 'bc', 'abc')
@@ -57,8 +57,8 @@ class Venn(Graphics):
             pero.Palette or palette name. This is used to automatically
             provide new color for main diagram circles.
         
-        outline properties:
-            Includes pero.LineProperties to specify the main circles outline.
+        label: pero.TextLabel
+            Specifies the glyph to be used to draw labels.
     """
     
     x = NumProperty(0, dynamic=False)
@@ -67,60 +67,48 @@ class Venn(Graphics):
     height = NumProperty(UNDEF, dynamic=False)
     padding = QuadProperty(10, dynamic=False)
     
-    bgr_line = Include(LineProperties, prefix="bgr", dynamic=False, line_width=0)
-    bgr_fill = Include(FillProperties, prefix="bgr", dynamic=False, fill_color="#fff")
+    bgr_line = Include(LineProperties, prefix="bgr_", dynamic=False, line_width=0)
+    bgr_fill = Include(FillProperties, prefix="bgr_", dynamic=False, fill_color="#fff")
     
-    mode = EnumProperty(VENN_MODE_SEMI, enum=VENN_MODE, dynamic=False, nullable=True)
-    palette = PaletteProperty(colors.Set2, dynamic=False, nullable=True)
-    outline = Include(LineProperties, prefix="outline", line_width=2, line_color="#fff")
-    labels = Include(TextProperties, prefix="labels", font_size=16, text_align=TEXT_ALIGN_CENTER, text_base=TEXT_BASE_MIDDLE)
+    mode = EnumProperty(VENN_MODE_SEMI, enum=VENN_MODE, dynamic=False, nullable=False)
+    palette = PaletteProperty(colors.Dark.trans(0.6), dynamic=False, nullable=False)
+    label = Property(UNDEF, types=(TextLabel,), dynamic=False, nullable=True)
     
-    a = Property(UNDEF, types=(Patch,), dynamic=False, nullable=False)
-    b = Property(UNDEF, types=(Patch,), dynamic=False, nullable=False)
-    ab = Property(UNDEF, types=(Patch,), dynamic=False, nullable=False)
-    c = Property(UNDEF, types=(Patch,), dynamic=False, nullable=False)
-    ac = Property(UNDEF, types=(Patch,), dynamic=False, nullable=False)
-    bc = Property(UNDEF, types=(Patch,), dynamic=False, nullable=False)
-    abc = Property(UNDEF, types=(Patch,), dynamic=False, nullable=False)
+    a = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
+    b = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
+    ab = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
+    c = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
+    ac = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
+    bc = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
+    abc = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
     
-    A = Property(UNDEF, types=(Patch,), dynamic=False, nullable=False)
-    B = Property(UNDEF, types=(Patch,), dynamic=False, nullable=False)
-    C = Property(UNDEF, types=(Patch,), dynamic=False, nullable=False)
+    A = Property(UNDEF, types=(CirclePatch,), dynamic=False, nullable=False)
+    B = Property(UNDEF, types=(CirclePatch,), dynamic=False, nullable=False)
+    C = Property(UNDEF, types=(CirclePatch,), dynamic=False, nullable=False)
     
     
     def __init__(self, a, b, ab, c=0, ac=0, bc=0, abc=0, **overrides):
         """Initializes a new instance of Venn diagram."""
         
-        # init main graphics
-        for key in _REGIONS:
-            if key not in overrides:
-                overrides[key] = Patch(
-                    tag = key,
-                    z_index = REGION_Z,
-                    shape_line_width = 0,
-                    shape_fill_color = colors.Transparent,
-                    label_font_size = UNDEF,
-                    label_font_name = UNDEF,
-                    label_font_family = UNDEF,
-                    label_font_style = UNDEF,
-                    label_font_weight = UNDEF,
-                    label_text_align = UNDEF,
-                    label_text_base = UNDEF)
+        # init regions
+        for i, key in enumerate(_REGIONS):
+            overrides[key] = RegionPatch(tag=key, z_index=REGION_Z+i, title=lambda d: str(d))
         
-        for key in _CIRCLES:
-            if key not in overrides:
-                overrides[key] = Patch(
-                    tag = key,
-                    z_index = CIRCLE_Z,
-                    shape_line_width = UNDEF,
-                    shape_line_dash = UNDEF,
-                    shape_line_style = UNDEF,
-                    shape_line_cap = UNDEF,
-                    shape_line_join = UNDEF,
-                    shape_fill_alpha = 128)
+        # init circles
+        for i, key in enumerate(_CIRCLES):
+            overrides[key] = CirclePatch(tag=key, z_index=CIRCLE_Z+i, title=key)
+        
+        # init label
+        if 'label' not in overrides:
+            overrides['label'] = TextLabel(font_size=16, text_align=TEXT_ALIGN_CENTER, text_base=TEXT_BASE_MIDDLE)
         
         # init base
         super().__init__(**overrides)
+        
+        # init containers
+        self._regions = tuple(self.get_property(k) for k in _REGIONS)
+        self._circles = tuple(self.get_property(k) for k in _CIRCLES)
+        self._frame = Frame(0, 0, 1, 1)
         
         # set values
         self.get_property(_REGIONS[0]).value = a
@@ -134,10 +122,13 @@ class Venn(Graphics):
         self.get_property(_CIRCLES[1]).value = b + ab + bc + abc
         self.get_property(_CIRCLES[2]).value = c + ac + bc + abc
         
-        # init buffs
-        self._regions = tuple(self.get_property(k) for k in _REGIONS)
-        self._circles = tuple(self.get_property(k) for k in _CIRCLES)
-        self._frame = Frame(0, 0, 1, 1)
+        # lock properties
+        for key in _REGIONS + _CIRCLES:
+            self.lock_property(key)
+            self.get_property(key).lock_property('value')
+        
+        # init colors
+        self._init_colors(force=False)
         
         # bind events
         self.bind(EVT_PROPERTY_CHANGED, self._on_venn_property_changed)
@@ -149,7 +140,7 @@ class Venn(Graphics):
         Gets regions in following order (a, b, ab, c, ac, bc, abc).
         
         Returns:
-            (perrot.venn.Patch,)
+            (perrot.venn.RegionPatch,)
                 Regions patches.
         """
         
@@ -162,7 +153,7 @@ class Venn(Graphics):
         Gets main circles in following order (a, b, c).
         
         Returns:
-            (perrot.venn.Patch,)
+            (perrot.venn.CirclePatch,)
                 Circles patches.
         """
         
@@ -178,7 +169,7 @@ class Venn(Graphics):
         width = self.get_property('width', source, overrides)
         height = self.get_property('height', source, overrides)
         padding = self.get_property('padding', source, overrides)
-        mode = self.get_property('mode', source, overrides)
+        label = self.get_property('label', source, overrides)
         
         # get size from canvas
         if width is UNDEF:
@@ -190,8 +181,8 @@ class Venn(Graphics):
         self._frame = Frame(padding[3], padding[0], width - (padding[1]+padding[3]), height - (padding[0]+padding[2]))
         
         # draw main bgr
-        canvas.set_pen_by(self, prefix="bgr", source=source, overrides=overrides)
-        canvas.set_brush_by(self, prefix="bgr", source=source, overrides=overrides)
+        canvas.set_pen_by(self, prefix="bgr_", source=source, overrides=overrides)
+        canvas.set_brush_by(self, prefix="bgr_", source=source, overrides=overrides)
         canvas.draw_rect(x, y, width, height)
         
         # refuse to draw if "negative" size
@@ -199,134 +190,80 @@ class Venn(Graphics):
             return
         
         # init patches
-        self._init_patches(mode, self._frame)
-        
-        # draw
-        self._draw_circles(canvas, source, overrides)
-        self._draw_regions(canvas, source, overrides)
-        self._draw_labels(canvas, source, overrides)
-    
-    
-    def _draw_circles(self, canvas, source, overrides):
-        """Draws circles."""
-        
-        # get properties
-        palette = self.get_property('palette', source, overrides)
-        
-        # init colors
-        color_scale = OrdinalScale(in_range=_CIRCLES, out_range=palette)
+        self._init_patches(source, overrides)
         
         # sort objects by z-index
-        objects = sorted(self._circles, key=lambda o: o.z_index)
+        regions = sorted(self._regions, key=lambda o: o.z_index)
+        circles = sorted(self._circles, key=lambda o: o.z_index)
         
-        # draw fill
-        for obj in objects:
-            
-            # get overrides
-            obj_overrides = self.get_child_overrides(obj.tag, overrides)
-            
-            # check if visible
-            if not obj.is_visible(obj.value, obj_overrides):
-                continue
-            
-            # set fill color
-            if obj.shape.fill_color is UNDEF:
-                obj_overrides['fill_color'] = color_scale.scale(obj.tag) or colors.Transparent
-            
-            # set pen and brush
-            canvas.line_width = 0
-            canvas.set_brush_by(obj.shape, source=obj.value, overrides=obj_overrides)
-            
-            # draw path
-            canvas.draw_path(obj.shape.path)
+        # draw circles fill
+        for obj in circles:
+            obj.draw_fill(canvas)
         
-        # draw outline
-        for obj in objects:
-            
-            # get overrides
-            obj_overrides = self.get_child_overrides(obj.tag, overrides)
-            
-            # check if visible
-            if not obj.is_visible(obj.value, obj_overrides):
-                continue
-            
-            # set pen and brush
-            canvas.fill_style = FILL_STYLE_TRANS
-            canvas.set_pen_by(self, 'outline', source=obj.value, overrides=overrides)
-            canvas.set_pen_by(obj.shape, source=obj.value, overrides=obj_overrides)
-            
-            # draw path
-            canvas.draw_path(obj.shape.path)
-    
-    
-    def _draw_regions(self, canvas, source, overrides):
-        """Draws regions."""
+        # draw regions fill
+        for obj in regions:
+            obj.draw_fill(canvas)
         
-        # sort objects by z-index
-        objects = sorted(self._regions, key=lambda o: o.z_index)
+        # draw circles outline
+        for obj in circles:
+            obj.draw_outline(canvas)
         
-        # draw regions
-        for obj in objects:
-            
-            # get overrides
-            obj_overrides = self.get_child_overrides(obj.tag, overrides)
-            
-            # check if visible
-            if not obj.is_visible(obj.value, obj_overrides):
-                continue
-            
-            # draw shape
-            obj.shape.draw(canvas, obj.value, **obj_overrides)
-    
-    
-    def _draw_labels(self, canvas, source, overrides):
-        """Draws labels."""
-        
-        # sort objects by z-index
-        objects = sorted(self._regions, key=lambda o: o.z_index)
+        # draw regions outline
+        for obj in regions:
+            obj.draw_outline(canvas)
         
         # draw labels
-        for obj in objects:
-            
-            # get overrides
-            obj_overrides = self.get_child_overrides(obj.tag, overrides)
-            
-            # check if visible
-            if not obj.is_visible(obj.value, obj_overrides):
-                continue
-            
-            # set font
-            canvas.set_text_by(self, 'labels', source=obj.value, overrides=overrides)
-            
-            # draw label
-            obj.label.draw(canvas, obj.value, **obj_overrides)
+        for obj in regions:
+            title = obj.get_property('title', obj.value)
+            obj_overrides = {'x': obj.x, 'y': obj.y, 'text': title}
+            label.draw(canvas, obj, **obj_overrides)
     
     
-    def _init_patches(self, mode, frame):
+    def _init_patches(self, source, overrides):
         """Initializes all patches."""
         
-        # get values from regions
-        values = [self.get_property(key).value for key in _REGIONS]
+        # get properties
+        mode = self.get_property('mode', source, overrides)
         
         # calculate venn
-        coords, radii = utils.calc_venn(*values, mode=mode)
-        coords, radii = utils.fit_into(coords, radii, *frame.rect)
+        data = [self.get_property(key).value for key in _REGIONS]
+        coords, radii = utils.calc_venn(*data, mode=mode)
+        coords, radii = utils.fit_into(coords, radii, *self._frame.rect)
         
         # create regions
         regions = utils.make_regions(coords, radii)
         
-        # update regions
+        # update regions path
         for obj in self._regions:
-            obj.shape.path = regions[obj.tag].path()
-            obj.label.x, obj.label.y = regions[obj.tag].label()
+            obj.path = regions[obj.tag].path()
+            obj.x, obj.y = regions[obj.tag].anchor()
         
-        # update circles
+        # update circles path
         for i, obj in enumerate(self._circles):
-            obj.shape.path = Path().circle(coords[i][0], coords[i][1], radii[i])
-            obj.label.x, obj.label.y = coords[i]
+            obj.path = Path().circle(coords[i][0], coords[i][1], radii[i])
+            obj.x, obj.y = coords[i]
+    
+    
+    def _init_colors(self, force=True):
+        """Sets colors."""
+        
+        # init color scale
+        scale = OrdinalScale(
+            in_range = _CIRCLES,
+            out_range = self.palette,
+            implicit = True,
+            recycle = True)
+        
+        # set to circles
+        for obj in self._circles:
+            color = obj.get_property('fill_color')
+            if force or color is UNDEF:
+                obj.fill_color = scale.scale(obj.tag)
     
     
     def _on_venn_property_changed(self, evt):
         """Called after any property has changed."""
         
-        pass
+        # color palette changed
+        if evt.name == 'palette':
+            self._init_colors()

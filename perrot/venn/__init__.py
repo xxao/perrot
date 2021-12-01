@@ -8,5 +8,5 @@ from . regions import Region, EmptyRegion, CircleRegion, RingRegion, ArcsRegion
 from . utils import *
 
 # import venn
-from . patch import Patch
+from . patches import RegionPatch, CirclePatch
 from . venn import Venn
