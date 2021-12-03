@@ -12,10 +12,12 @@ s = sum(data)
 venn = perrot.venn.Venn(
     *data,
     mode = perrot.venn.SEMI,
+    palette = pero.colors.Dark.trans(0.6),
     A_title = "Series A",
     B_title = "Series B",
     C_title = "Series C",
     label_text = lambda d: f"{d.value}\n{d.value/s:.0%}")
 
 # show diagram
+venn.export("venn.png", width=400, height=400)
 venn.show("Venn Diagram", width=400, height=400)
