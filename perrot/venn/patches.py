@@ -36,7 +36,6 @@ class Patch(Glyph):
     """
     
     value = NumProperty(0, dynamic=False)
-    title = StringProperty(UNDEF)
     path = Property(UNDEF, types=(Path,))
     
     line = Include(LineProperties)
@@ -123,11 +122,25 @@ class RegionPatch(Patch):
 
 
 class CirclePatch(Patch):
-    """Defines a Venn diagram circle patch."""
+    """
+    Defines a Venn diagram circle patch.
+    
+    Properties:
+        
+        title: str or callable
+            Specifies the region title.
+    """
+    
+    
+    title = StringProperty(UNDEF)
     
     
     def __init__(self, **overrides):
         """Initializes a new instance of CirclePatch."""
+        
+        # init visibility
+        if 'visible' not in overrides:
+            overrides['visible'] = lambda d: self.value != 0
         
         # init outline
         if 'line_width' not in overrides:

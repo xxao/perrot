@@ -4,7 +4,7 @@
 from pero.enums import *
 from pero.properties import *
 from pero import colors
-from pero import Graphics, Frame, Path, TextLabel
+from pero import Graphics, Frame, Path, TextLabel, LegendBox, MarkerLegend
 from pero import OrdinalScale
 
 from . enums import *
@@ -74,6 +74,8 @@ class Venn(Graphics):
     palette = PaletteProperty(colors.Dark.trans(0.6), dynamic=False, nullable=False)
     label = Property(UNDEF, types=(TextLabel,), dynamic=False, nullable=True)
     
+    legend = Property(UNDEF, types=(LegendBox,), dynamic=False, nullable=True)
+    
     a = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
     b = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
     ab = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
@@ -92,7 +94,7 @@ class Venn(Graphics):
         
         # init regions
         for i, key in enumerate(_REGIONS):
-            overrides[key] = RegionPatch(tag=key, z_index=REGION_Z+i, title=lambda d: str(d))
+            overrides[key] = RegionPatch(tag=key, z_index=REGION_Z+i)
         
         # init circles
         for i, key in enumerate(_CIRCLES):
@@ -100,7 +102,11 @@ class Venn(Graphics):
         
         # init label
         if 'label' not in overrides:
-            overrides['label'] = TextLabel(font_size=16, text_align=TEXT_ALIGN_CENTER, text_base=TEXT_BASE_MIDDLE)
+            overrides['label'] = TextLabel(font_size=14, text_align=TEXT_ALIGN_CENTER, text_base=TEXT_BASE_MIDDLE, text=lambda d:d.value)
+        
+        # init legend
+        if 'legend' not in overrides:
+            overrides['legend'] = LegendBox(anchor=POS_N, orientation=ORI_HORIZONTAL)
         
         # init base
         super().__init__(**overrides)
@@ -185,12 +191,15 @@ class Venn(Graphics):
         canvas.set_brush_by(self, prefix="bgr_", source=source, overrides=overrides)
         canvas.draw_rect(x, y, width, height)
         
+        # init legend
+        self._init_legend(canvas, source, overrides)
+        
         # refuse to draw if "negative" size
         if self._frame.reversed:
             return
         
         # init patches
-        self._init_patches(source, overrides)
+        self._init_patches(canvas, source, overrides)
         
         # sort objects by z-index
         regions = sorted(self._regions, key=lambda o: o.z_index)
@@ -214,12 +223,41 @@ class Venn(Graphics):
         
         # draw labels
         for obj in regions:
-            title = obj.get_property('title', obj.value)
-            obj_overrides = {'x': obj.x, 'y': obj.y, 'text': title}
+            obj_overrides = {'x': obj.x, 'y': obj.y}
             label.draw(canvas, obj, **obj_overrides)
+        
+        # draw legend
+        self.legend.draw(canvas, x=self._frame.cx, y=self._frame.bottom+10)
     
     
-    def _init_patches(self, source, overrides):
+    def _init_legend(self, canvas, source, overrides):
+        """Initializes legend."""
+        
+        # check if visible
+        if not self.legend.is_visible():
+            return
+        
+        # get items
+        items = []
+        for obj in self._circles:
+            if obj.is_visible(obj):
+                title = obj.get_property('title', obj)
+                if title:
+                    items.append(MarkerLegend(
+                        text = title,
+                        marker = 'o',
+                        marker_size = 10,
+                        marker_fill_color = obj.fill_color))
+        
+        # set items
+        self.legend.items = items
+        
+        # update frame
+        bbox = self.legend.get_bbox(canvas)
+        self._frame.shrink(bottom=bbox.height+10)
+    
+    
+    def _init_patches(self, canvas, source, overrides):
         """Initializes all patches."""
         
         # get properties
