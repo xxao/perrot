@@ -4,7 +4,7 @@
 import numpy
 
 from . enums import *
-from . regions import CircleRegion
+from . regions import EmptyRegion, CircleRegion
 
 
 def calc_venn(a, b, ab, c=0., ac=0., bc=0., abc=0., mode=FULL, spacing=0.1):
@@ -374,9 +374,9 @@ def make_regions(coords, radii):
     r_a, r_b, r_c = radii
     
     # init sections
-    reg_a = CircleRegion(c_a, r_a)
-    reg_b = CircleRegion(c_b, r_b)
-    reg_c = CircleRegion(c_c, r_c)
+    reg_a = CircleRegion(c_a, r_a) if r_a else EmptyRegion()
+    reg_b = CircleRegion(c_b, r_b) if r_b else EmptyRegion()
+    reg_c = CircleRegion(c_c, r_c) if r_c else EmptyRegion()
     
     reg_a, reg_ab = reg_a.overlay(c_b, r_b)
     reg_a, reg_ac = reg_a.overlay(c_c, r_c)

@@ -152,6 +152,10 @@ class CircleRegion(Region):
                 Remaining and overlapping parts.
         """
         
+        # check radius
+        if radius == 0:
+            return self, EmptyRegion()
+        
         # calc distance
         dist = utils.distance(self._center, center)
         
@@ -264,6 +268,10 @@ class RingRegion(Region):
             (perrot.venn.Region, perrot.venn.Region)
                 Remaining and overlapping parts.
         """
+        
+        # check radius
+        if radius == 0:
+            return self, EmptyRegion()
         
         # calc distance
         dist = utils.distance(self._out_center, center)
@@ -495,13 +503,13 @@ class ArcsRegion(Region):
             points = (a.middle for a in arcs)
             return utils.polygon_centroid(*points)
         
-        # circle inside arcs
+        # TODO: circle inside arcs
         if len(segments) == 2:
-            return None
+            return 10, 10
         
-        # circles inside circle
+        # TODO: circles inside circle
         if len(segments) == 3:
-            return None
+            return 10, 10
         
         raise NotImplementedError("Unknown label scenario!")
     
@@ -521,6 +529,10 @@ class ArcsRegion(Region):
             (perrot.venn.Region, perrot.venn.Region)
                 Remaining and overlapping regions.
         """
+        
+        # check radius
+        if radius == 0:
+            return self, EmptyRegion()
         
         # check number of arcs
         if len(self._arcs) > 2:
