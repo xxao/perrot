@@ -9,6 +9,7 @@ from pero import OrdinalScale
 
 from . enums import *
 from . import utils
+from .regions import EmptyRegion
 from . patches import RegionPatch, CirclePatch
 
 # define constants
@@ -92,6 +93,9 @@ class Venn(Graphics):
     def __init__(self, a, b, ab, c=0, ac=0, bc=0, abc=0, **overrides):
         """Initializes a new instance of Venn diagram."""
         
+        # get data
+        self._data = {'a': a, 'b': b, 'ab': ab, 'c': c, 'ac': ac, 'bc': bc, 'abc': abc}
+        
         # init regions
         for i, key in enumerate(_REGIONS):
             overrides[key] = RegionPatch(tag=key, z_index=REGION_Z+i)
@@ -102,7 +106,7 @@ class Venn(Graphics):
         
         # init label
         if 'label' not in overrides:
-            overrides['label'] = TextLabel(font_size=14, text_align=TEXT_ALIGN_CENTER, text_base=TEXT_BASE_MIDDLE, text=lambda d:d.value)
+            overrides['label'] = TextLabel(font_size=14, text_align=TEXT_ALIGN_CENTER, text_base=TEXT_BASE_MIDDLE, text=lambda d: d.value)
         
         # init legend
         if 'legend' not in overrides:
@@ -117,13 +121,9 @@ class Venn(Graphics):
         self._frame = Frame(0, 0, 1, 1)
         
         # set values
-        self.get_property(_REGIONS[0]).value = a
-        self.get_property(_REGIONS[1]).value = b
-        self.get_property(_REGIONS[2]).value = ab
-        self.get_property(_REGIONS[3]).value = c
-        self.get_property(_REGIONS[4]).value = ac
-        self.get_property(_REGIONS[5]).value = bc
-        self.get_property(_REGIONS[6]).value = abc
+        for key in _REGIONS:
+            self.get_property(key).value = self._data[key]
+        
         self.get_property(_CIRCLES[0]).value = a + ab + ac + abc
         self.get_property(_CIRCLES[1]).value = b + ab + bc + abc
         self.get_property(_CIRCLES[2]).value = c + ac + bc + abc
@@ -223,8 +223,9 @@ class Venn(Graphics):
         
         # draw labels
         for obj in regions:
-            obj_overrides = {'x': obj.x, 'y': obj.y}
-            label.draw(canvas, obj, **obj_overrides)
+            if obj.visible:
+                obj_overrides = {'x': obj.x, 'y': obj.y}
+                label.draw(canvas, obj, **obj_overrides)
         
         # draw legend
         self.legend.draw(canvas, x=self._frame.cx, y=self._frame.bottom+10)
@@ -240,14 +241,19 @@ class Venn(Graphics):
         # get items
         items = []
         for obj in self._circles:
-            if obj.is_visible(obj):
-                title = obj.get_property('title', obj)
-                if title:
-                    items.append(MarkerLegend(
-                        text = title,
-                        marker = 'o',
-                        marker_size = 10,
-                        marker_fill_color = obj.fill_color))
+            
+            # skip empty
+            if obj.value == 0:
+                continue
+            
+            # make item
+            title = obj.get_property('title', obj)
+            if title:
+                items.append(MarkerLegend(
+                    text = title,
+                    marker = 'o',
+                    marker_size = 10,
+                    marker_fill_color = obj.fill_color))
         
         # set items
         self.legend.items = items
@@ -274,7 +280,8 @@ class Venn(Graphics):
         # update regions path
         for obj in self._regions:
             obj.path = regions[obj.tag].path()
-            obj.x, obj.y = regions[obj.tag].anchor()
+            obj.x, obj.y = regions[obj.tag].anchor() or (0, 0)
+            obj.visible = not isinstance(regions[obj.tag], EmptyRegion)
         
         # update circles path
         for i, obj in enumerate(self._circles):

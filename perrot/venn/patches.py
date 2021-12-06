@@ -138,10 +138,6 @@ class CirclePatch(Patch):
     def __init__(self, **overrides):
         """Initializes a new instance of CirclePatch."""
         
-        # init visibility
-        if 'visible' not in overrides:
-            overrides['visible'] = lambda d: self.value != 0
-        
         # init outline
         if 'line_width' not in overrides:
             overrides['line_width'] = 2

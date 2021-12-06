@@ -6,8 +6,7 @@ import perrot.venn
 
 # init data [a, b, ab, c, ac, bc, abc]
 data = [10, 8, 22, 6, 9, 4, 2]
-data = [10, 8, 22]
-data = [4487, 1502, 6661]
+# data = [10, 8, 22]
 
 s = sum(data)
 
