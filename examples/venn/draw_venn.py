@@ -15,6 +15,8 @@ venn = perrot.venn.Venn(
     *data,
     mode = perrot.venn.SEMI,
     palette = pero.colors.Dark.trans(0.6),
+    title_text = "Venn Diagram",
+    legend_position = pero.BOTTOM,
     A_title = "Series A",
     B_title = "Series B",
     C_title = "Series C",

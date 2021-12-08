@@ -4,10 +4,12 @@
 from pero.enums import *
 from pero.properties import *
 from pero import colors
-from pero import Glyph, Path
+from pero import Path
+
+from .. chart import InGraphics
 
 
-class Patch(Glyph):
+class Patch(InGraphics):
     """
     Abstract base class for various types of Venn diagram patches.
     
@@ -130,7 +132,6 @@ class CirclePatch(Patch):
         title: str or callable
             Specifies the region title.
     """
-    
     
     title = StringProperty(UNDEF)
     
