@@ -283,11 +283,11 @@ class Venn(Chart):
             item = MarkerLegend(
                 text = title,
                 marker = 'o',
-                marker_size = 10)
+                marker_size = 12)
             
             # set line and fill
-            item.set_properties_from(obj, 'line_', 'marker_line_')
-            item.set_properties_from(obj, 'fill_', 'marker_fill_')
+            item.marker.set_properties_from(obj, 'line_', 'line_')
+            item.marker.set_properties_from(obj, 'fill_', 'fill_')
             
             # add item
             items.append(item)
