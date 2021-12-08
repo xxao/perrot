@@ -8,5 +8,6 @@ version = (0, 15, 2)
 from pero import *
 
 # import modules
+from . import chart
 from . import plot
 from . import venn
