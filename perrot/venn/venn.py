@@ -4,10 +4,10 @@
 from pero.enums import *
 from pero.properties import *
 from pero import colors
-from pero import Graphics, Frame, Path, TextLabel, MarkerLegend
+from pero import Path, TextLabel, MarkerLegend
 from pero import OrdinalScale
 
-from .. chart import Chart, Title, OutLegend, OutGraphics
+from .. chart import Chart, Title, OutLegend
 from . enums import *
 from . import utils
 from . regions import EmptyRegion
@@ -20,6 +20,8 @@ _CIRCLES = ('A', 'B', 'C')
 
 class Venn(Chart):
     """
+    This class provides main functionality to construct and draw Venn diagrams
+    with two ro three circles.
     
     Properties:
         
@@ -122,7 +124,7 @@ class Venn(Chart):
     @property
     def circles(self):
         """
-        Gets main circles in following order (a, b, c).
+        Gets main circles in following order (A, B, C).
         
         Returns:
             (perrot.venn.CirclePatch,)
