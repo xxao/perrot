@@ -8,4 +8,4 @@ from . enums import *
 from . graphics import ChartGraphics, InGraphics, OutGraphics
 from . chart import Chart
 from . title import Title
-from . legend import InLegend, OutLegend
+from . legends import InLegend, OutLegend

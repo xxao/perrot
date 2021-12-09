@@ -9,5 +9,6 @@ from pero import *
 
 # import modules
 from . import chart
+from . import pie
 from . import plot
 from . import venn
