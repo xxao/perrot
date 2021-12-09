@@ -31,10 +31,12 @@ class Patch(InGraphics):
             Includes pero.FillProperties to specify the patch fill.
         
         x: int
-            Specifies the label anchor X-coordinate.
+            Specifies the x-coordinate of the anchor. This is mostly used to
+            position the label.
         
         y: int
-            Specifies the label anchor Y-coordinate.
+            Specifies the y-coordinate of the anchor. This is mostly used to
+            position the label.
     """
     
     value = NumProperty(0, dynamic=False)

@@ -143,6 +143,10 @@ class Chart(Graphics):
                 Requested object or None if not available.
         """
         
+        # get object tag
+        tag = tag.tag if isinstance(tag, Graphics) else tag
+        
+        # get object
         return self._graphics.get(tag, None)
     
     
@@ -321,8 +325,8 @@ class Chart(Graphics):
         color = color_scale.scale(DATA_FRAME)
         glyph.draw(canvas, self._data_frame,
             label = DATA_FRAME,
-            line_color = color.opaque(0.4),
-            fill_color = color.opaque(0.25))
+            line_color = color,
+            fill_color = color.opaque(0.7))
         
         # draw outside frames
         for tag, obj in self._graphics.items():
@@ -335,8 +339,8 @@ class Chart(Graphics):
             color = color_scale.scale(tag)
             glyph.draw(canvas, obj.frame,
                 label = obj.tag,
-                line_color = color.opaque(0.5),
-                fill_color = color.opaque(0.25))
+                line_color = color,
+                fill_color = color.opaque(0.7))
     
     
     def init_frames(self, canvas, source=UNDEF, **overrides):
@@ -392,7 +396,7 @@ class Chart(Graphics):
             
             position = obj.position
             extent = obj.get_extent(canvas) if obj.visible else 0
-            margin = obj.margin if obj.visible else (0, 0, 0, 0)
+            margin = obj.margin if (obj.visible and extent) else (0, 0, 0, 0)
             
             if position == POS_LEFT:
                 left_obj.append(obj)

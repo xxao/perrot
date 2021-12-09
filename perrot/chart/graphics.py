@@ -52,13 +52,12 @@ class OutGraphics(ChartGraphics):
     def get_extent(self, canvas, source=UNDEF, **overrides):
         """
         This method is automatically called by parent chart to get amount of
-        logical space needed to draw the object.
+        logical space needed to draw the object. This method should be
+        overwritten by derived classes to provide specific extent.
         
         The value should only reflect the necessary space in the relevant
         direction specified by 'position' property. The value should not include
         specified object margin.
-        
-        This method should be overwritten by derived classed.
         
         Args:
             canvas: pero.Canvas

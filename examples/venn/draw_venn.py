@@ -2,7 +2,7 @@
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
 import pero
-import perrot.venn
+import perrot
 
 # init data [a, b, ab, c, ac, bc, abc]
 data = [10, 8, 22, 6, 9, 4, 2]

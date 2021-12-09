@@ -21,7 +21,7 @@ _CIRCLES = ('A', 'B', 'C')
 class Venn(Chart):
     """
     This class provides main functionality to construct and draw Venn diagrams
-    with two ro three circles.
+    with two or three circles.
     
     Properties:
         
@@ -72,23 +72,37 @@ class Venn(Chart):
         
         # init regions
         for i, key in enumerate(_REGIONS):
-            overrides[key] = RegionPatch(tag=key, z_index=REGION_Z+i)
+            overrides[key] = RegionPatch(
+                tag = key,
+                z_index = REGION_Z+i)
         
         # init circles
         for i, key in enumerate(_CIRCLES):
-            overrides[key] = CirclePatch(tag=key, z_index=CIRCLE_Z+i, title=key)
+            overrides[key] = CirclePatch(
+                tag = key,
+                z_index = CIRCLE_Z+i,
+                title = key)
         
         # init title
         if 'title' not in overrides:
-            overrides['title'] = Title(position=POS_TOP)
+            overrides['title'] = Title(
+                tag = 'title',
+                position = POS_TOP)
         
         # init legend
         if 'legend' not in overrides:
-            overrides['legend'] = OutLegend(position=POS_BOTTOM, orientation=ORI_HORIZONTAL)
+            overrides['legend'] = OutLegend(
+                tag = 'legend',
+                position = POS_BOTTOM,
+                orientation = ORI_HORIZONTAL)
         
         # init label
         if 'label' not in overrides:
-            overrides['label'] = TextLabel(font_size=14, text_align=TEXT_ALIGN_CENTER, text_base=TEXT_BASE_MIDDLE, text=lambda d: d.value)
+            overrides['label'] = TextLabel(
+                text = lambda d: d.value,
+                font_size = 14,
+                text_align = TEXT_ALIGN_CENTER,
+                text_base = TEXT_BASE_MIDDLE)
         
         # init base
         super().__init__(**overrides)
@@ -98,7 +112,7 @@ class Venn(Chart):
         self._regions = tuple(self.get_property(k) for k in _REGIONS)
         self._circles = tuple(self.get_property(k) for k in _CIRCLES)
         
-        # register main graphics
+        # init graphics
         self._init_graphics()
         
         # init colors
@@ -140,14 +154,14 @@ class Venn(Chart):
         # get properties
         label = self.get_property('label', source, overrides)
         
-        # init legend
-        self._init_legend(canvas, source, overrides)
+        # update legend
+        self._update_legend(canvas, source, overrides)
         
         # init frames
         self.init_frames(canvas, source, **overrides)
         
-        # init patches
-        self._init_patches(canvas, source, overrides)
+        # update patches
+        self._update_patches(canvas, source, overrides)
         
         # draw main bgr
         self.draw_bgr(canvas, source, **overrides)
@@ -157,7 +171,7 @@ class Venn(Chart):
             return
         
         # get objects
-        objects = list(self._graphics.values())
+        objects = list(self.graphics)
         objects.sort(key=lambda o: o.z_index)
         regions = [o for o in objects if isinstance(o, RegionPatch)]
         circles = [o for o in objects if isinstance(o, CirclePatch)]
@@ -189,10 +203,81 @@ class Venn(Chart):
         # draw remaining objects
         for obj in others:
             obj.draw(canvas)
+        
+        # draw debug frames
+        # self.draw_frames(canvas)
+    
+    
+    def _update_legend(self, canvas, source, overrides):
+        """Updates legend items."""
+        
+        # check if visible
+        if not self.legend or not self.legend.is_visible():
+            return
+        
+        # check if static
+        if self.legend.static:
+            return
+        
+        # get items
+        items = []
+        for obj in self._circles:
+            
+            # skip empty
+            if obj.value == 0:
+                continue
+            
+            # get title
+            title = obj.get_property('title', obj)
+            if not title:
+                continue
+            
+            # init item
+            item = MarkerLegend(
+                text = title,
+                marker = 'o',
+                marker_size = 12)
+            
+            # set line and fill
+            item.marker.set_properties_from(obj, 'line_', 'line_')
+            item.marker.set_properties_from(obj, 'fill_', 'fill_')
+            
+            # add item
+            items.append(item)
+        
+        # set items
+        self.legend.items = tuple(items)
+    
+    
+    def _update_patches(self, canvas, source, overrides):
+        """Updates circles and regions patches."""
+        
+        # get properties
+        mode = self.get_property('mode', source, overrides)
+        
+        # calculate venn
+        frame = self.get_frame()
+        data = [self.get_property(key).value for key in _REGIONS]
+        coords, radii = utils.calc_venn(*data, mode=mode)
+        coords, radii = utils.fit_into(coords, radii, *frame.rect)
+        
+        # create regions
+        regions = utils.make_regions(coords, radii)
+        
+        # update regions
+        for obj in self._regions:
+            obj.path = regions[obj.tag].path()
+            obj.x, obj.y = regions[obj.tag].anchor() or (0, 0)
+            obj.visible = not isinstance(regions[obj.tag], EmptyRegion)
+        
+        # update circles
+        for i, obj in enumerate(self._circles):
+            obj.path = Path().circle(coords[i][0], coords[i][1], radii[i])
+            obj.x, obj.y = coords[i]
     
     
     def _init_graphics(self):
-        """Registers main objects."""
+        """Initializes and registers required graphics."""
         
         # set regions values
         for key in _REGIONS:
@@ -223,77 +308,6 @@ class Venn(Chart):
         
         if self.title:
             self.add(self.title)
-    
-    
-    def _init_patches(self, canvas, source, overrides):
-        """Initializes circles and regions patches."""
-        
-        # get properties
-        mode = self.get_property('mode', source, overrides)
-        
-        # calculate venn
-        frame = self.get_frame()
-        data = [self.get_property(key).value for key in _REGIONS]
-        coords, radii = utils.calc_venn(*data, mode=mode)
-        coords, radii = utils.fit_into(coords, radii, *frame.rect)
-        
-        # create regions
-        regions = utils.make_regions(coords, radii)
-        
-        # update regions path
-        for obj in self._regions:
-            obj.path = regions[obj.tag].path()
-            obj.x, obj.y = regions[obj.tag].anchor() or (0, 0)
-            obj.visible = not isinstance(regions[obj.tag], EmptyRegion)
-        
-        # update circles path
-        for i, obj in enumerate(self._circles):
-            obj.path = Path().circle(coords[i][0], coords[i][1], radii[i])
-            obj.x, obj.y = coords[i]
-    
-    
-    def _init_legend(self, canvas, source, overrides):
-        """Initializes legend."""
-        
-        # check if visible
-        if not self.legend or not self.legend.is_visible():
-            return
-        
-        # check if static
-        if self.legend.static:
-            return
-        
-        # clear items
-        self.legend.items = []
-        
-        # get items
-        items = []
-        for obj in self._circles:
-            
-            # skip empty
-            if obj.value == 0:
-                continue
-            
-            # get title
-            title = obj.get_property('title', obj)
-            if not title:
-                continue
-            
-            # init item
-            item = MarkerLegend(
-                text = title,
-                marker = 'o',
-                marker_size = 12)
-            
-            # set line and fill
-            item.marker.set_properties_from(obj, 'line_', 'line_')
-            item.marker.set_properties_from(obj, 'fill_', 'fill_')
-            
-            # add item
-            items.append(item)
-        
-        # set items
-        self.legend.items = items
     
     
     def _init_colors(self, force=True):
