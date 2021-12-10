@@ -48,7 +48,7 @@ ordinal_axis = perrot.plot.OrdinalAxis(
     margin = (20, 0, 0, 0),
     z_index = 3,
     labels = ("one", 'two', "three", "four", "five"),
-    label_between = True,
+    major_tick_size = 0,
     static = False,
     level = 3)
 

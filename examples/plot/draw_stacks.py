@@ -16,13 +16,14 @@ x_axis = perrot.plot.OrdinalAxis(
     position = pero.BOTTOM,
     margin = 0,
     labels = categories,
-    label_between = True,
+    major_tick_size = 0,
     level = 1)
 
 # init plot
 plot = perrot.plot.Plot(
     x_axis = x_axis,
-    y_axis_title = "count")
+    y_axis_title = "count",
+    x_grid_show_major_lines = False)
 
 # init labels
 label = pero.TextLabel(
