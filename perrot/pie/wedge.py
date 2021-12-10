@@ -1,9 +1,6 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-import math
-
-from pero.enums import *
 from pero.properties import *
 from pero import Wedge as WedgeGlyph
 
@@ -19,7 +16,16 @@ class Wedge(WedgeGlyph):
         
         title: str or callable
             Specifies the wedge title.
+        
+        label_x: int
+            Specifies the x-coordinate of the label.
+        
+        label_y: int
+            Specifies the y-coordinate of the label.
     """
     
     value = NumProperty(0, dynamic=False)
     title = StringProperty(UNDEF)
+    
+    label_x = NumProperty(0, dynamic=False)
+    label_y = NumProperty(0, dynamic=False)

@@ -88,41 +88,22 @@ class Pie(Chart):
         
         # get objects
         objects = list(self.graphics)
-        objects.sort(key=lambda o: o.z_index)
         rings = [o for o in objects if isinstance(o, Ring)]
+        rings.sort(key=lambda o: o.z_index, reverse=True)
         others = [o for o in objects if not isinstance(o, Ring)]
+        others.sort(key=lambda o: o.z_index)
         
-        # get max radius
+        # calc rings radii
         data_frame = self.get_frame()
-        max_radius = 0.5 * min(data_frame.wh)
+        radii = self._calc_radii()
         
         # draw rings
-        last_radius = 0
-        for i, obj in enumerate(rings):
-            
-            # get inner radius
-            inner_radius = obj.inner_radius
-            if inner_radius is UNDEF:
-                inner_radius = last_radius
-            else:
-                inner_radius *= max_radius
-            
-            # get outer radius
-            outer_radius = max_radius * (obj.outer_radius or (i + 1) / len(rings))
-            
-            # check radii
-            inner_radius = min(inner_radius, max_radius)
-            outer_radius = min(outer_radius, max_radius)
-            
-            # remember last
-            last_radius = outer_radius
-            
-            # draw ring
+        for obj in rings:
             obj.draw(canvas,
                 x = data_frame.cx,
                 y = data_frame.cy,
-                inner_radius = inner_radius,
-                outer_radius = outer_radius)
+                inner_radius = radii[obj.tag][0],
+                outer_radius = radii[obj.tag][1])
         
         # draw remaining objects
         for obj in others:
@@ -186,6 +167,42 @@ class Pie(Chart):
         
         # create and add ring
         self.add(Ring(values, titles, explode, **overrides))
+    
+    
+    def _calc_radii(self):
+        """Calculates radii for each ring."""
+        
+        # init container
+        radii = {}
+        
+        # get max radius
+        data_frame = self.get_frame()
+        max_radius = 0.5 * min(data_frame.wh)
+        count = len(self._rings)
+        
+        # draw rings
+        last_radius = 0
+        for i, obj in enumerate(self._rings):
+            
+            # get inner radius
+            inner_radius = obj.inner_radius
+            if inner_radius is UNDEF:
+                inner_radius = last_radius
+            else:
+                inner_radius *= max_radius
+            
+            # get outer radius
+            outer_radius = max_radius * (obj.outer_radius or (i + 1) / count)
+            
+            # check radii
+            inner_radius = min(inner_radius, max_radius)
+            outer_radius = min(outer_radius, max_radius)
+            
+            # store radii
+            radii[obj.tag] = (inner_radius, outer_radius)
+            last_radius = outer_radius
+        
+        return radii
     
     
     def _update_legend(self, canvas, source, overrides):

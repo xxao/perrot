@@ -5,11 +5,15 @@ import pero
 import perrot
 
 # init data
-values1 = [10, 8, 22, 6, 9, 4, 2]
-titles1 = ["A", "B", "AB", "C", "AC", "BC", "ABC"]
+values_1 = [40, 17, 4]
+titles_1 = ["I", "II", "III"]
+explode_1 = [0, 0, 0]
+palette_1 = pero.colors.Dark
 
-values2 = [40, 19, 2]
-titles2 = ["I", "II", "III"]
+values_2 = [10, 8, 22, 6, 8, 3, 4]
+titles_2 = ["A", "B", "AB", "C", "AC", "BC", "ABC"]
+explode_2 = [0, 0.2, 0, 0, 0, 0, 0]
+palette_2 = [palette_1[i].lighter(f) for i in range(3) for f in (0.2, 0.4, 0.6)]
 
 # init pie chart
 pie = perrot.pie.Pie(
@@ -17,8 +21,17 @@ pie = perrot.pie.Pie(
     legend_position = pero.RIGHT)
 
 # add rings
-pie.ring(values1, titles1, inner_radius=0.33, outer_radius=0.66, palette=pero.colors.Dark)
-pie.ring(values2, titles2, palette=pero.colors.Set2)
+pie.ring(values_1, titles_1, explode_1,
+    inner_radius = 0.25,
+    outer_radius = 0.5,
+    palette = palette_1,
+    label_text = lambda d: f"{d.value/sum(values_1):.0%}",
+    label_font_weight = pero.BOLD,
+    label_text_color = "w")
+
+pie.ring(values_2, titles_2, explode_2,
+    palette = palette_2,
+    label_font_size = 14)
 
 # show chart
-pie.show("Pie Chart", width=500, height=400)
+pie.show("Pie Chart", width=450, height=400)
