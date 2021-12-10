@@ -60,6 +60,7 @@ class InLegend(InGraphics):
     position = EnumProperty(POS_NE, enum=POSITION_COMPASS, dynamic=False)
     orientation = EnumProperty(ORI_VERTICAL, enum=ORIENTATION)
     
+    margin = QuadProperty(10, dynamic=False)
     radius = QuadProperty(3, dynamic=False)
     padding = QuadProperty(5, dynamic=False)
     spacing = NumProperty(5, dynamic=False)
