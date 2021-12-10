@@ -30,13 +30,11 @@ class Patch(InGraphics):
         fill properties:
             Includes pero.FillProperties to specify the patch fill.
         
-        x: int
-            Specifies the x-coordinate of the anchor. This is mostly used to
-            position the label.
+        label_x: int
+            Specifies the x-coordinate of the label.
         
-        y: int
-            Specifies the y-coordinate of the anchor. This is mostly used to
-            position the label.
+        label_y: int
+            Specifies the y-coordinate of the label.
     """
     
     value = NumProperty(0, dynamic=False)
@@ -45,8 +43,8 @@ class Patch(InGraphics):
     line = Include(LineProperties)
     fill = Include(FillProperties)
     
-    x = NumProperty(0, dynamic=False)
-    y = NumProperty(0, dynamic=False)
+    label_x = NumProperty(0, dynamic=False)
+    label_y = NumProperty(0, dynamic=False)
     
     
     def draw(self, canvas, source=UNDEF, **overrides):

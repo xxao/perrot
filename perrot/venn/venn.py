@@ -100,6 +100,8 @@ class Venn(Chart):
         if 'label' not in overrides:
             overrides['label'] = TextLabel(
                 text = lambda d: d.value,
+                x = lambda d: d.label_x,
+                y = lambda d: d.label_y,
                 font_size = 14,
                 text_align = TEXT_ALIGN_CENTER,
                 text_base = TEXT_BASE_MIDDLE)
@@ -114,9 +116,6 @@ class Venn(Chart):
         
         # init graphics
         self._init_graphics()
-        
-        # init colors
-        self._init_colors(force=False)
         
         # bind events
         self.bind(EVT_PROPERTY_CHANGED, self._on_venn_property_changed)
@@ -155,13 +154,13 @@ class Venn(Chart):
         label = self.get_property('label', source, overrides)
         
         # update legend
-        self._update_legend(canvas, source, overrides)
+        self._update_legend(canvas, source, **overrides)
         
         # init frames
         self.init_frames(canvas, source, **overrides)
         
         # update patches
-        self._update_patches(canvas, source, overrides)
+        self._update_patches(canvas, source, **overrides)
         
         # draw main bgr
         self.draw_bgr(canvas, source, **overrides)
@@ -196,9 +195,8 @@ class Venn(Chart):
         # draw labels
         if label:
             for obj in regions:
-                if obj.visible:
-                    obj_overrides = {'x': obj.x, 'y': obj.y}
-                    label.draw(canvas, obj, **obj_overrides)
+                if obj.is_visible(obj):
+                    label.draw(canvas, obj)
         
         # draw remaining objects
         for obj in others:
@@ -208,7 +206,7 @@ class Venn(Chart):
         # self.draw_frames(canvas)
     
     
-    def _update_legend(self, canvas, source, overrides):
+    def _update_legend(self, canvas, source=UNDEF, **overrides):
         """Updates legend items."""
         
         # check if visible
@@ -249,7 +247,7 @@ class Venn(Chart):
         self.legend.items = tuple(items)
     
     
-    def _update_patches(self, canvas, source, overrides):
+    def _update_patches(self, canvas, source=UNDEF, **overrides):
         """Updates circles and regions patches."""
         
         # get properties
@@ -267,13 +265,13 @@ class Venn(Chart):
         # update regions
         for obj in self._regions:
             obj.path = regions[obj.tag].path()
-            obj.x, obj.y = regions[obj.tag].anchor() or (0, 0)
+            obj.label_x, obj.label_y = regions[obj.tag].anchor() or (0, 0)
             obj.visible = not isinstance(regions[obj.tag], EmptyRegion)
         
         # update circles
         for i, obj in enumerate(self._circles):
             obj.path = Path().circle(coords[i][0], coords[i][1], radii[i])
-            obj.x, obj.y = coords[i]
+            obj.label_x, obj.label_y = coords[i]
     
     
     def _init_graphics(self):
@@ -288,6 +286,9 @@ class Venn(Chart):
         self.get_property(_CIRCLES[0]).value = a + ab + ac + abc
         self.get_property(_CIRCLES[1]).value = b + ab + bc + abc
         self.get_property(_CIRCLES[2]).value = c + ac + bc + abc
+        
+        # set circles fill
+        self._init_colors()
         
         # lock properties
         for key in _REGIONS + _CIRCLES:
@@ -310,21 +311,18 @@ class Venn(Chart):
             self.add(self.title)
     
     
-    def _init_colors(self, force=True):
+    def _init_colors(self):
         """Sets colors."""
         
         # init color scale
-        scale = OrdinalScale(
-            in_range = _CIRCLES,
+        color_scale = OrdinalScale(
             out_range = self.palette,
             implicit = True,
             recycle = True)
         
-        # set to circles
+        # update circles
         for obj in self._circles:
-            color = obj.get_property('fill_color')
-            if force or color is UNDEF:
-                obj.fill_color = scale.scale(obj.tag)
+            obj.fill_color = color_scale.scale(obj.tag)
     
     
     def _on_venn_property_changed(self, evt):

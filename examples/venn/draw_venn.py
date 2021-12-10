@@ -8,8 +8,6 @@ import perrot
 data = [10, 8, 22, 6, 9, 4, 2]
 # data = [10, 8, 22]
 
-s = sum(data)
-
 # create venn
 venn = perrot.venn.Venn(
     *data,
@@ -20,7 +18,7 @@ venn = perrot.venn.Venn(
     A_title = "Series A",
     B_title = "Series B",
     C_title = "Series C",
-    label_text = lambda d: f"{d.value}\n{d.value/s:.0%}")
+    label_text = lambda d: f"{d.value}\n{d.value/sum(data):.0%}")
 
 # show diagram
 venn.show("Venn Diagram", width=400, height=400)

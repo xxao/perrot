@@ -85,14 +85,14 @@ class Chart(Graphics):
     def __init__(self, **overrides):
         """Initializes a new instance of the Chart."""
         
+        # init base
+        super().__init__(**overrides)
+        
         # init container for all graphics
         self._graphics = {}
         
         # init data frame
         self._data_frame = Frame(0, 0, 1, 1)
-        
-        # init base
-        super().__init__(**overrides)
     
     
     @property
@@ -105,7 +105,7 @@ class Chart(Graphics):
                 Registered graphics.
         """
         
-        return self._graphics.values()
+        return tuple(self._graphics.values())
     
     
     def get_frame(self, tag=DATA_FRAME):
