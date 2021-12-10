@@ -44,6 +44,7 @@ understand all the following images. Check the image name and find corresponding
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_scatter.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_stacks.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/venn.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/pie.png" height="150"/>
 </p>
 
 
