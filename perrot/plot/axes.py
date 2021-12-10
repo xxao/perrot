@@ -657,16 +657,9 @@ class OrdinalAxis(Axis):
         
         labels: tuple
             Specifies the labels to be displayed.
-        
-        label_between: bool
-            Specifies whether labels should be in-between the major ticks (True)
-            or stick to them (False). If set to True, number of ticks should be
-            one item bigger compared to the labels, otherwise the last label
-            will not be shown.
     """
     
     labels = TupleProperty(UNDEF, intypes=(str,), dynamic=False)
-    label_between = BoolProperty(False)
     
     
     def __init__(self, **overrides):
@@ -705,33 +698,28 @@ class OrdinalAxis(Axis):
             self.ticker.formatter.labels = ()
             return
         
-        # labels between ticks
-        if self.label_between:
-            count = len(self.labels) + 1
-            ticks = tuple(range(count))
-            values = tuple(i+0.5 for i in ticks)
-            self.empty_range = (0, count-1)
-        
-        # labels on ticks
-        else:
-            count = len(self.labels)
-            ticks = tuple(range(count))
-            values = ticks
-            self.empty_range = (-0.5, count-0.5)
+        # init values
+        count = len(self.labels)
+        mapper_values = tuple(range(count))
+        major_ticks = tuple(range(count))
+        minor_ticks = tuple([-0.5] + [t + 0.5 for t in major_ticks])
+        full_range = (-0.5, count-0.5)
         
         # make mapper
         self.mapper = OrdinalScale(
             in_range = self.labels,
-            out_range = values,
+            out_range = mapper_values,
             default = UNDEF,
             implicit = False,
             recycle = False)
         
-        # update scale
-        self.scale.in_range = self.empty_range
+        # update range
+        self.empty_range = full_range
+        self.scale.in_range = full_range
         
         # update ticker
-        self.ticker.major_values = ticks
+        self.ticker.major_values = major_ticks
+        self.ticker.minor_values = minor_ticks
         self.ticker.formatter.labels = self.labels
     
     
@@ -739,7 +727,7 @@ class OrdinalAxis(Axis):
         """Called after any property has changed."""
         
         # labels changed
-        if evt.name in ('labels', 'label_between'):
+        if evt.name == 'labels':
             self._update_labels()
 
 
