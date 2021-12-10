@@ -79,7 +79,7 @@ class Chart(Graphics):
     
     bgr_line = Include(LineProperties, prefix="bgr_", dynamic=False, line_width=0)
     bgr_fill = Include(FillProperties, prefix="bgr_", dynamic=False, fill_color="#fff")
-    radius = QuadProperty(UNDEF, dynamic=False)
+    bgr_radius = QuadProperty(UNDEF, dynamic=False)
     
     
     def __init__(self, **overrides):
@@ -286,7 +286,7 @@ class Chart(Graphics):
         y = self.get_property('y', source, overrides)
         width = self.get_property('width', source, overrides)
         height = self.get_property('height', source, overrides)
-        radius = self.get_property('radius', source, overrides)
+        radius = self.get_property('bgr_radius', source, overrides)
         
         # get size from canvas
         if width is UNDEF:
