@@ -5,43 +5,55 @@ import pero
 import perrot
 
 # init chart
-chart = perrot.chart.Chart(
-    bgr_fill_color = pero.colors.LightGrey,
-)
+chart = perrot.chart.Chart()
 
-# add titles
-top_title = perrot.chart.Title(
+# init title
+title = perrot.chart.Title(
     position = pero.TOP,
     text = "Top Title",
     font_size = 14)
 
-bottom_title = perrot.chart.Title(
-    position = pero.BOTTOM,
-    text = "Bottom Title")
-
-left_title = perrot.chart.Title(
-    position = pero.LEFT,
-    text = "Left Title")
-
-right_title = perrot.chart.Title(
-    position = pero.RIGHT,
-    text = "Right Title")
-
-chart.add(top_title)
-chart.add(bottom_title)
-chart.add(left_title)
-chart.add(right_title)
-
-# add legend
-legend = perrot.chart.OutLegend(
+# init axes
+top_axis = perrot.chart.OrdinalAxis(
+    title = "Top Axis",
     position = pero.TOP,
-    orientation = pero.HORIZONTAL,
-    z_index = top_title.z_index - 1,
+    margin = 0,
+    scale_in_range = (0, 10),
+    labels = ("one", "two", "three", "four", "five"),
+    major_tick_size = 0)
+
+bottom_axis = perrot.chart.LinAxis(
+    title = "Bottom Axis",
+    position = pero.BOTTOM,
+    margin = 0,
+    scale_in_range = (-10, 10))
+
+left_axis = perrot.chart.LogAxis(
+    title = "Left Axis",
+    position = pero.LEFT,
+    margin = 0,
+    scale_in_range = (1, 10000))
+
+right_axis = perrot.chart.LinAxis(
+    title = "Right Axis",
+    position = pero.RIGHT,
+    margin = 0)
+
+# init legend
+legend = perrot.chart.InLegend(
+    position = pero.NE,
+    orientation = pero.VERTICAL,
     items = (
-        pero.MarkerLegend(text="Legend 1", marker='o', marker_fill_color='r'),
-        pero.MarkerLegend(text="Legend 2", marker='s', marker_fill_color='g'))
+        pero.MarkerLegend(text="Legend 1", marker='o', marker_fill_color='r', marker_line_width=0),
+        pero.MarkerLegend(text="Legend 2", marker='s', marker_fill_color='g', marker_line_width=0))
 )
 
+# add objects
+chart.add(top_axis)
+chart.add(bottom_axis)
+chart.add(left_axis)
+chart.add(right_axis)
+chart.add(title)
 chart.add(legend)
 
 # show chart

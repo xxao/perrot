@@ -9,3 +9,4 @@ from . graphics import ChartGraphics, InGraphics, OutGraphics
 from . chart import Chart
 from . title import Title
 from . legends import InLegend, OutLegend
+from . axes import Axis, LinAxis, LogAxis, OrdinalAxis, TimeAxis
