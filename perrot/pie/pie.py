@@ -3,9 +3,7 @@
 
 from pero.enums import *
 from pero.properties import *
-from pero import colors
-from pero import Path, TextLabel, MarkerLegend
-from pero import OrdinalScale
+from pero import MarkerLegend
 
 from .. chart import Chart, Title, OutLegend
 from . ring import Ring
@@ -71,10 +69,14 @@ class Pie(Chart):
     
     
     def draw(self, canvas, source=UNDEF, **overrides):
-        """Uses given canvas to draw the diagram."""
+        """Uses given canvas to draw the pie chart."""
+        
+        # check if visible
+        if not self.is_visible(source, overrides):
+            return
         
         # update legend
-        self._update_legend(canvas, source, overrides)
+        self._update_legend(canvas, source, **overrides)
         
         # init frames
         self.init_frames(canvas, source, **overrides)
@@ -88,14 +90,16 @@ class Pie(Chart):
         
         # get objects
         objects = list(self.graphics)
+        
         rings = [o for o in objects if isinstance(o, Ring)]
         rings.sort(key=lambda o: o.z_index, reverse=True)
+        
         others = [o for o in objects if not isinstance(o, Ring)]
         others.sort(key=lambda o: o.z_index)
         
         # calc rings radii
         data_frame = self.get_frame()
-        radii = self._calc_radii()
+        radii = self._calc_radii(canvas, source, **overrides)
         
         # draw rings
         for obj in rings:
@@ -132,7 +136,7 @@ class Pie(Chart):
     
     def remove(self, obj):
         """
-        Removes object corresponding to given tag.
+        Removes specified object.
         
         Args:
             obj: str or pero.Graphics
@@ -169,7 +173,7 @@ class Pie(Chart):
         self.add(Ring(values, titles, explode, **overrides))
     
     
-    def _calc_radii(self):
+    def _calc_radii(self, canvas, source=UNDEF, **overrides):
         """Calculates radii for each ring."""
         
         # init container
@@ -205,7 +209,7 @@ class Pie(Chart):
         return radii
     
     
-    def _update_legend(self, canvas, source, overrides):
+    def _update_legend(self, canvas, source=UNDEF, **overrides):
         """Updates legend items."""
         
         # check if visible
