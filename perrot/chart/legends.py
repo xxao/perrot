@@ -86,6 +86,16 @@ class InLegend(InGraphics):
         if not self.is_visible(source, overrides):
             return
         
+        # update legend glyph
+        self._update_glyph(canvas, source, **overrides)
+        
+        # draw legend
+        self._glyph.draw(canvas)
+    
+    
+    def _update_glyph(self, canvas, source=UNDEF, **overrides):
+        """Updates legend glyph."""
+        
         # get properties
         frame = self.get_property('frame', source, overrides)
         position = self.get_property('position', source, overrides)
@@ -99,46 +109,52 @@ class InLegend(InGraphics):
         self._glyph.anchor = position
         
         if position == POS_N:
-            self._glyph.x = frame.cx
-            self._glyph.y = frame.y1 + margin[0]
+            x = frame.cx
+            y = frame.y1 + margin[0]
         
         elif position == POS_NE:
-            self._glyph.x = frame.x2 - margin[1]
-            self._glyph.y = frame.y1 + margin[0]
+            x = frame.x2 - margin[1]
+            y = frame.y1 + margin[0]
         
         elif position == POS_E:
-            self._glyph.x = frame.x2 - margin[1]
-            self._glyph.y = frame.cy
+            x = frame.x2 - margin[1]
+            y = frame.cy
         
         elif position == POS_SE:
-            self._glyph.x = frame.x2 - margin[1]
-            self._glyph.y = frame.y2 - margin[2]
+            x = frame.x2 - margin[1]
+            y = frame.y2 - margin[2]
         
         elif position == POS_S:
-            self._glyph.x = frame.cx
-            self._glyph.y = frame.y2 - margin[2]
+            x = frame.cx
+            y = frame.y2 - margin[2]
         
         elif position == POS_SW:
-            self._glyph.x = frame.x1 + margin[3]
-            self._glyph.y = frame.y2 - margin[2]
+            x = frame.x1 + margin[3]
+            y = frame.y2 - margin[2]
         
         elif position == POS_W:
-            self._glyph.x = frame.x1 + margin[3]
-            self._glyph.y = frame.cy
+            x = frame.x1 + margin[3]
+            y = frame.cy
         
         elif position == POS_NW:
-            self._glyph.x = frame.x1 + margin[3]
-            self._glyph.y = frame.y1 + margin[0]
+            x = frame.x1 + margin[3]
+            y = frame.y1 + margin[0]
         
         elif position == POS_C:
-            self._glyph.x = frame.cx
-            self._glyph.y = frame.cy
+            x = frame.cx
+            y = frame.cy
         
-        # update glyph properties
+        else:
+            x = frame.x2 - margin[1]
+            y = frame.y1 + margin[0]
+        
+        # update glyph shared
         self._glyph.set_properties_from(self, source=source, overrides=overrides)
         
-        # draw legend
-        self._glyph.draw(canvas)
+        # update glyph
+        self._glyph.anchor = position
+        self._glyph.x = x
+        self._glyph.y = y
 
 
 class OutLegend(OutGraphics):
@@ -240,6 +256,16 @@ class OutLegend(OutGraphics):
         if not self.is_visible(source, overrides):
             return
         
+        # update legend glyph
+        self._update_glyph(canvas, source, **overrides)
+        
+        # draw legend
+        self._glyph.draw(canvas)
+    
+    
+    def _update_glyph(self, canvas, source=UNDEF, **overrides):
+        """Updates legend glyph."""
+        
         # get properties
         frame = self.get_property('frame', source, overrides)
         position = self.get_property('position', source, overrides)
@@ -247,29 +273,36 @@ class OutLegend(OutGraphics):
         # check values
         position = position or POS_RIGHT
         
-        # set anchor
+        # get anchor
         if position == POS_TOP:
-            self._glyph.anchor = POS_N
-            self._glyph.x = frame.cx
-            self._glyph.y = frame.y1
+            anchor = POS_N
+            x = frame.cx
+            y = frame.y1
         
         elif position == POS_RIGHT:
-            self._glyph.anchor = POS_E
-            self._glyph.x = frame.x2
-            self._glyph.y = frame.cy
+            anchor = POS_E
+            x = frame.x2
+            y = frame.cy
         
         elif position == POS_BOTTOM:
-            self._glyph.anchor = POS_S
-            self._glyph.x = frame.cx
-            self._glyph.y = frame.y2
+            anchor = POS_S
+            x = frame.cx
+            y = frame.y2
         
         elif position == POS_LEFT:
-            self._glyph.anchor = POS_W
-            self._glyph.x = frame.x1
-            self._glyph.y = frame.cy
+            anchor = POS_W
+            x = frame.x1
+            y = frame.cy
         
-        # update glyph properties
+        else:
+            anchor = POS_E
+            x = frame.x2
+            y = frame.cy
+        
+        # update glyph shared
         self._glyph.set_properties_from(self, source=source, overrides=overrides)
         
-        # draw legend
-        self._glyph.draw(canvas)
+        # update glyph
+        self._glyph.anchor = anchor
+        self._glyph.x = x
+        self._glyph.y = y

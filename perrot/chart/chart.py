@@ -220,7 +220,7 @@ class Chart(Graphics):
     
     def remove(self, obj):
         """
-        Removes object corresponding to given tag.
+        Removes specified object.
         
         This method only serves to de-register the object. Consider overriding
         in derived classes to perform any required checks and call this base
@@ -246,6 +246,10 @@ class Chart(Graphics):
     
     def draw(self, canvas, source=UNDEF, **overrides):
         """Uses given canvas to draw the chart."""
+        
+        # check if visible
+        if not self.is_visible(source, overrides):
+            return
         
         # init frames
         self.init_frames(canvas, source, **overrides)

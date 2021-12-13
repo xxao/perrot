@@ -150,6 +150,10 @@ class Venn(Chart):
     def draw(self, canvas, source=UNDEF, **overrides):
         """Uses given canvas to draw the diagram."""
         
+        # check if visible
+        if not self.is_visible(source, overrides):
+            return
+        
         # get properties
         label = self.get_property('label', source, overrides)
         

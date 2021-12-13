@@ -32,12 +32,14 @@ left_axis = perrot.chart.LogAxis(
     title = "Left Axis",
     position = pero.LEFT,
     margin = 0,
-    scale_in_range = (1, 10000))
+    scale_in_range = (1, 1e4))
 
 right_axis = perrot.chart.LinAxis(
     title = "Right Axis",
     position = pero.RIGHT,
-    margin = 0)
+    margin = 0,
+    scale_in_range = (1, 1e9),
+    ticker_formatter_hide_suffix = True)
 
 # init legend
 legend = perrot.chart.InLegend(

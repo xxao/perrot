@@ -276,8 +276,6 @@ class Axis(OutGraphics):
         label_offset = self.get_property('label_offset', source, overrides)
         
         # make ticks
-        ticker.start = scale.in_range[0]
-        ticker.end = scale.in_range[1]
         major_ticks = tuple(map(scale.scale, ticker.major_ticks()))
         minor_ticks = tuple(map(scale.scale, ticker.minor_ticks()))
         
@@ -291,7 +289,7 @@ class Axis(OutGraphics):
         label_offset += ticks_extent
         title_offset += ticks_extent + labels_extent
         
-        # get anchor coords
+        # get anchor
         if position == POS_LEFT:
             x = frame.x2
             y = frame.y1
@@ -315,10 +313,10 @@ class Axis(OutGraphics):
         # get length
         length = abs(scale.out_range[1] - scale.out_range[0])
         
-        # update glyph
+        # update glyph shared
         self._glyph.set_properties_from(self, source=source, overrides=overrides)
         
-        # draw axis
+        # update glyph
         self._glyph.x = x
         self._glyph.y = y
         self._glyph.length = length
@@ -337,6 +335,7 @@ class Axis(OutGraphics):
         frame = self.get_property('frame', source, overrides)
         position = self.get_property('position', source, overrides)
         scale = self.get_property('scale', source, overrides)
+        ticker = self.get_property('ticker', source, overrides)
         
         # update scale
         if position == POS_LEFT:
@@ -353,10 +352,17 @@ class Axis(OutGraphics):
         
         else:
             scale.out_range = frame.x1, frame.x2
+        
+        # update ticker
+        ticker.start = scale.in_range[0]
+        ticker.end = scale.in_range[1]
     
     
-    def _update_position(self, keep={}):
+    def _update_position(self, canvas=None, source=UNDEF, **overrides):
         """Updates properties according to current position."""
+        
+        # get properties
+        position = self.get_property('position', source, overrides)
         
         # init values
         title_text_align = UNDEF
@@ -365,49 +371,42 @@ class Axis(OutGraphics):
         label_text_base = UNDEF
         
         # left axis
-        if self.position == POS_LEFT:
+        if position == POS_LEFT:
             title_text_align = TEXT_ALIGN_CENTER
             title_text_base = TEXT_BASE_BOTTOM
             label_text_align = TEXT_ALIGN_RIGHT
             label_text_base = TEXT_BASE_MIDDLE
         
         # right axis
-        elif self.position == POS_RIGHT:
+        elif position == POS_RIGHT:
             title_text_align = TEXT_ALIGN_CENTER
             title_text_base = TEXT_BASE_BOTTOM
             label_text_align = TEXT_ALIGN_LEFT
             label_text_base = TEXT_BASE_MIDDLE
         
         # top axis
-        elif self.position == POS_TOP:
+        elif position == POS_TOP:
             title_text_align = TEXT_ALIGN_CENTER
             title_text_base = TEXT_BASE_BOTTOM
             label_text_align = TEXT_ALIGN_CENTER
             label_text_base = TEXT_BASE_BOTTOM
         
         # bottom axis
-        elif self.position == POS_BOTTOM:
+        elif position == POS_BOTTOM:
             title_text_align = TEXT_ALIGN_CENTER
             title_text_base = TEXT_BASE_TOP
             label_text_align = TEXT_ALIGN_CENTER
             label_text_base = TEXT_BASE_TOP
         
         # automatic
-        elif self.position != UNDEF:
+        elif position != UNDEF:
             return
         
         # apply
-        if 'title_text_align' not in keep:
-            self.title_text_align = title_text_align
-        
-        if 'title_text_base' not in keep:
-            self.title_text_base = title_text_base
-        
-        if 'label_text_align' not in keep:
-            self.label_text_align = label_text_align
-        
-        if 'label_text_base' not in keep:
-            self.label_text_base = label_text_base
+        self.title_text_align = title_text_align
+        self.title_text_base = title_text_base
+        self.label_text_align = label_text_align
+        self.label_text_base = label_text_base
     
     
     def _on_axis_property_changed(self, evt):
