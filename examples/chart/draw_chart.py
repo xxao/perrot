@@ -5,57 +5,78 @@ import pero
 import perrot
 
 # init chart
-chart = perrot.chart.Chart()
+chart = perrot.chart.Chart(
+    frame_line_width = 1,
+    frame_line_color = "k",
+    frame_fill_color = "#fff",
+    bgr_fill_color = "#eee"
+    )
 
-# init title
+# init titles
 title = perrot.chart.Title(
     position = pero.TOP,
-    text = "Top Title",
+    text = "Chart Title",
     font_size = 14)
 
-# init axes
-top_axis = perrot.chart.OrdinalAxis(
-    title = "Top Axis",
+sub_title = perrot.chart.Title(
     position = pero.TOP,
-    margin = 0,
-    scale_in_range = (0, 10),
-    labels = ("one", "two", "three", "four", "five"),
-    major_tick_size = 0)
+    text = "Sub Title",
+    font_size = 10)
 
-bottom_axis = perrot.chart.LinAxis(
-    title = "Bottom Axis",
+# init axes
+x_axis = perrot.chart.LinAxis(
+    title = "X-Axis",
     position = pero.BOTTOM,
     margin = 0,
     scale_in_range = (-10, 10))
 
-left_axis = perrot.chart.LogAxis(
-    title = "Left Axis",
+y_axis = perrot.chart.LogAxis(
+    title = "Y-Axis",
     position = pero.LEFT,
     margin = 0,
     scale_in_range = (1, 1e4))
 
-right_axis = perrot.chart.LinAxis(
-    title = "Right Axis",
-    position = pero.RIGHT,
-    margin = 0,
-    scale_in_range = (1, 1e9),
-    ticker_formatter_hide_suffix = True)
+# init grids
+x_major_grid = perrot.chart.Grid(
+    mode = perrot.chart.GRID_MAJOR,
+    orientation = pero.VERTICAL,
+    scale = x_axis.scale,
+    ticker = x_axis.ticker)
+
+y_major_grid = perrot.chart.Grid(
+    mode = perrot.chart.GRID_MAJOR,
+    orientation = pero.HORIZONTAL,
+    scale = y_axis.scale,
+    ticker = y_axis.ticker)
+
+y_minor_grid = perrot.chart.Grid(
+    mode = perrot.chart.GRID_MINOR,
+    orientation = pero.HORIZONTAL,
+    scale = y_axis.scale,
+    ticker = y_axis.ticker,
+    line_color = "#f5f5f5ff")
 
 # init legend
-legend = perrot.chart.InLegend(
+legend = perrot.chart.InsideLegend(
     position = pero.NE,
     orientation = pero.VERTICAL,
+    static = True,
     items = (
         pero.MarkerLegend(text="Legend 1", marker='o', marker_fill_color='r', marker_line_width=0),
         pero.MarkerLegend(text="Legend 2", marker='s', marker_fill_color='g', marker_line_width=0))
 )
 
 # add objects
-chart.add(top_axis)
-chart.add(bottom_axis)
-chart.add(left_axis)
-chart.add(right_axis)
+chart.add(sub_title)
 chart.add(title)
+
+chart.add(x_axis)
+chart.add(x_major_grid)
+
+chart.add(y_axis)
+chart.add(y_minor_grid)
+chart.add(y_major_grid)
+
 chart.add(legend)
 
 # show chart

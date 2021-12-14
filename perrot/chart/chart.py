@@ -9,6 +9,7 @@ from pero import colors
 
 from . enums import *
 from . graphics import InGraphics, OutGraphics
+from . axes import Axis
 
 
 class Chart(Graphics):
@@ -35,25 +36,35 @@ class Chart(Graphics):
             Specifies the inner space of the chart as a single value or values
             for individual sides starting from top.
         
-        data_frame_x1: int, float or UNDEF
+        frame_x1: int, float or UNDEF
             Specifies the fixed x-coordinate of the left edge of the inside
             data frame. If not provided it is determined automatically by chart
             graphics.
         
-        data_frame_x2: int, float or UNDEF
+        frame_x2: int, float or UNDEF
             Specifies the fixed x-coordinate of the right edge of the inside
             data frame. If not provided it is determined automatically by chart
             graphics.
         
-        data_frame_y1: int, float or UNDEF
+        frame_y1: int, float or UNDEF
             Specifies the fixed y-coordinate of the top edge of the inside
             data frame. If not provided it is determined automatically by chart
             graphics.
         
-        data_frame_y2: int, float or UNDEF
+        frame_y2: int, float or UNDEF
             Specifies the fixed y-coordinate of the bottom edge of the inside
             data frame. If not provided it is determined automatically by chart
             graphics.
+        
+        frame_line properties:
+            Includes pero.LineProperties to specify the data frame outline.
+        
+        frame_fill properties:
+            Includes pero.FillProperties to specify the data frame fill.
+        
+        frame_radius: int, float, (int,), (float,) or UNDEF
+            Specifies the corner radius of the data frame as a single value
+            or values for individual corners starting from top-left.
         
         bgr_line properties:
             Includes pero.LineProperties to specify the full chart outline.
@@ -61,7 +72,7 @@ class Chart(Graphics):
         bgr_fill properties:
             Includes pero.FillProperties to specify the full chart fill.
         
-        radius: int, float, (int,), (float,) or UNDEF
+        bgr_radius: int, float, (int,), (float,) or UNDEF
             Specifies the corner radius of the full chart box as a single value
             or values for individual corners starting from top-left.
     """
@@ -72,10 +83,14 @@ class Chart(Graphics):
     height = NumProperty(UNDEF, dynamic=False)
     padding = QuadProperty(10, dynamic=False)
     
-    data_frame_x1 = NumProperty(UNDEF)
-    data_frame_x2 = NumProperty(UNDEF)
-    data_frame_y1 = NumProperty(UNDEF)
-    data_frame_y2 = NumProperty(UNDEF)
+    frame_x1 = NumProperty(UNDEF)
+    frame_x2 = NumProperty(UNDEF)
+    frame_y1 = NumProperty(UNDEF)
+    frame_y2 = NumProperty(UNDEF)
+    
+    frame_line = Include(LineProperties, prefix="frame_", dynamic=False, line_width=0)
+    frame_fill = Include(FillProperties, prefix="frame_", dynamic=False)
+    frame_radius = QuadProperty(UNDEF, dynamic=False)
     
     bgr_line = Include(LineProperties, prefix="bgr_", dynamic=False, line_width=0)
     bgr_fill = Include(FillProperties, prefix="bgr_", dynamic=False, fill_color="#fff")
@@ -88,8 +103,10 @@ class Chart(Graphics):
         # init base
         super().__init__(**overrides)
         
-        # init container for all graphics
+        # init containers
         self._graphics = {}
+        self._axes = []
+        self._mapping = {}
         
         # init data frame
         self._data_frame = Frame(0, 0, 1, 1)
@@ -108,13 +125,30 @@ class Chart(Graphics):
         return tuple(self._graphics.values())
     
     
-    def get_frame(self, tag=DATA_FRAME):
+    @property
+    def axes(self):
+        """
+        Gets all available axes.
+        
+        Returns:
+            (perrot.chart.Axis,)
+                All available axes.
+        """
+        
+        return tuple(self._axes)
+    
+    
+    def get_frame(self, tag=DATA_FRAME, silent=False):
         """
         Gets logical frame of an object specified by given tag.
         
         Args:
             tag: str
                 Object's unique tag.
+            
+            silent: bool
+                If set to True, no error message is shown for unknown objects
+                and None is returned.
         
         Returns:
             pero.Frame or None
@@ -126,17 +160,21 @@ class Chart(Graphics):
             return self._data_frame
         
         # object frame
-        obj = self.get_obj(tag)
+        obj = self.get_obj(tag, silent)
         return obj.frame if obj is not None else None
     
     
-    def get_obj(self, tag):
+    def get_obj(self, tag, silent=False):
         """
         Gets object for given tag.
         
         Args:
             tag: str
                 Object's unique tag.
+            
+            silent: bool
+                If set to True, no error message is shown for unknown objects
+                and None is returned.
         
         Returns:
             pero.Graphics or None
@@ -147,7 +185,14 @@ class Chart(Graphics):
         tag = tag.tag if isinstance(tag, Graphics) else tag
         
         # get object
-        return self._graphics.get(tag, None)
+        obj = self._graphics.get(tag, None)
+        
+        # check if known
+        if obj is None and not silent:
+            message = "Cannot find the object by tag '%s'!" % tag
+            raise KeyError(message)
+        
+        return obj
     
     
     def get_obj_below(self, x, y):
@@ -186,6 +231,30 @@ class Chart(Graphics):
         return objects[0]
     
     
+    def get_obj_axes(self, obj):
+        """
+        Gets all axes associated with specified object.
+        
+        Args:
+            obj: str or pero.Graphics
+                Object's unique tag or the object itself.
+        
+        Returns:
+            (perrot.chartAxis,)
+                Associated axes.
+        """
+        
+        # get object
+        obj = self.get_obj(obj)
+        
+        # get mapping
+        mapping = self._mapping.get(obj.tag, None)
+        if not mapping:
+            return ()
+        
+        return tuple(self._graphics[t] for t in mapping.keys())
+    
+    
     def add(self, obj):
         """
         Adds additional graphics to the chart.
@@ -211,11 +280,15 @@ class Chart(Graphics):
         
         # set z-index
         if obj.z_index is UNDEF:
-            z_indices = [1] + [o.z_index for o in self._graphics.values() if o.z_index]
+            z_indices = [0] + [o.z_index for o in self.graphics if o.z_index]
             obj.z_index = max(z_indices) + 1
         
         # register object
         self._graphics[obj.tag] = obj
+        
+        # add to axes
+        if isinstance(obj, Axis):
+            self._axes.append(obj)
     
     
     def remove(self, obj):
@@ -231,17 +304,69 @@ class Chart(Graphics):
                 Object's unique tag or the object itself.
         """
         
-        # get object tag
-        tag = obj.tag if isinstance(obj, Graphics) else obj
-        
         # get object
-        obj = self._graphics.get(tag, None)
-        if obj is None:
-            message = "Cannot find object by tag '%s'!" % tag
-            raise ValueError(message)
+        obj = self.get_obj(obj)
+        
+        # remove axis
+        if isinstance(obj, Axis):
+            
+            # check mapping
+            axes = [y for x in self._mapping.values() for y in x]
+            if obj.tag in axes:
+                message = "Axis '%s' is used by another graphics and cannot be removed!" % obj.tag
+                raise ValueError(message)
+            
+            # remove axis
+            self._axes.remove(obj)
+        
+        # remove mapping
+        if obj.tag in self._mapping:
+            del self._mapping[obj.tag]
         
         # remove object
-        del self._graphics[tag]
+        del self._graphics[obj.tag]
+    
+    
+    def map(self, obj, axis, scale='scale'):
+        """
+        Maps object to specific axis to share and update the scale. Current
+        object mapping can be removed by providing None instead of the axis.
+        
+        Args:
+            obj: str or pero.Graphics
+                Unique tag of the object or the object itself.
+            
+            axis: str, perrot.chart.Axis or None
+                Unique tag of the axis or the axis itself.
+            
+            scale: str or None
+                Scale property name of the object to be synced with the axis.
+        """
+        
+        # get object
+        obj = self.get_obj(obj)
+        
+        # remove mapping
+        if axis is None:
+            del self._mapping[obj.tag]
+            return
+        
+        # get axis
+        axis = self.get_obj(axis)
+        
+        # check scale property
+        if not obj.has_property(scale):
+            message = "Object doesn't have the property '%s'!" % scale
+            raise AttributeError(message)
+        
+        # get existing mapping
+        mapping = self._mapping.get(obj.tag, {})
+        
+        # add/replace by given axis
+        mapping[axis.tag] = {'scale': scale}
+        
+        # store new mapping
+        self._mapping[obj.tag] = mapping
     
     
     def draw(self, canvas, source=UNDEF, **overrides):
@@ -261,6 +386,9 @@ class Chart(Graphics):
         if self._data_frame.reversed:
             return
         
+        # draw data frame fill
+        self.draw_frame(canvas, source, frame_line_width=0, **overrides)
+        
         # get objects
         objects = list(self._graphics.values())
         objects.sort(key=lambda o: o.z_index)
@@ -273,13 +401,16 @@ class Chart(Graphics):
                 if obj.visible:
                     obj.draw(canvas)
         
+        # draw data frame outline
+        self.draw_frame(canvas, source, frame_fill_style=TRANS, **overrides)
+        
         # draw outside objects
         for obj in out_objects:
             if obj.visible:
                 obj.draw(canvas)
         
         # draw debug frames
-        # self.draw_frames(canvas, source, **overrides)
+        # self.draw_debug_frames(canvas, source, **overrides)
     
     
     def draw_bgr(self, canvas, source=UNDEF, **overrides):
@@ -304,7 +435,19 @@ class Chart(Graphics):
         canvas.draw_rect(x, y, width, height, radius)
     
     
-    def draw_frames(self, canvas, source=UNDEF, **overrides):
+    def draw_frame(self, canvas, source=UNDEF, **overrides):
+        """Uses given canvas to draw the data frame."""
+        
+        # get properties
+        radius = self.get_property('frame_radius', source, overrides)
+        
+        # draw frame
+        canvas.set_pen_by(self, prefix="frame_", source=source, overrides=overrides)
+        canvas.set_brush_by(self, prefix="frame_", source=source, overrides=overrides)
+        canvas.draw_rect(*self._data_frame.rect, radius)
+    
+    
+    def draw_debug_frames(self, canvas, source=UNDEF, **overrides):
         """Draws main objects frames (for debugging)."""
         
         # init color scale
@@ -361,10 +504,10 @@ class Chart(Graphics):
         height = self.get_property('height', source, overrides)
         padding = self.get_property('padding', source, overrides)
         
-        data_frame_x1 = self.get_property('data_frame_x1', source, overrides)
-        data_frame_x2 = self.get_property('data_frame_x2', source, overrides)
-        data_frame_y1 = self.get_property('data_frame_y1', source, overrides)
-        data_frame_y2 = self.get_property('data_frame_y2', source, overrides)
+        frame_x1 = self.get_property('frame_x1', source, overrides)
+        frame_x2 = self.get_property('frame_x2', source, overrides)
+        frame_y1 = self.get_property('frame_y1', source, overrides)
+        frame_y2 = self.get_property('frame_y2', source, overrides)
         
         # get size from canvas
         if width is UNDEF:
@@ -431,23 +574,23 @@ class Chart(Graphics):
                 raise ValueError(message)
         
         # init inside data frame
-        if data_frame_x1 is UNDEF:
-            data_frame_x1 = x + padding[3] + sum(left_extents) + sum(left_margins[:-1])
+        if frame_x1 is UNDEF:
+            frame_x1 = x + padding[3] + sum(left_extents) + sum(left_margins[:-1])
         
-        if data_frame_x2 is UNDEF:
-            data_frame_x2 = x - padding[1] + width - sum(right_extents) - sum(right_margins[:-1])
+        if frame_x2 is UNDEF:
+            frame_x2 = x - padding[1] + width - sum(right_extents) - sum(right_margins[:-1])
         
-        if data_frame_y1 is UNDEF:
-            data_frame_y1 = y + padding[0] + sum(top_extents) + sum(top_margins[:-1])
+        if frame_y1 is UNDEF:
+            frame_y1 = y + padding[0] + sum(top_extents) + sum(top_margins[:-1])
         
-        if data_frame_y2 is UNDEF:
-            data_frame_y2 = y - padding[2] + height - sum(bottom_extents) - sum(bottom_margins[:-1])
+        if frame_y2 is UNDEF:
+            frame_y2 = y - padding[2] + height - sum(bottom_extents) - sum(bottom_margins[:-1])
         
         self._data_frame = Frame(
-            data_frame_x1,
-            data_frame_y1,
-            data_frame_x2-data_frame_x1,
-            data_frame_y2-data_frame_y1)
+            frame_x1,
+            frame_y1,
+            frame_x2-frame_x1,
+            frame_y2-frame_y1)
         
         # make frame for left objects
         shift = self._data_frame.x1 - left_margins[0]

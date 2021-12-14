@@ -7,7 +7,7 @@ from pero import colors
 from pero import Path, TextLabel, MarkerLegend
 from pero import OrdinalScale
 
-from .. chart import Chart, Title, OutLegend
+from .. chart import Chart, Title, Legend
 from . enums import *
 from . import utils
 from . regions import EmptyRegion
@@ -40,7 +40,7 @@ class Venn(Chart):
         title: perrot.chart.Title, None or UNDEF
             Specifies the title display graphics.
         
-        legend: perrot.chart.OutLegend, None or UNDEF
+        legend: perrot.chart.Legend, None or UNDEF
             Specifies the legend display graphics.
         
         label: pero.TextLabel
@@ -63,7 +63,7 @@ class Venn(Chart):
     C = Property(UNDEF, types=(CirclePatch,), dynamic=False, nullable=False)
     
     title = Property(UNDEF, types=(Title,), dynamic=False, nullable=True)
-    legend = Property(UNDEF, types=(OutLegend,), dynamic=False, nullable=True)
+    legend = Property(UNDEF, types=(Legend,), dynamic=False, nullable=True)
     label = Property(UNDEF, types=(TextLabel,), dynamic=False, nullable=True)
     
     
@@ -91,7 +91,7 @@ class Venn(Chart):
         
         # init legend
         if 'legend' not in overrides:
-            overrides['legend'] = OutLegend(
+            overrides['legend'] = Legend(
                 tag = 'legend',
                 position = POS_BOTTOM,
                 orientation = ORI_HORIZONTAL)
@@ -207,7 +207,7 @@ class Venn(Chart):
             obj.draw(canvas)
         
         # draw debug frames
-        # self.draw_frames(canvas)
+        # self.draw_debug_frames(canvas)
     
     
     def _update_legend(self, canvas, source=UNDEF, **overrides):

@@ -5,7 +5,7 @@ from pero.enums import *
 from pero.properties import *
 from pero import MarkerLegend
 
-from .. chart import Chart, Title, OutLegend
+from .. chart import Chart, Title, Legend
 from . ring import Ring
 
 
@@ -18,12 +18,12 @@ class Pie(Chart):
         title: perrot.chart.Title, None or UNDEF
             Specifies the title display graphics.
         
-        legend: perrot.chart.OutLegend, None or UNDEF
+        legend: perrot.chart.Legend, None or UNDEF
             Specifies the legend display graphics.
     """
     
     title = Property(UNDEF, types=(Title,), dynamic=False, nullable=True)
-    legend = Property(UNDEF, types=(OutLegend,), dynamic=False, nullable=True)
+    legend = Property(UNDEF, types=(Legend,), dynamic=False, nullable=True)
     
     
     def __init__(self, **overrides):
@@ -37,7 +37,7 @@ class Pie(Chart):
         
         # init legend
         if 'legend' not in overrides:
-            overrides['legend'] = OutLegend(
+            overrides['legend'] = Legend(
                 tag = 'legend',
                 position = POS_RIGHT,
                 orientation = ORI_VERTICAL)
@@ -114,7 +114,7 @@ class Pie(Chart):
             obj.draw(canvas)
         
         # draw debug frames
-        # self.draw_frames(canvas)
+        # self.draw_debug_frames(canvas)
     
     
     def add(self, obj):

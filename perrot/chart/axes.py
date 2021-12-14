@@ -6,17 +6,25 @@ from pero.properties import *
 from pero import StraitAxis
 from pero import Scale, ContinuousScale, LinScale, LogScale, OrdinalScale
 from pero import Ticker, LinTicker, LogTicker, FixTicker, TimeTicker
-from pero import IndexFormatter
+from pero import Formatter, IndexFormatter
 
 from . graphics import OutGraphics
 
 
 class Axis(OutGraphics):
     """
-    Axis provides a standard type of axis used for Cartesian plots. It is drawn
-    as a horizontal or vertical line with ticks and labels. It is using
-    specified 'scale' and 'ticker' instances to convert coordinates between
-    original data units to device output positions.
+    Axis provides a wrapper for the pero.StraitAxis glyph to draw axes in
+    charts. It is using specified 'scale' and 'ticker' instances to convert
+    coordinates between original data units to device output positions.
+    
+    There are some additional properties like 'autoscale', 'symmetric',
+    'check_limits', 'includes' etc., which have no direct effect on the
+    axis but can be used by parent chart to correctly adjust the scaling along
+    particular axis and influence chart interactivity.
+    
+    For some tools it might be convenient to 'format' a real value using axis
+    scale and ticker formatter. If specific formatter is needed it can be
+    provided by the 'tooltip' property.
     
     Properties:
         
@@ -97,6 +105,39 @@ class Axis(OutGraphics):
         
         minor_tick_offset: int or float
             Specifies the shift of the minor ticks from the main line.
+        
+        static: bool
+            Specifies whether the range should be fixed (True) or whether it
+            should be changed by current data, zooming and panning.
+        
+        autoscale: bool
+            Specifies whether the range should be set automatically according to
+            currently displayed data.
+        
+        symmetric: bool
+            Specifies whether the range should always be adjusted to be
+            symmetrical along zero.
+        
+        includes: tuple, None or UNDEF
+            Specifies the values to be always within the displayed range.
+        
+        check_limits: bool
+            Specifies whether displayed range should not exceed the limits
+            defined by current data. This value is used to limit zooming and
+            panning.
+        
+        empty_range: tuple
+            Specifies the default range to be used if there are no data in the
+            chart.
+        
+        tooltip: pero.Formatter, None or UNDEF
+            Specifies the explicit formatter to be used by the 'format' method.
+            If set to None the empty string is returned. If set to UNDEF the
+            formatter defined by current ticker is used.
+        
+        tooltip_resaware: bool
+            Specifies whether custom tooltip formatter domain and precision
+            should be set automatically based on current axis resolution.
     """
     
     show_title = BoolProperty(True, dynamic=False)
@@ -129,9 +170,19 @@ class Axis(OutGraphics):
     minor_tick_size = NumProperty(3, dynamic=False)
     minor_tick_offset = NumProperty(0, dynamic=False)
     
+    static = BoolProperty(False, dynamic=False)
+    autoscale = BoolProperty(False, dynamic=False)
+    symmetric = BoolProperty(False, dynamic=False)
+    includes = TupleProperty(UNDEF, intypes=(float, int), dynamic=False, nullable=True)
+    check_limits = BoolProperty(False, dynamic=False)
+    empty_range = TupleProperty((0., 1.), intypes=(float, int), dynamic=False)
+    
+    tooltip = Property(UNDEF, types=(Formatter,), dynamic=False, nullable=True)
+    tooltip_resaware = BoolProperty(True, dynamic=False)
+    
     
     def __init__(self, **overrides):
-        """Initializes a new instance of axis."""
+        """Initializes a new instance of the Axis."""
         
         # init scale
         if 'scale' not in overrides:
@@ -156,7 +207,7 @@ class Axis(OutGraphics):
     
     def get_extent(self, canvas, source=UNDEF, **overrides):
         """
-        This method is automatically called by parent plot to get amount of
+        This method is automatically called by parent chart to get amount of
         logical space needed to draw the object.
         """
         
@@ -165,6 +216,23 @@ class Axis(OutGraphics):
         extent += self._get_title_extent(canvas, source, **overrides)
         
         return extent
+    
+    
+    def get_range(self, device=False):
+        """
+        Gets current displayed range of the axis using device or data units.
+        
+        Args:
+            device: bool
+                If set to True, device units are returned instead of real data
+                units.
+        
+        Returns:
+            (float, float)
+                Current range.
+        """
+        
+        return self.scale.out_range if device else self.scale.in_range
     
     
     def draw(self, canvas, source=UNDEF, **overrides):
@@ -182,6 +250,67 @@ class Axis(OutGraphics):
         
         # draw axis
         self._glyph.draw(canvas)
+    
+    
+    def zoom(self, start=None, end=None):
+        """
+        Sets current displayed range of the axis using real data units. If None
+        is set for particular value, current value is kept.
+        
+        Args:
+            start: float or None
+                Axis start value.
+            
+            end: float or None
+                Axis end value.
+        """
+        
+        # get limits if not set
+        if start is None:
+            start = self.scale.in_range[0]
+        if end is None:
+            end = self.scale.in_range[1]
+        
+        # update scale
+        self.scale.in_range = (start, end)
+        
+        # update ticker
+        self.ticker.start = self.scale.in_range[0]
+        self.ticker.end = self.scale.in_range[1]
+    
+    
+    def format(self, value):
+        """
+        Formats given value using defined tooltip or ticker formatter.
+        
+        Args:
+            value: any
+                Raw value to be formatted.
+        
+        Returns:
+            str
+                Formatted value.
+        """
+        
+        # tooltip disabled
+        if self.tooltip is None:
+            return ""
+        
+        # use ticker formatter
+        if self.tooltip is UNDEF:
+            formatter = self.ticker.formatter
+        
+        # use custom formatter
+        else:
+            formatter = self.tooltip
+            if self.tooltip_resaware:
+                in_range = self.scale.in_range[1] - self.scale.in_range[0]
+                out_range = self.scale.out_range[1] - self.scale.out_range[0]
+                formatter.domain = in_range
+                formatter.precision = in_range / out_range
+        
+        # format value
+        return formatter.format(value) + formatter.suffix()
     
     
     def _get_ticks_extent(self, canvas, source=UNDEF, **overrides):
@@ -276,12 +405,14 @@ class Axis(OutGraphics):
         label_offset = self.get_property('label_offset', source, overrides)
         
         # make ticks
+        ticker.start = scale.in_range[0]
+        ticker.end = scale.in_range[1]
         major_ticks = tuple(map(scale.scale, ticker.major_ticks()))
         minor_ticks = tuple(map(scale.scale, ticker.minor_ticks()))
         
         # make title and labels
         labels = ticker.labels()
-        title = title + self.ticker.suffix() if title else ""
+        title = title + ticker.suffix() if title else ""
         
         # get offsets
         ticks_extent = self._get_ticks_extent(canvas, source, **overrides)
@@ -335,7 +466,6 @@ class Axis(OutGraphics):
         frame = self.get_property('frame', source, overrides)
         position = self.get_property('position', source, overrides)
         scale = self.get_property('scale', source, overrides)
-        ticker = self.get_property('ticker', source, overrides)
         
         # update scale
         if position == POS_LEFT:
@@ -352,10 +482,6 @@ class Axis(OutGraphics):
         
         else:
             scale.out_range = frame.x1, frame.x2
-        
-        # update ticker
-        ticker.start = scale.in_range[0]
-        ticker.end = scale.in_range[1]
     
     
     def _update_position(self, canvas=None, source=UNDEF, **overrides):
@@ -425,7 +551,7 @@ class LinAxis(Axis):
     
     
     def __init__(self, **overrides):
-        """Initializes a new instance of linear axis."""
+        """Initializes a new instance of the LinAxis."""
         
         # init defaults
         if 'scale' not in overrides:
@@ -456,7 +582,7 @@ class LogAxis(Axis):
     
     
     def __init__(self, **overrides):
-        """Initializes a new instance of logarithmic axis."""
+        """Initializes a new instance of the LogAxis."""
         
         # init defaults
         if 'scale' not in overrides:
@@ -464,6 +590,9 @@ class LogAxis(Axis):
         
         if 'ticker' not in overrides:
             overrides['ticker'] = LogTicker()
+        
+        if 'empty_range' not in overrides:
+            overrides['empty_range'] = (1., 10.)
         
         # init base
         super().__init__(**overrides)
@@ -509,7 +638,7 @@ class OrdinalAxis(Axis):
     
     
     def __init__(self, **overrides):
-        """Initializes a new instance of ordinal axis."""
+        """Initializes a new instance of the OrdinalAxis."""
         
         # init defaults
         if 'scale' not in overrides:
@@ -538,6 +667,7 @@ class OrdinalAxis(Axis):
         # remove labels
         if not self.labels:
             self.mapper = UNDEF
+            self.empty_range = (-0.5, 0.5)
             self.scale.in_range = (-0.5, 0.5)
             self.ticker.major_values = ()
             self.ticker.minor_values = ()
@@ -560,6 +690,7 @@ class OrdinalAxis(Axis):
             recycle = False)
         
         # update scale
+        self.empty_range = full_range
         self.scale.in_range = full_range
         
         # update ticker
@@ -581,7 +712,7 @@ class TimeAxis(Axis):
     
     
     def __init__(self, **overrides):
-        """Initializes a new instance of time axis."""
+        """Initializes a new instance of the TimeAxis."""
         
         # init defaults
         if 'scale' not in overrides:

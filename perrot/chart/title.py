@@ -5,13 +5,14 @@ import math
 
 from pero.enums import *
 from pero.properties import *
+from pero import Text
 
 from . graphics import OutGraphics
 
 
 class Title(OutGraphics):
     """
-    Title provides a simple drawing mechanism to include a title in charts.
+    Title provides a wrapper for the pero.Text glyph to draw chart titles.
     
     Properties:
         
@@ -28,6 +29,13 @@ class Title(OutGraphics):
     font = Include(TextProperties, dynamic=False, font_size=14, font_weight=FONT_WEIGHT_BOLD, text_align=TEXT_ALIGN_CENTER)
     
     
+    def __init__(self, **overrides):
+        """Initializes a new instance of the Title."""
+        
+        super().__init__(**overrides)
+        self._glyph = Text()
+    
+    
     def get_extent(self, canvas, source=UNDEF, **overrides):
         """
         This method is automatically called by parent chart to get amount of
@@ -38,10 +46,8 @@ class Title(OutGraphics):
         if not self.is_visible(source, overrides):
             return 0
         
-        # get text
+        # get properties
         text = self.get_property('text', source, overrides)
-        if not text:
-            return 0
         
         # set text
         canvas.set_text_by(self)
@@ -57,18 +63,21 @@ class Title(OutGraphics):
         if not self.is_visible(source, overrides):
             return
         
+        # update grid glyph
+        self._update_glyph(canvas, source, **overrides)
+        
+        # draw grid
+        self._glyph.draw(canvas)
+    
+    
+    def _update_glyph(self, canvas, source=UNDEF, **overrides):
+        """Updates text glyph."""
+        
         # get properties
         frame = self.get_property('frame', source, overrides)
         position = self.get_property('position', source, overrides)
         align = self.get_property('text_align', source, overrides)
         text = self.get_property('text', source, overrides)
-        
-        # check data
-        if not text:
-            return
-        
-        # set text
-        canvas.set_text_by(self, source=source, overrides=overrides)
         
         # get angle and coords
         angle = 0
@@ -101,6 +110,12 @@ class Title(OutGraphics):
             elif align == TEXT_ALIGN_RIGHT:
                 y += height
         
-        # draw text
-        canvas.text_base = TEXT_BASE_MIDDLE
-        canvas.draw_text(text, x, y, angle=angle)
+        # update glyph shared
+        self._glyph.set_properties_from(self, source=source, overrides=overrides)
+        
+        # update text
+        self._glyph.text = text
+        self._glyph.x = x
+        self._glyph.y = y
+        self._glyph.angle = angle
+        self._glyph.text_base = TEXT_BASE_MIDDLE
