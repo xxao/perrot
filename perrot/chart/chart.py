@@ -106,7 +106,6 @@ class Chart(Graphics):
         # init containers
         self._graphics = {}
         self._axes = []
-        self._mapping = {}
         
         # init data frame
         self._data_frame = Frame(0, 0, 1, 1)
@@ -231,30 +230,6 @@ class Chart(Graphics):
         return objects[0]
     
     
-    def get_obj_axes(self, obj):
-        """
-        Gets all axes associated with specified object.
-        
-        Args:
-            obj: str or pero.Graphics
-                Object's unique tag or the object itself.
-        
-        Returns:
-            (perrot.chartAxis,)
-                Associated axes.
-        """
-        
-        # get object
-        obj = self.get_obj(obj)
-        
-        # get mapping
-        mapping = self._mapping.get(obj.tag, None)
-        if not mapping:
-            return ()
-        
-        return tuple(self._graphics[t] for t in mapping.keys())
-    
-    
     def add(self, obj):
         """
         Adds additional graphics to the chart.
@@ -307,66 +282,8 @@ class Chart(Graphics):
         # get object
         obj = self.get_obj(obj)
         
-        # remove axis
-        if isinstance(obj, Axis):
-            
-            # check mapping
-            axes = [y for x in self._mapping.values() for y in x]
-            if obj.tag in axes:
-                message = "Axis '%s' is used by another graphics and cannot be removed!" % obj.tag
-                raise ValueError(message)
-            
-            # remove axis
-            self._axes.remove(obj)
-        
-        # remove mapping
-        if obj.tag in self._mapping:
-            del self._mapping[obj.tag]
-        
         # remove object
         del self._graphics[obj.tag]
-    
-    
-    def map(self, obj, axis, scale='scale'):
-        """
-        Maps object to specific axis to share and update the scale. Current
-        object mapping can be removed by providing None instead of the axis.
-        
-        Args:
-            obj: str or pero.Graphics
-                Unique tag of the object or the object itself.
-            
-            axis: str, perrot.chart.Axis or None
-                Unique tag of the axis or the axis itself.
-            
-            scale: str or None
-                Scale property name of the object to be synced with the axis.
-        """
-        
-        # get object
-        obj = self.get_obj(obj)
-        
-        # remove mapping
-        if axis is None:
-            del self._mapping[obj.tag]
-            return
-        
-        # get axis
-        axis = self.get_obj(axis)
-        
-        # check scale property
-        if not obj.has_property(scale):
-            message = "Object doesn't have the property '%s'!" % scale
-            raise AttributeError(message)
-        
-        # get existing mapping
-        mapping = self._mapping.get(obj.tag, {})
-        
-        # add/replace by given axis
-        mapping[axis.tag] = {'scale': scale}
-        
-        # store new mapping
-        self._mapping[obj.tag] = mapping
     
     
     def draw(self, canvas, source=UNDEF, **overrides):
