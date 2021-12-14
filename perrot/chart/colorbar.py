@@ -34,6 +34,9 @@ class ColorBar(OutGraphics):
         
         line properties:
             Includes pero.LineProperties to specify the bar outline.
+        
+        fill properties:
+            Includes pero.FillProperties to specify the bar fill.
     """
     
     position = EnumProperty(POS_RIGHT, enum=POSITION_LRTB, dynamic=False)
@@ -44,6 +47,7 @@ class ColorBar(OutGraphics):
     thickness = NumProperty(20, dynamic=False)
     steps = NumProperty(128, dynamic=False)
     line = Include(LineProperties, line_color="#000")
+    fill = Include(FillProperties, fill_color="#fff")
     
     
     def __init__(self, **overrides):

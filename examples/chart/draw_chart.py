@@ -9,8 +9,7 @@ chart = perrot.chart.Chart(
     frame_line_width = 1,
     frame_line_color = "k",
     frame_fill_color = "#fff",
-    bgr_fill_color = "#eee"
-    )
+    bgr_fill_color = "#eee")
 
 # init titles
 title = perrot.chart.Title(
@@ -56,6 +55,24 @@ y_minor_grid = perrot.chart.Grid(
     ticker = y_axis.ticker,
     line_color = "#f5f5f5ff")
 
+# init color bar and axis
+c_bar = perrot.chart.ColorBar(
+    position = pero.RIGHT,
+    gradient = pero.colors.YlOrBr,
+    margin = (0, 0, 0, 10))
+
+c_axis = perrot.chart.LinAxis(
+    title = "Z-Axis",
+    position = pero.RIGHT,
+    margin = 0,
+    scale_in_range = (0, 100))
+
+# init gauge
+x_gauge = perrot.chart.Gauge(
+    position = pero.TOP,
+    scale = x_axis.scale,
+    full_range = (-100, 100))
+
 # init legend
 legend = perrot.chart.InsideLegend(
     position = pero.NE,
@@ -67,6 +84,8 @@ legend = perrot.chart.InsideLegend(
 )
 
 # add objects
+chart.add(x_gauge)
+
 chart.add(sub_title)
 chart.add(title)
 
@@ -76,6 +95,9 @@ chart.add(x_major_grid)
 chart.add(y_axis)
 chart.add(y_minor_grid)
 chart.add(y_major_grid)
+
+chart.add(c_bar)
+chart.add(c_axis)
 
 chart.add(legend)
 
