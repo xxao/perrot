@@ -1,12 +1,12 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-from pero.enums import *
 from pero.properties import *
 from pero import colors
 from pero import ColorBar as ColorBarGlyph
 from pero import ContinuousScale, LinScale
 
+from .. enums import *
 from .graphics import OutGraphics
 
 
@@ -91,7 +91,7 @@ class ColorBar(OutGraphics):
         self._glyph.draw(canvas)
     
     
-    def _update_glyph(self, canvas, source=UNDEF, **overrides):
+    def _update_glyph(self, canvas=None, source=UNDEF, **overrides):
         """Updates colorbar glyph."""
         
         # get properties

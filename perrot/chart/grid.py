@@ -1,13 +1,12 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-from pero.enums import *
 from pero.properties import *
 from pero import ParallelGrid
 from pero import ContinuousScale, LinScale
 from pero import Ticker, LinTicker
 
-from . enums import *
+from .. enums import *
 from . graphics import InGraphics
 
 
@@ -77,7 +76,7 @@ class Grid(InGraphics):
         self._glyph.draw(canvas)
     
     
-    def _update_glyph(self, canvas, source=UNDEF, **overrides):
+    def _update_glyph(self, canvas=None, source=UNDEF, **overrides):
         """Updates grid glyph."""
         
         # get properties

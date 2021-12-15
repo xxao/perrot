@@ -492,6 +492,7 @@ class ArcsRegion(Region):
         if all(len(s) > 1 for s in segments):
             
             # get biggest segment
+            arcs = []
             length = 0
             for segment in segments:
                 ln = sum(abs(a.length()) for a in segment)

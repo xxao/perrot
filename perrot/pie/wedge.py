@@ -2,12 +2,12 @@
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
 from pero.properties import *
-from pero import Wedge as WedgeGlyph
+from pero import Wedge
 
 
-class Wedge(WedgeGlyph):
+class PieWedge(Wedge):
     """
-    Defines a wedge glyph.
+    Defines a pie chart wedge glyph.
     
     Properties:
         

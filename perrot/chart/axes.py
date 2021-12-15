@@ -1,13 +1,13 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-from pero.enums import *
 from pero.properties import *
 from pero import StraitAxis
 from pero import Scale, ContinuousScale, LinScale, LogScale, OrdinalScale
 from pero import Ticker, LinTicker, LogTicker, FixTicker, TimeTicker
 from pero import Formatter, IndexFormatter
 
+from .. enums import *
 from . graphics import OutGraphics
 
 
@@ -313,7 +313,7 @@ class Axis(OutGraphics):
         return formatter.format(value) + formatter.suffix()
     
     
-    def _get_ticks_extent(self, canvas, source=UNDEF, **overrides):
+    def _get_ticks_extent(self, canvas=None, source=UNDEF, **overrides):
         """Calculates the space needed for ticks."""
         
         extent = 0

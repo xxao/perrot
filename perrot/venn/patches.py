@@ -1,15 +1,15 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-from pero.enums import *
 from pero.properties import *
 from pero import colors
 from pero import Path
 
+from .. enums import *
 from .. chart import InGraphics
 
 
-class Patch(InGraphics):
+class VennPatch(InGraphics):
     """
     Abstract base class for various types of Venn diagram patches.
     
@@ -101,12 +101,12 @@ class Patch(InGraphics):
         canvas.draw_path(path)
 
 
-class RegionPatch(Patch):
-    """Defines a Venn diagram region patch."""
+class VennRegion(VennPatch):
+    """Defines a Venn diagram region glyph."""
     
     
     def __init__(self, **overrides):
-        """Initializes a new instance of RegionPatch."""
+        """Initializes a new instance of the VennRegion."""
         
         # init outline
         if 'line_width' not in overrides:
@@ -123,9 +123,9 @@ class RegionPatch(Patch):
         super().__init__(**overrides)
 
 
-class CirclePatch(Patch):
+class VennCircle(VennPatch):
     """
-    Defines a Venn diagram circle patch.
+    Defines a Venn diagram circle glyph.
     
     Properties:
         
@@ -137,7 +137,7 @@ class CirclePatch(Patch):
     
     
     def __init__(self, **overrides):
-        """Initializes a new instance of CirclePatch."""
+        """Initializes a new instance of the VennCircle."""
         
         # init outline
         if 'line_width' not in overrides:

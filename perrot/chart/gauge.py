@@ -1,11 +1,11 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-from pero.enums import *
 from pero.properties import *
 from pero import StraitGauge
 from pero import ContinuousScale, LinScale
 
+from .. enums import *
 from . graphics import OutGraphics
 
 
@@ -99,7 +99,7 @@ class Gauge(OutGraphics):
         self._glyph.draw(canvas)
     
     
-    def _update_glyph(self, canvas, source=UNDEF, **overrides):
+    def _update_glyph(self, canvas=None, source=UNDEF, **overrides):
         """Updates gauge glyph."""
         
         # get properties

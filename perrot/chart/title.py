@@ -3,10 +3,10 @@
 
 import math
 
-from pero.enums import *
 from pero.properties import *
 from pero import Text
 
+from .. enums import *
 from . graphics import OutGraphics
 
 
@@ -70,7 +70,7 @@ class Title(OutGraphics):
         self._glyph.draw(canvas)
     
     
-    def _update_glyph(self, canvas, source=UNDEF, **overrides):
+    def _update_glyph(self, canvas=None, source=UNDEF, **overrides):
         """Updates text glyph."""
         
         # get properties
