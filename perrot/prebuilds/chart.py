@@ -79,6 +79,9 @@ class Chart(ChartBase):
             
             explode: (float,) or None
                 Relative offsets for individual wedges.
+            
+            overrides: key:value pairs
+                Specific properties to be set additionally to the pie ring.
         
         Returns:
             perrot.pie.Pie
@@ -123,6 +126,9 @@ class Chart(ChartBase):
             
             abc: int
                 Number of items unique to ABC overlap.
+            
+            overrides: key:value pairs
+                Specific properties to be set additionally to the venn diagram.
         
         Returns:
             perrot.venn.Venn
