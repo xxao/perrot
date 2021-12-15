@@ -10,5 +10,5 @@ from . axes import Axis, LinAxis, LogAxis, OrdinalAxis, TimeAxis
 from . grid import Grid
 from . labels import Labels
 from . annotation import Annotation
-from . gauge import Gauge
+from . posbar import PositionBar
 from . colorbar import ColorBar

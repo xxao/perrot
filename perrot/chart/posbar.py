@@ -9,10 +9,10 @@ from .. enums import *
 from . graphics import OutGraphics
 
 
-class Gauge(OutGraphics):
+class PositionBar(OutGraphics):
     """
-    Gauge provides a wrapper for the pero.Gauge glyph to get an overview of
-    current zoom in the context of the chart full data range.
+    PositionBar provides a wrapper for the pero.Gauge glyph to get an overview
+    of current zoom in the context of the chart full data range.
     
     Properties:
         
@@ -63,7 +63,7 @@ class Gauge(OutGraphics):
     
     
     def __init__(self, **overrides):
-        """Initializes a new instance of the Gauge."""
+        """Initializes a new instance of the PositionBar."""
         
         # init scale
         if 'scale' not in overrides:
