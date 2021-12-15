@@ -3,7 +3,7 @@
 
 import numpy
 
-from . enums import *
+from .. enums import *
 from . regions import EmptyRegion, CircleRegion
 
 
@@ -12,25 +12,25 @@ def calc_venn(a, b, ab, c=0., ac=0., bc=0., abc=0., mode=FULL, spacing=0.1):
     Calculates coordinates and radii for three Venn diagram circles.
     
     Args:
-        a: float
+        a: int
             Number of items unique to A.
         
-        b: float
+        b: int
             Number of items unique to B.
         
-        ab: float
+        ab: int
             Number of items unique to AB overlap.
         
-        c: float
+        c: int
             Number of items unique to C.
         
-        ac: float
+        ac: int
             Number of items unique to AC overlap.
         
-        bc: float
+        bc: int
             Number of items unique to BC overlap.
         
-        abc: float
+        abc: int
             Number of items unique to ABC overlap.
         
         mode: str
@@ -58,7 +58,7 @@ def calc_venn(a, b, ab, c=0., ac=0., bc=0., abc=0., mode=FULL, spacing=0.1):
     r_c = numpy.sqrt((c + ac + bc + abc) / numpy.pi)
 
     # make fully proportional
-    if mode == VENN_MODE_FULL:
+    if mode == VENN_FULL:
         
         # calc spacing
         spacing = max(r_a, r_b, r_c) * spacing
@@ -69,7 +69,7 @@ def calc_venn(a, b, ab, c=0., ac=0., bc=0., abc=0., mode=FULL, spacing=0.1):
         d_bc = calc_distance(r_b, r_c, bc + abc, spacing)
     
     # make semi proportional
-    elif mode == VENN_MODE_SEMI:
+    elif mode == VENN_SEMI:
         
         # calc distances
         d_ab = max(r_a, r_b)

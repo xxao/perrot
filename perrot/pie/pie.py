@@ -1,162 +1,75 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-from pero.enums import *
+import math
+
+import pero
 from pero.properties import *
-from pero import MarkerLegend
+from pero import colors
+from pero import OrdinalScale
+from pero import MarkerLegend, Label, TextLabel
 
-from .. chart import Chart, Title, Legend
-from . ring import Ring
+from .. enums import *
+from .. chart import InGraphics
+from . wedge import PieWedge
 
 
-class Pie(Chart):
+class Pie(InGraphics):
     """
-    This class provides main functionality to construct and draw pie charts.
+    Pie provides a mechanism to construct and draw pie chart wedges rings.
     
     Properties:
         
-        title: perrot.chart.Title, None or UNDEF
-            Specifies the title display graphics.
+        x: int
+            Specifies the x-coordinate of the center.
         
-        legend: perrot.chart.Legend, None or UNDEF
-            Specifies the legend display graphics.
+        y: int
+            Specifies the y-coordinate of the center.
+        
+        inner_radius: int
+            Specifies the inner radius. If the value is equal or les than 1, the
+            radius is handled as relative to available space. Otherwise the
+            exact radius is used.
+        
+        outer_radius: int
+            Specifies the outer radius. If the value is equal or les than 1, the
+            radius is handled as relative to available space. Otherwise the
+            exact radius is used. The radius includes all the 'explode' shifts.
+        
+        angle properties:
+            Includes pero.AngleProperties to specify the start angle.
+        
+        palette: pero.Palette, tuple, str
+            Specifies the default color palette as a sequence of colors,
+            pero.Palette or palette name. This is used to automatically
+            provide new color for individual wedges.
+        
+        line properties:
+            Includes pero.LineProperties to specify the wedges outline.
+        
+        label: pero.MarkerLegend
+            Specifies the glyph to be used to draw legend items.
+        
+        label: pero.TextLabel
+            Specifies the glyph to be used to draw labels.
     """
     
-    title = Property(UNDEF, types=(Title,), dynamic=False, nullable=True)
-    legend = Property(UNDEF, types=(Legend,), dynamic=False, nullable=True)
+    x = NumProperty(UNDEF, dynamic=False)
+    y = NumProperty(UNDEF, dynamic=False)
+    inner_radius = NumProperty(UNDEF, dynamic=False)
+    outer_radius = NumProperty(UNDEF, dynamic=False)
+    angle = Include(AngleProperties, dynamic=False, angle=-0.5*math.pi)
+    
+    outline = Include(LineProperties, line_width=1, line_color="w")
+    palette = PaletteProperty(colors.Dark, dynamic=False, nullable=False)
+    
+    legend = Property(UNDEF, types=(MarkerLegend,), dynamic=False, nullable=True)
+    label = Property(UNDEF, types=(Label,), dynamic=False, nullable=True)
     
     
-    def __init__(self, **overrides):
-        """Initializes a new instance of pie chart."""
-        
-        # init title
-        if 'title' not in overrides:
-            overrides['title'] = Title(
-                tag = 'title',
-                position = POS_TOP)
-        
-        # init legend
-        if 'legend' not in overrides:
-            overrides['legend'] = Legend(
-                tag = 'legend',
-                position = POS_RIGHT,
-                orientation = ORI_VERTICAL)
-        
-        # init base
-        super().__init__(**overrides)
-        
-        # init containers
-        self._rings = []
-        
-        # init graphics
-        self._init_graphics()
-        
-        # bind events
-        self.bind(EVT_PROPERTY_CHANGED, self._on_pie_property_changed)
-    
-    
-    @property
-    def rings(self):
+    def __init__(self, values, titles=None, explode=None, **overrides):
         """
-        Gets individual rings.
-        
-        Returns:
-            (perrot.pie.Ring,)
-                Pie rings.
-        """
-        
-        return tuple(self._rings)
-    
-    
-    def draw(self, canvas, source=UNDEF, **overrides):
-        """Uses given canvas to draw the pie chart."""
-        
-        # check if visible
-        if not self.is_visible(source, overrides):
-            return
-        
-        # update legend
-        self._update_legend(canvas, source, **overrides)
-        
-        # init frames
-        self.init_frames(canvas, source, **overrides)
-        
-        # draw main bgr
-        self.draw_bgr(canvas, source, **overrides)
-        
-        # refuse to draw if "negative" size
-        if self.get_frame().reversed:
-            return
-        
-        # get objects
-        objects = list(self.graphics)
-        
-        rings = [o for o in objects if isinstance(o, Ring)]
-        rings.sort(key=lambda o: o.z_index, reverse=True)
-        
-        others = [o for o in objects if not isinstance(o, Ring)]
-        others.sort(key=lambda o: o.z_index)
-        
-        # calc rings radii
-        data_frame = self.get_frame()
-        radii = self._calc_radii(canvas, source, **overrides)
-        
-        # draw rings
-        for obj in rings:
-            obj.draw(canvas,
-                x = data_frame.cx,
-                y = data_frame.cy,
-                inner_radius = radii[obj.tag][0],
-                outer_radius = radii[obj.tag][1])
-        
-        # draw remaining objects
-        for obj in others:
-            obj.draw(canvas)
-        
-        # draw debug frames
-        # self.draw_debug_frames(canvas)
-    
-    
-    def add(self, obj):
-        """
-        Adds additional graphics to the chart.
-        
-        Args:
-            obj: perrot.plot.InGraphics or perrot.plot.OutGraphics
-                Object to be added.
-        """
-        
-        # register object
-        super().add(obj)
-        
-        # add to rings
-        if isinstance(obj, Ring):
-            self._rings.append(obj)
-    
-    
-    def remove(self, obj):
-        """
-        Removes specified object.
-        
-        Args:
-            obj: str or pero.Graphics
-                Object's unique tag or the object itself.
-        """
-        
-        # get object
-        obj = self.get_obj(obj)
-        
-        # remove object
-        super().remove(obj)
-        
-        # remove ring
-        if obj in self._rings:
-            self._rings.remove(obj)
-    
-    
-    def ring(self, values, titles=None, explode=None, **overrides):
-        """
-        Creates and adds a new pie chart ring based on given values.
+        Initializes a new instance of the Pie.
         
         Args:
             values: (float,)
@@ -166,112 +79,221 @@ class Pie(Chart):
                 Titles for individual wedges.
             
             explode: (float,) or None
-                Shifts from center for individual wedges.
+                Relative offsets for individual wedges.
         """
         
-        # create and add ring
-        self.add(Ring(values, titles, explode, **overrides))
+        # init legend
+        if 'legend' not in overrides:
+            overrides['legend'] = MarkerLegend(
+                text = lambda d: d.title,
+                marker = 'o',
+                marker_size = 12)
+        
+        # init label
+        if 'label' not in overrides:
+            overrides['label'] = TextLabel(
+                text = lambda d: d.value,
+                font_size = 12,
+                text_align = TEXT_ALIGN_CENTER,
+                text_base = TEXT_BASE_MIDDLE)
+        
+        # init base
+        super().__init__(**overrides)
+        
+        # get data
+        self._values = tuple(values)
+        self._titles = tuple(titles) if titles else tuple("" for _ in values)
+        self._explode = tuple(explode) if explode else tuple(0 for _ in values)
+        self._wedges = []
+        
+        # check data
+        if len(self._values) != len(self._titles) or len(self._values) != len(self._explode):
+            raise ValueError("Unequal length for values, titles and explode!")
+        
+        # init graphics
+        self._init_graphics()
+        
+        # bind events
+        self.bind(EVT_PROPERTY_CHANGED, self._on_pie_property_changed)
     
     
-    def _calc_radii(self, canvas, source=UNDEF, **overrides):
-        """Calculates radii for each ring."""
+    def get_legends(self, canvas=None, source=UNDEF, **overrides):
+        """Returns all legend items of the object."""
         
-        # init container
-        radii = {}
-        
-        # get max radius
-        data_frame = self.get_frame()
-        max_radius = 0.5 * min(data_frame.wh)
-        count = len(self._rings)
-        
-        # draw rings
-        last_radius = 0
-        for i, obj in enumerate(self._rings):
-            
-            # get inner radius
-            inner_radius = obj.inner_radius
-            if inner_radius is UNDEF:
-                inner_radius = last_radius
-            else:
-                inner_radius *= max_radius
-            
-            # get outer radius
-            outer_radius = max_radius * (obj.outer_radius or (i + 1) / count)
-            
-            # check radii
-            inner_radius = min(inner_radius, max_radius)
-            outer_radius = min(outer_radius, max_radius)
-            
-            # store radii
-            radii[obj.tag] = (inner_radius, outer_radius)
-            last_radius = outer_radius
-        
-        return radii
-    
-    
-    def _update_legend(self, canvas, source=UNDEF, **overrides):
-        """Updates legend items."""
-        
-        # check if visible
-        if not self.legend or not self.legend.is_visible():
-            return
-        
-        # check if static
-        if self.legend.static:
-            return
+        # get properties
+        legend = self.get_property('legend', source, overrides)
+        if not legend:
+            return ()
         
         # get items
         items = []
-        for ring in self._rings:
-            for obj in ring.wedges:
-                
-                # skip empty
-                if obj.value == 0:
-                    continue
-                
-                # get title
-                title = obj.get_property('title', obj)
-                if not title:
-                    continue
-                
-                # init item
-                item = MarkerLegend(
-                    text = title,
-                    marker = 'o',
-                    marker_size = 12)
-                
-                # set line and fill
-                item.marker.set_properties_from(obj, 'line_', 'line_')
-                item.marker.set_properties_from(obj, 'fill_', 'fill_')
-                
-                # add item
-                items.append(item)
+        for obj in self._wedges:
+            
+            # skip empty
+            if not obj.visible or not obj.value or not obj.title:
+                continue
+            
+            # init item
+            item = legend.clone(obj, deep=True)
+            item.marker.set_properties_from(obj, 'line_', 'line_')
+            item.marker.set_properties_from(obj, 'fill_', 'fill_')
+            
+            # add item
+            items.append(item)
         
-        # set items
-        self.legend.items = items
+        return items
+    
+    
+    def get_labels(self, canvas=None, source=UNDEF, **overrides):
+        """Returns all labels of the object."""
+        
+        # get properties
+        label = self.get_property('label', source, overrides)
+        if not label:
+            return ()
+        
+        # update wedges
+        self._update_wedges(canvas, source, **overrides)
+        
+        # get items
+        items = []
+        for obj in self._wedges:
+            
+            # skip empty
+            if not obj.visible or not obj.value:
+                continue
+            
+            # init item
+            item = label.clone(obj, deep=True)
+            item.x = obj.label_x
+            item.y = obj.label_y
+            
+            # add item
+            items.append(item)
+        
+        return items
+    
+    
+    def draw(self, canvas, source=UNDEF, **overrides):
+        """Uses given canvas to draw the ring."""
+        
+        # check if visible
+        if not self.is_visible(source, overrides):
+            return
+        
+        # update wedges
+        self._update_wedges(canvas, source, **overrides)
+        
+        # draw wedges
+        for obj in self._wedges:
+            obj.draw(canvas)
+    
+    
+    def _update_wedges(self, canvas=None, source=UNDEF, **overrides):
+        """Updates wedges shape."""
+        
+        # get properties
+        frame = self.get_property('frame', source, overrides)
+        x = self.get_property('x', source, overrides)
+        y = self.get_property('y', source, overrides)
+        inner_radius = self.get_property('inner_radius', source, overrides)
+        outer_radius = self.get_property('outer_radius', source, overrides)
+        angle = AngleProperties.get_angle(self, '', ANGLE_RAD, source, overrides)
+        
+        # get center
+        if x is UNDEF:
+            x = frame.cx
+        if y is UNDEF:
+            y = frame.cy
+        
+        # get max radius
+        max_radius = 0.5 * min(frame.wh)
+        
+        # get inner radius
+        inner_radius = inner_radius or 0
+        if inner_radius and inner_radius <= 1:
+            inner_radius = inner_radius * max_radius
+        
+        # get outer radius
+        outer_radius = outer_radius or 1
+        if outer_radius and outer_radius <= 1:
+            outer_radius = outer_radius * max_radius
+        
+        # include explode
+        outer_radius = (outer_radius + (inner_radius * max(self._explode))) / (1 + max(self._explode))
+        
+        # init values
+        start_angle = angle or 0
+        total = float(sum(self._values))
+        label_x = x + 0.5 * (outer_radius + inner_radius)
+        label_y = y
+        
+        # update wedges
+        for i, wedge in enumerate(self._wedges):
+            
+            # update shape
+            wedge.x = x
+            wedge.y = y
+            wedge.inner_radius = inner_radius
+            wedge.outer_radius = outer_radius
+            wedge.offset = self._explode[i] * (outer_radius - inner_radius)
+            wedge.start_angle = start_angle
+            wedge.end_angle = start_angle + 2 * math.pi * self._values[i] / total
+            
+            # update label
+            angle = wedge.start_angle + 0.5 * (wedge.end_angle - wedge.start_angle)
+            wedge.label_x, wedge.label_y = pero.rotate((label_x + wedge.offset, label_y), angle, (x, y))
+            
+            # keep last angle
+            start_angle = wedge.end_angle
     
     
     def _init_graphics(self):
-        """Initializes and registers required graphics."""
+        """Initializes wedges glyphs."""
         
-        # register additional objects
-        if self.legend:
-            self.add(self.legend)
+        # init container
+        self._wedges = []
         
-        if self.title:
-            self.add(self.title)
+        # init wedges
+        for i in range(len(self._values)):
+            
+            # init wedge
+            wedge = PieWedge(
+                value = self._values[i],
+                title = self._titles[i])
+            
+            # lock value
+            wedge.lock_property('value')
+            
+            # store wedge
+            self._wedges.append(wedge)
+        
+        # set wedges line and fill
+        self._init_colors()
+    
+    
+    def _init_colors(self):
+        """Sets colors."""
+        
+        # init color scale
+        color_scale = OrdinalScale(
+            out_range = self.palette,
+            implicit = True,
+            recycle = True)
+        
+        # update wedges
+        for obj in self._wedges:
+            obj.fill_color = color_scale.scale(obj.tag)
+            obj.set_properties_from(self, 'line_', 'line_')
     
     
     def _on_pie_property_changed(self, evt):
         """Called after any property has changed."""
         
-        # main objects
-        if evt.name in ('title', 'legend'):
-            
-            # remove old
-            if evt.old_value:
-                self.remove(evt.old_value.tag)
-            
-            # register new
-            if evt.new_value:
-                self.add(evt.new_value)
+        # color palette changed
+        if evt.name == 'palette':
+            self._init_colors()
+        
+        # outline changed
+        if evt.name.startswith('line_'):
+            self._init_colors()

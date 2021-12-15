@@ -1,107 +1,118 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-from pero.enums import *
 from pero.properties import *
 from pero import colors
-from pero import Path, TextLabel, MarkerLegend
 from pero import OrdinalScale
+from pero import Path, MarkerLegend, Label, TextLabel
 
-from .. chart import Chart, Title, Legend
-from . enums import *
+from .. enums import *
+from .. chart import InGraphics
 from . import utils
 from . regions import EmptyRegion
-from . patches import Patch, RegionPatch, CirclePatch
+from . patches import VennRegion, VennCircle
 
 # define constants
 _REGIONS = ('a', 'b', 'ab', 'c', 'ac', 'bc', 'abc')
 _CIRCLES = ('A', 'B', 'C')
 
 
-class Venn(Chart):
+class Venn(InGraphics):
     """
-    This class provides main functionality to construct and draw Venn diagrams
-    with two or three circles.
+    Venn provides a mechanism to construct and draw Venn diagrams with two or
+    three circles.
     
     Properties:
         
         mode: pero.VENN or callable
             Specifies whether circles and overlaps should be proportional to
-            their area as any item from the pero.venn.VENN enum.
-                perrot.venn.VENN.NONE - non-proportional
-                perrot.venn.VENN.SEMI - circles are proportional but overlaps not
-                perrot.venn.VENN.FULL - circles and overlaps try to be proportional
+            their area as any item from the pero.venn.VENN_MODE enum.
+                perrot.venn.VENN_MODE.NONE - non-proportional
+                perrot.venn.VENN_MODE.SEMI - circles are proportional but overlaps not
+                perrot.venn.VENN_MODE.FULL - circles and overlaps try to be proportional
         
         palette: pero.Palette, tuple, str
             Specifies the default color palette as a sequence of colors,
             pero.Palette or palette name. This is used to automatically
             provide new color for main diagram circles.
         
-        title: perrot.chart.Title, None or UNDEF
-            Specifies the title display graphics.
-        
-        legend: perrot.chart.Legend, None or UNDEF
+        legend: perrot.chart.OutLegend, None or UNDEF
             Specifies the legend display graphics.
         
         label: pero.TextLabel
             Specifies the glyph to be used to draw labels.
     """
     
-    mode = EnumProperty(VENN_MODE_SEMI, enum=VENN_MODE, dynamic=False, nullable=False)
+    mode = EnumProperty(VENN_SEMI, enum=VENN_MODE, dynamic=False, nullable=False)
     palette = PaletteProperty(colors.Dark.trans(0.6), dynamic=False, nullable=False)
     
-    a = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
-    b = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
-    ab = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
-    c = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
-    ac = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
-    bc = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
-    abc = Property(UNDEF, types=(RegionPatch,), dynamic=False, nullable=False)
+    a = Property(UNDEF, types=(VennRegion,), dynamic=False, nullable=False)
+    b = Property(UNDEF, types=(VennRegion,), dynamic=False, nullable=False)
+    ab = Property(UNDEF, types=(VennRegion,), dynamic=False, nullable=False)
+    c = Property(UNDEF, types=(VennRegion,), dynamic=False, nullable=False)
+    ac = Property(UNDEF, types=(VennRegion,), dynamic=False, nullable=False)
+    bc = Property(UNDEF, types=(VennRegion,), dynamic=False, nullable=False)
+    abc = Property(UNDEF, types=(VennRegion,), dynamic=False, nullable=False)
     
-    A = Property(UNDEF, types=(CirclePatch,), dynamic=False, nullable=False)
-    B = Property(UNDEF, types=(CirclePatch,), dynamic=False, nullable=False)
-    C = Property(UNDEF, types=(CirclePatch,), dynamic=False, nullable=False)
+    A = Property(UNDEF, types=(VennCircle,), dynamic=False, nullable=False)
+    B = Property(UNDEF, types=(VennCircle,), dynamic=False, nullable=False)
+    C = Property(UNDEF, types=(VennCircle,), dynamic=False, nullable=False)
     
-    title = Property(UNDEF, types=(Title,), dynamic=False, nullable=True)
-    legend = Property(UNDEF, types=(Legend,), dynamic=False, nullable=True)
-    label = Property(UNDEF, types=(TextLabel,), dynamic=False, nullable=True)
+    legend = Property(UNDEF, types=(MarkerLegend,), dynamic=False, nullable=True)
+    label = Property(UNDEF, types=(Label,), dynamic=False, nullable=True)
     
     
     def __init__(self, a, b, ab, c=0, ac=0, bc=0, abc=0, **overrides):
-        """Initializes a new instance of Venn diagram."""
+        """
+        Initializes a new instance of the Venn.
+        
+        Args:
+            a: int
+                Number of items unique to A.
+            
+            b: int
+                Number of items unique to B.
+            
+            ab: int
+                Number of items unique to AB overlap.
+            
+            c: int
+                Number of items unique to C.
+            
+            ac: int
+                Number of items unique to AC overlap.
+            
+            bc: int
+                Number of items unique to BC overlap.
+            
+            abc: int
+                Number of items unique to ABC overlap.
+        """
         
         # init regions
         for i, key in enumerate(_REGIONS):
-            overrides[key] = RegionPatch(
+            overrides[key] = VennRegion(
                 tag = key,
-                z_index = REGION_Z+i)
+                z_index = VENN_REGION_Z+i)
         
         # init circles
         for i, key in enumerate(_CIRCLES):
-            overrides[key] = CirclePatch(
+            overrides[key] = VennCircle(
                 tag = key,
-                z_index = CIRCLE_Z+i,
+                z_index = VENN_CIRCLE_Z+i,
                 title = key)
-        
-        # init title
-        if 'title' not in overrides:
-            overrides['title'] = Title(
-                tag = 'title',
-                position = POS_TOP)
         
         # init legend
         if 'legend' not in overrides:
-            overrides['legend'] = Legend(
-                tag = 'legend',
-                position = POS_BOTTOM,
-                orientation = ORI_HORIZONTAL)
+            overrides['legend'] = MarkerLegend(
+                text = lambda d: d.title,
+                marker = 'o',
+                marker_size = 12)
         
         # init label
         if 'label' not in overrides:
             overrides['label'] = TextLabel(
                 text = lambda d: d.value,
-                x = lambda d: d.label_x,
-                y = lambda d: d.label_y,
                 font_size = 14,
                 text_align = TEXT_ALIGN_CENTER,
                 text_base = TEXT_BASE_MIDDLE)
@@ -110,7 +121,7 @@ class Venn(Chart):
         super().__init__(**overrides)
         
         # init containers
-        self._data = {'a': a, 'b': b, 'ab': ab, 'c': c, 'ac': ac, 'bc': bc, 'abc': abc}
+        self._values = {'a': a, 'b': b, 'ab': ab, 'c': c, 'ac': ac, 'bc': bc, 'abc': abc}
         self._regions = tuple(self.get_property(k) for k in _REGIONS)
         self._circles = tuple(self.get_property(k) for k in _CIRCLES)
         
@@ -121,30 +132,61 @@ class Venn(Chart):
         self.bind(EVT_PROPERTY_CHANGED, self._on_venn_property_changed)
     
     
-    @property
-    def regions(self):
-        """
-        Gets regions in following order (a, b, ab, c, ac, bc, abc).
+    def get_legends(self, canvas=None, source=UNDEF, **overrides):
+        """Returns all legend items of the object."""
         
-        Returns:
-            (perrot.venn.RegionPatch,)
-                Regions patches.
-        """
+        # get properties
+        legend = self.get_property('legend', source, overrides)
+        if not legend:
+            return ()
         
-        return self._regions
+        # get items
+        items = []
+        for obj in self._circles:
+            
+            # skip empty
+            if not obj.visible or not obj.value or not obj.title:
+                continue
+            
+            # init item
+            item = legend.clone(obj, deep=True)
+            item.marker.set_properties_from(obj, 'line_', 'line_')
+            item.marker.set_properties_from(obj, 'fill_', 'fill_')
+            
+            # add item
+            items.append(item)
+        
+        return items
     
     
-    @property
-    def circles(self):
-        """
-        Gets main circles in following order (A, B, C).
+    def get_labels(self, canvas=None, source=UNDEF, **overrides):
+        """Returns all labels of the object."""
         
-        Returns:
-            (perrot.venn.CirclePatch,)
-                Circles patches.
-        """
+        # get properties
+        label = self.get_property('label', source, overrides)
+        if not label:
+            return ()
         
-        return self._circles
+        # update patches
+        self._update_patches(canvas, source, **overrides)
+        
+        # get items
+        items = []
+        for obj in self._regions:
+            
+            # skip empty
+            if not obj.visible or not obj.value:
+                continue
+            
+            # init item
+            item = label.clone(obj, deep=True)
+            item.x = obj.label_x
+            item.y = obj.label_y
+            
+            # add item
+            items.append(item)
+        
+        return items
     
     
     def draw(self, canvas, source=UNDEF, **overrides):
@@ -154,31 +196,15 @@ class Venn(Chart):
         if not self.is_visible(source, overrides):
             return
         
-        # get properties
-        label = self.get_property('label', source, overrides)
-        
-        # update legend
-        self._update_legend(canvas, source, **overrides)
-        
-        # init frames
-        self.init_frames(canvas, source, **overrides)
-        
         # update patches
         self._update_patches(canvas, source, **overrides)
         
-        # draw main bgr
-        self.draw_bgr(canvas, source, **overrides)
-        
-        # refuse to draw if "negative" size
-        if self.get_frame().reversed:
-            return
-        
         # get objects
-        objects = list(self.graphics)
-        objects.sort(key=lambda o: o.z_index)
-        regions = [o for o in objects if isinstance(o, RegionPatch)]
-        circles = [o for o in objects if isinstance(o, CirclePatch)]
-        others = [o for o in objects if not isinstance(o, Patch)]
+        circles = [o for o in self._circles]
+        circles.sort(key=lambda o: o.z_index)
+        
+        regions = [o for o in self._regions]
+        regions.sort(key=lambda o: o.z_index)
         
         # draw circles fill
         for obj in circles:
@@ -195,72 +221,18 @@ class Venn(Chart):
         # draw regions outline
         for obj in regions:
             obj.draw_outline(canvas)
-        
-        # draw labels
-        if label:
-            for obj in regions:
-                if obj.is_visible(obj):
-                    label.draw(canvas, obj)
-        
-        # draw remaining objects
-        for obj in others:
-            obj.draw(canvas)
-        
-        # draw debug frames
-        # self.draw_debug_frames(canvas)
     
     
-    def _update_legend(self, canvas, source=UNDEF, **overrides):
-        """Updates legend items."""
-        
-        # check if visible
-        if not self.legend or not self.legend.is_visible():
-            return
-        
-        # check if static
-        if self.legend.static:
-            return
-        
-        # get items
-        items = []
-        for obj in self._circles:
-            
-            # skip empty
-            if obj.value == 0:
-                continue
-            
-            # get title
-            title = obj.get_property('title', obj)
-            if not title:
-                continue
-            
-            # init item
-            item = MarkerLegend(
-                text = title,
-                marker = 'o',
-                marker_size = 12)
-            
-            # set line and fill
-            item.marker.set_properties_from(obj, 'line_', 'line_')
-            item.marker.set_properties_from(obj, 'fill_', 'fill_')
-            
-            # add item
-            items.append(item)
-        
-        # set items
-        self.legend.items = tuple(items)
-    
-    
-    def _update_patches(self, canvas, source=UNDEF, **overrides):
+    def _update_patches(self, canvas=None, source=UNDEF, **overrides):
         """Updates circles and regions patches."""
         
         # get properties
         mode = self.get_property('mode', source, overrides)
+        frame = self.get_property('frame', source, overrides)
         
         # calculate venn
-        frame = self.get_frame()
-        data = [self.get_property(key).value for key in _REGIONS]
-        coords, radii = utils.calc_venn(*data, mode=mode)
+        values = [self._values[key] for key in _REGIONS]
+        coords, radii = utils.calc_venn(*values, mode=mode)
         coords, radii = utils.fit_into(coords, radii, *frame.rect)
         
         # create regions
@@ -283,10 +255,10 @@ class Venn(Chart):
         
         # set regions values
         for key in _REGIONS:
-            self.get_property(key).value = self._data[key]
+            self.get_property(key).value = self._values[key]
         
         # set circles values
-        a, b, ab, c, ac, bc, abc = [self._data[k] for k in _REGIONS]
+        a, b, ab, c, ac, bc, abc = [self._values[k] for k in _REGIONS]
         self.get_property(_CIRCLES[0]).value = a + ab + ac + abc
         self.get_property(_CIRCLES[1]).value = b + ab + bc + abc
         self.get_property(_CIRCLES[2]).value = c + ac + bc + abc
@@ -298,21 +270,6 @@ class Venn(Chart):
         for key in _REGIONS + _CIRCLES:
             self.lock_property(key)
             self.get_property(key).lock_property('value')
-        
-        # register circles
-        for key in _CIRCLES:
-            self.add(self.get_property(key))
-        
-        # register regions
-        for key in _REGIONS:
-            self.add(self.get_property(key))
-        
-        # register additional objects
-        if self.legend:
-            self.add(self.legend)
-        
-        if self.title:
-            self.add(self.title)
     
     
     def _init_colors(self):
@@ -335,14 +292,3 @@ class Venn(Chart):
         # color palette changed
         if evt.name == 'palette':
             self._init_colors()
-        
-        # main objects
-        if evt.name in ('title', 'legend'):
-            
-            # remove old
-            if evt.old_value:
-                self.remove(evt.old_value.tag)
-            
-            # register new
-            if evt.new_value:
-                self.add(evt.new_value)
