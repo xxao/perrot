@@ -4,6 +4,7 @@
 from pero.properties import *
 from pero import Label, LabelBox
 
+from .. enums import *
 from . graphics import InGraphics
 
 
@@ -16,6 +17,11 @@ class Labels(InGraphics):
         
         items: (pero.Label,), None or UNDEF
             Specifies labels to draw.
+        
+        static: bool
+            Specifies whether the label items are given by user directly (True)
+            or whether they should be retrieved automatically from parent chart
+            (False).
         
         overlap: bool
             Specifies whether the labels can overlap each other (True) or should
@@ -32,6 +38,7 @@ class Labels(InGraphics):
     """
     
     items = ListProperty(UNDEF, types=(Label,), dynamic=False)
+    static = BoolProperty(False, dynamic=False)
     
     overlap = BoolProperty(False, dynamic=False)
     spacing = NumProperty(4, dynamic=False)
@@ -43,6 +50,34 @@ class Labels(InGraphics):
         
         super().__init__(**overrides)
         self._glyph = LabelBox()
+    
+    
+    def finalize(self, chart, canvas, source=UNDEF, **overrides):
+        """
+        This method is automatically called by parent chart to finalize the
+        object.
+        """
+        
+        # check if static
+        static = self.get_property('static', source, overrides)
+        if static:
+            return
+        
+        # clean items
+        self.items = []
+        
+        # check if visible
+        if not self.is_visible(source, overrides):
+            return
+        
+        # get items from objects
+        items = []
+        for obj in chart.graphics:
+            if isinstance(obj, InGraphics) and obj.visible:
+                items += obj.get_labels(canvas)
+        
+        # set new items
+        self.items = items
     
     
     def draw(self, canvas, source=UNDEF, **overrides):

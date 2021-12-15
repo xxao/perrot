@@ -1,9 +1,10 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-from pero.enums import *
 from pero.properties import *
 from pero import Graphics
+
+from .. enums import *
 
 
 class ChartGraphics(Graphics):
@@ -18,6 +19,58 @@ class ChartGraphics(Graphics):
     """
     
     frame = FrameProperty(UNDEF, dynamic=False)
+    
+    
+    def prepare(self, chart, canvas, source=UNDEF, **overrides):
+        """
+        This method is automatically called by parent chart to prepare the
+        object. It is typically used to retrieve position independent data like
+        legends from other objects. Note that the correct 'frame' property is
+        not set yet.
+        
+        This method should be overwritten by derived classed.
+        
+        Args:
+            chart: perrot.chart.Chart
+                Parent chart.
+            
+            canvas: pero.Canvas
+                Canvas used to draw the graphics.
+            
+            source: any
+                Data source to be used for calculating callable properties.
+            
+            overrides: str:any pairs
+                Specific properties to be overwritten.
+        """
+        
+        pass
+    
+    
+    def finalize(self, chart, canvas, source=UNDEF, **overrides):
+        """
+        This method is automatically called by parent chart to finalize the
+        object. It is typically used to retrieve position dependent data like
+        labels from other objects. Note that the correct 'frame' property is set
+        already.
+        
+        This method should be overwritten by derived classed.
+        
+        Args:
+            chart: perrot.chart.Chart
+                Parent chart.
+            
+            canvas: pero.Canvas
+                Canvas used to draw the graphics.
+            
+            source: any
+                Data source to be used for calculating callable properties.
+            
+            overrides: str:any pairs
+                Specific properties to be overwritten.
+        """
+        
+        pass
 
 
 class InGraphics(ChartGraphics):
@@ -26,7 +79,53 @@ class InGraphics(ChartGraphics):
     the main data area.
     """
     
-    pass
+    
+    def get_legends(self, canvas, source=UNDEF, **overrides):
+        """
+        Returns all legend items of the object.
+        
+        This method should be overwritten by derived classed.
+        
+        Args:
+            canvas: pero.Canvas
+                Canvas used to draw the graphics.
+            
+            source: any
+                Data source to be used for calculating callable properties.
+            
+            overrides: str:any pairs
+                Specific properties to be overwritten.
+        
+        Returns:
+            (pero.Legend,)
+                Legend items.
+        """
+        
+        return ()
+    
+    
+    def get_labels(self, canvas, source=UNDEF, **overrides):
+        """
+        Returns all labels of the object.
+        
+        This method should be overwritten by derived classed.
+        
+        Args:
+            canvas: pero.Canvas
+                Canvas used to draw the graphics.
+            
+            source: any
+                Data source to be used for calculating callable properties.
+            
+            overrides: str:any pairs
+                Specific properties to be overwritten.
+        
+        Returns:
+            (pero.Label,)
+                Label items.
+        """
+        
+        return ()
 
 
 class OutGraphics(ChartGraphics):

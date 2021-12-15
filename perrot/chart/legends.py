@@ -1,17 +1,16 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-from pero.enums import *
 from pero.properties import *
-from pero import LegendBox
-from pero import Legend as LegendItem
+from pero import Legend, LegendBox
 
+from .. enums import *
 from . graphics import InGraphics, OutGraphics
 
 
-class Legend(OutGraphics):
+class OutLegend(OutGraphics):
     """
-    Legend provides a wrapper for the pero.LegendBox glyph to draw the chart
+    OutLegend provides a wrapper for the pero.LegendBox glyph to draw the chart
     legend outside the main data frame.
     
     Properties:
@@ -54,7 +53,7 @@ class Legend(OutGraphics):
             Includes pero.FillProperties to specify the legend box fill.
     """
     
-    items = TupleProperty(UNDEF, types=(LegendItem,), dynamic=False, nullable=True)
+    items = TupleProperty(UNDEF, types=(Legend,), dynamic=False, nullable=True)
     static = BoolProperty(False, dynamic=False)
     
     position = EnumProperty(POS_RIGHT, enum=POSITION_LRTB, dynamic=False)
@@ -69,7 +68,7 @@ class Legend(OutGraphics):
     
     
     def __init__(self, **overrides):
-        """Initializes a new instance of the Legend."""
+        """Initializes a new instance of the OutLegend."""
         
         # init legend glyph
         self._glyph = LegendBox()
@@ -101,6 +100,34 @@ class Legend(OutGraphics):
         return bbox.height if position in POSITION_TB else bbox.width
     
     
+    def prepare(self, chart, canvas, source=UNDEF, **overrides):
+        """
+        This method is automatically called by parent chart to prepare the
+        object.
+        """
+        
+        # check if static
+        static = self.get_property('static', source, overrides)
+        if static:
+            return
+        
+        # clean items
+        self.items = []
+        
+        # check if visible
+        if not self.is_visible(source, overrides):
+            return
+        
+        # get items from objects
+        items = []
+        for obj in chart.graphics:
+            if isinstance(obj, InGraphics) and obj.visible:
+                items += obj.get_legends(canvas)
+        
+        # set new items
+        self.items = items
+    
+    
     def draw(self, canvas, source=UNDEF, **overrides):
         """Uses given canvas to draw the legend."""
         
@@ -115,7 +142,7 @@ class Legend(OutGraphics):
         self._glyph.draw(canvas)
     
     
-    def _update_glyph(self, canvas, source=UNDEF, **overrides):
+    def _update_glyph(self, canvas=None, source=UNDEF, **overrides):
         """Updates legend glyph."""
         
         # get properties
@@ -160,9 +187,9 @@ class Legend(OutGraphics):
         self._glyph.y = y
 
 
-class InsideLegend(InGraphics):
+class InLegend(InGraphics):
     """
-    InsideLegend provides a wrapper for the pero.LegendBox glyph to draw the
+    InLegend provides a wrapper for the pero.LegendBox glyph to draw the
     chart legend inside the main data frame.
     
     Properties:
@@ -205,7 +232,7 @@ class InsideLegend(InGraphics):
             Includes pero.FillProperties to specify the legend box fill.
     """
     
-    items = TupleProperty(UNDEF, types=(LegendItem,), dynamic=False, nullable=True)
+    items = TupleProperty(UNDEF, types=(Legend,), dynamic=False, nullable=True)
     static = BoolProperty(False, dynamic=False)
     
     position = EnumProperty(POS_NE, enum=POSITION_COMPASS, dynamic=False)
@@ -221,13 +248,41 @@ class InsideLegend(InGraphics):
     
     
     def __init__(self, **overrides):
-        """Initializes a new instance of the InsideLegend."""
+        """Initializes a new instance of the InLegend."""
         
         # init legend glyph
         self._glyph = LegendBox()
         
         # init base
         super().__init__(**overrides)
+    
+    
+    def prepare(self, chart, canvas, source=UNDEF, **overrides):
+        """
+        This method is automatically called by parent chart to prepare the
+        object.
+        """
+        
+        # check if static
+        static = self.get_property('static', source, overrides)
+        if static:
+            return
+        
+        # clean items
+        self.items = []
+        
+        # check if visible
+        if not self.is_visible(source, overrides):
+            return
+        
+        # get items from objects
+        items = []
+        for obj in chart.graphics:
+            if isinstance(obj, InGraphics) and obj.visible:
+                items += obj.get_legends(canvas)
+        
+        # set new items
+        self.items = items
     
     
     def draw(self, canvas, source=UNDEF, **overrides):
@@ -244,7 +299,7 @@ class InsideLegend(InGraphics):
         self._glyph.draw(canvas)
     
     
-    def _update_glyph(self, canvas, source=UNDEF, **overrides):
+    def _update_glyph(self, canvas=None, source=UNDEF, **overrides):
         """Updates legend glyph."""
         
         # get properties
