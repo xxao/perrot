@@ -10,7 +10,7 @@ from . graphics import InGraphics
 
 class Labels(InGraphics):
     """
-    Labels provide a wrapper for the pero.LabelBox glyph to draw all specified
+    Labels provides a wrapper for the pero.LabelBox glyph to draw all specified
     chart labels at once.
     
     Properties:

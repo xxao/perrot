@@ -235,6 +235,40 @@ class Axis(OutGraphics):
         return self.scale.out_range if device else self.scale.in_range
     
     
+    def get_tooltip(self, value):
+        """
+        Formats given value using defined tooltip or ticker formatter.
+        
+        Args:
+            value: any
+                Raw value to be formatted.
+        
+        Returns:
+            str
+                Formatted value.
+        """
+        
+        # tooltip disabled
+        if self.tooltip is None:
+            return ""
+        
+        # use ticker formatter
+        if self.tooltip is UNDEF:
+            formatter = self.ticker.formatter
+        
+        # use custom formatter
+        else:
+            formatter = self.tooltip
+            if self.tooltip_resaware:
+                in_range = self.scale.in_range[1] - self.scale.in_range[0]
+                out_range = self.scale.out_range[1] - self.scale.out_range[0]
+                formatter.domain = in_range
+                formatter.precision = in_range / out_range
+        
+        # format value
+        return formatter.format(value) + formatter.suffix()
+    
+    
     def draw(self, canvas, source=UNDEF, **overrides):
         """Uses given canvas to draw the axis."""
         
@@ -277,40 +311,6 @@ class Axis(OutGraphics):
         # update ticker
         self.ticker.start = self.scale.in_range[0]
         self.ticker.end = self.scale.in_range[1]
-    
-    
-    def format(self, value):
-        """
-        Formats given value using defined tooltip or ticker formatter.
-        
-        Args:
-            value: any
-                Raw value to be formatted.
-        
-        Returns:
-            str
-                Formatted value.
-        """
-        
-        # tooltip disabled
-        if self.tooltip is None:
-            return ""
-        
-        # use ticker formatter
-        if self.tooltip is UNDEF:
-            formatter = self.ticker.formatter
-        
-        # use custom formatter
-        else:
-            formatter = self.tooltip
-            if self.tooltip_resaware:
-                in_range = self.scale.in_range[1] - self.scale.in_range[0]
-                out_range = self.scale.out_range[1] - self.scale.out_range[0]
-                formatter.domain = in_range
-                formatter.precision = in_range / out_range
-        
-        # format value
-        return formatter.format(value) + formatter.suffix()
     
     
     def _get_ticks_extent(self, canvas=None, source=UNDEF, **overrides):

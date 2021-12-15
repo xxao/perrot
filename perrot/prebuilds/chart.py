@@ -11,7 +11,7 @@ from .. venn import Venn
 
 class Chart(ChartBase):
     """
-    Chart provide a pre-build simple chart with included title, legend and
+    Chart provides a pre-build simple chart with included title, legend and
     labels container. In addition, convenient methods to create pie chart or
     venn diagram are available.
     
