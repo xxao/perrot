@@ -104,4 +104,4 @@ legend = perrot.InLegend(
 chart.add(legend)
 
 # show chart
-chart.show()
+chart.show("Perrot Chart", width=600, height=450)
