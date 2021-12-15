@@ -185,7 +185,7 @@ class ChartBase(Graphics):
         
         Note that this method only checks the objects positioned outside the
         main data frame. If given position is anywhere inside data frame, the
-        perrot.chart.DATA_FRAME constant is returned.
+        perrot.DATA_FRAME constant is returned.
         
         Args:
             x: int or float
@@ -196,7 +196,7 @@ class ChartBase(Graphics):
         
         Returns:
             pero.Graphics, str or None
-                Corresponding object, perrot.chart.DATA_FRAME or None.
+                Corresponding object, perrot.DATA_FRAME or None.
         """
         
         # check data frame first
@@ -223,13 +223,13 @@ class ChartBase(Graphics):
         call this base method inside.
         
         Args:
-            obj: perrot.chart.InGraphics or perrot.chart.OutGraphics
+            obj: perrot.InGraphics or perrot.OutGraphics
                 Object to be added.
         """
         
         # check type
         if not isinstance(obj, (InGraphics, OutGraphics)):
-            message = "Object must be of type perrot.chart.InGraphics or perrot.chart.OutGraphics! -> %s" % type(obj)
+            message = "Object must be of type perrot.InGraphics or perrot.OutGraphics! -> %s" % type(obj)
             raise TypeError(message)
         
         # check tag

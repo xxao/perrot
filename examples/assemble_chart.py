@@ -47,21 +47,21 @@ chart.add(y_axis)
 
 # init grids
 x_major_grid = perrot.Grid(
-    mode = perrot.chart.GRID_MAJOR,
+    mode = perrot.GRID_MAJOR,
     orientation = perrot.VERTICAL,
     z_index = perrot.GRID_MAJOR_Z,
     scale = x_axis.scale,
     ticker = x_axis.ticker)
 
 y_major_grid = perrot.Grid(
-    mode = perrot.chart.GRID_MAJOR,
+    mode = perrot.GRID_MAJOR,
     orientation = perrot.HORIZONTAL,
     z_index = perrot.GRID_MAJOR_Z,
     scale = y_axis.scale,
     ticker = y_axis.ticker)
 
 y_minor_grid = perrot.Grid(
-    mode = perrot.chart.GRID_MINOR,
+    mode = perrot.GRID_MINOR,
     orientation = perrot.HORIZONTAL,
     z_index = perrot.GRID_MINOR_Z,
     scale = y_axis.scale,

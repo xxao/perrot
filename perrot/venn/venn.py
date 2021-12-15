@@ -36,7 +36,7 @@ class Venn(InGraphics):
             pero.Palette or palette name. This is used to automatically
             provide new color for main diagram circles.
         
-        legend: perrot.chart.OutLegend, None or UNDEF
+        legend: perrot.OutLegend, None or UNDEF
             Specifies the legend display graphics.
         
         label: pero.TextLabel

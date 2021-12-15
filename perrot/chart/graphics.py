@@ -31,7 +31,7 @@ class ChartGraphics(Graphics):
         This method should be overwritten by derived classed.
         
         Args:
-            chart: perrot.chart.Chart
+            chart: perrot.ChartBase
                 Parent chart.
             
             canvas: pero.Canvas
@@ -57,7 +57,7 @@ class ChartGraphics(Graphics):
         This method should be overwritten by derived classed.
         
         Args:
-            chart: perrot.chart.Chart
+            chart: perrot.ChartBase
                 Parent chart.
             
             canvas: pero.Canvas

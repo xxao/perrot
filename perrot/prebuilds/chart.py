@@ -17,10 +17,10 @@ class Chart(ChartBase):
     
     Properties:
         
-        title: perrot.chart.Title, None or UNDEF
+        title: perrot.Title, None or UNDEF
             Specifies the title display graphics.
         
-        legend: perrot.chart.Legend, None or UNDEF
+        legend: perrot.Legend, None or UNDEF
             Specifies the legend display graphics.
         
         label: pero.TextLabel
