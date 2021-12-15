@@ -1,20 +1,18 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-from pero.enums import *
 from pero.properties import *
 from pero import Graphics, Path, Frame, Framer
 from pero import OrdinalScale
 from pero import colors
 
-from . enums import *
+from .. enums import *
 from . graphics import InGraphics, OutGraphics
-from . axes import Axis
 
 
-class Chart(Graphics):
+class ChartBase(Graphics):
     """
-    Abstract base class for different types of chart.
+    ChartBase provides a base for different types of charts.
     
     Properties:
         
@@ -98,14 +96,13 @@ class Chart(Graphics):
     
     
     def __init__(self, **overrides):
-        """Initializes a new instance of the Chart."""
+        """Initializes a new instance of the ChartBase."""
         
         # init base
         super().__init__(**overrides)
         
         # init containers
         self._graphics = {}
-        self._axes = []
         
         # init data frame
         self._data_frame = Frame(0, 0, 1, 1)
@@ -122,19 +119,6 @@ class Chart(Graphics):
         """
         
         return tuple(self._graphics.values())
-    
-    
-    @property
-    def axes(self):
-        """
-        Gets all available axes.
-        
-        Returns:
-            (perrot.chart.Axis,)
-                All available axes.
-        """
-        
-        return tuple(self._axes)
     
     
     def get_frame(self, tag=DATA_FRAME, silent=False):
@@ -260,10 +244,6 @@ class Chart(Graphics):
         
         # register object
         self._graphics[obj.tag] = obj
-        
-        # add to axes
-        if isinstance(obj, Axis):
-            self._axes.append(obj)
     
     
     def remove(self, obj):
@@ -293,8 +273,8 @@ class Chart(Graphics):
         if not self.is_visible(source, overrides):
             return
         
-        # init frames
-        self.init_frames(canvas, source, **overrides)
+        # init objects
+        self.init_objects(canvas, source, **overrides)
         
         # draw main bgr
         self.draw_bgr(canvas, source, **overrides)
@@ -405,6 +385,25 @@ class Chart(Graphics):
                 label = obj.tag,
                 line_color = color,
                 fill_color = color.opaque(0.7))
+    
+    
+    def init_objects(self, canvas, source=UNDEF, **overrides):
+        """Prepares objects to be drawn."""
+        
+        # get ant sort objects
+        objects = list(self._graphics.values())
+        objects.sort(key=lambda o: o.z_index)
+        
+        # prepare objects
+        for obj in objects:
+            obj.prepare(self, canvas, source, **overrides)
+        
+        # init frames
+        self.init_frames(canvas, source, **overrides)
+        
+        # finalize objects
+        for obj in objects:
+            obj.finalize(self, canvas, source, **overrides)
     
     
     def init_frames(self, canvas, source=UNDEF, **overrides):
