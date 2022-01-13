@@ -7,6 +7,9 @@ version = (0, 15, 2)
 # import enums
 from . enums import *
 
+# import pero colors
+from pero import colors
+
 # import modules
 from . import chart
 from . import pie
@@ -16,6 +19,9 @@ from . import venn
 # import main objects
 from . chart import *
 
+# import series
+from . series import *
+
 # import pie chart
 from . pie import Pie
 
@@ -24,3 +30,4 @@ from . venn import Venn
 
 # import pre-build charts
 from . prebuilds import Chart
+from . prebuilds import Plot
