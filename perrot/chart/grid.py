@@ -47,14 +47,6 @@ class Grid(InGraphics):
     def __init__(self, **overrides):
         """Initializes a new instance of the Grid."""
         
-        # init scale
-        if 'scale' not in overrides:
-            overrides['scale'] = LinScale()
-        
-        # init ticker
-        if 'ticker' not in overrides:
-            overrides['ticker'] = LinTicker()
-        
         # init base
         super().__init__(**overrides)
         
@@ -85,6 +77,11 @@ class Grid(InGraphics):
         scale = self.get_property('scale', source, overrides)
         ticker = self.get_property('ticker', source, overrides)
         mode = self.get_property('mode', source, overrides)
+        
+        # check scale
+        if not scale or not ticker:
+            self._glyph.ticks = ()
+            return
         
         # get ticks
         ticker.start = scale.in_range[0]

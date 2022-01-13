@@ -126,6 +126,30 @@ class InGraphics(ChartGraphics):
         """
         
         return ()
+    
+    
+    def get_tooltip(self, x, y, limit):
+        """
+        Gets the nearest object tooltip (e.g. data point, region etc.).
+        
+        This method should be overwritten by derived classed.
+        
+        Args:
+            x: int or float
+                Cursor x-coordinate in device units.
+            
+            y: int or float
+                Cursor y-coordinate in device units.
+            
+            limit: int or float
+                Maximum allowed distance in device units.
+        
+        Returns:
+            pero.Tooltip or None
+                Tooltip item.
+        """
+        
+        return None
 
 
 class OutGraphics(ChartGraphics):

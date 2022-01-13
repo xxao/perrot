@@ -77,6 +77,26 @@ class ColorBar(OutGraphics):
         return self.get_property('thickness', source, overrides)
     
     
+    def get_color(self, value):
+        """
+        Converts given value into color according to current gradient and scale.
+        
+        Args:
+            value: float
+                Value to convert in real data units.
+        
+        Returns:
+            pero.Color
+                Corresponding color.
+        """
+        
+        # normalize value by current scale
+        norm = self.scale.normalize(value)
+        
+        # convert normalized value into color
+        return self.gradient.color_at(norm)
+    
+    
     def draw(self, canvas, source=None, **overrides):
         """Uses given canvas to draw color bar."""
         

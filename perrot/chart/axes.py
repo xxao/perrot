@@ -28,21 +28,6 @@ class Axis(OutGraphics):
     
     Properties:
         
-        show_title: bool
-            Specifies whether the title should be displayed.
-        
-        show_labels: bool
-            Specifies whether the labels should be displayed.
-        
-        show_line: bool
-            Specifies whether the major axis line should be displayed.
-        
-        show_major_ticks: bool
-            Specifies whether the major ticks should be displayed.
-        
-        show_minor_ticks: bool
-            Specifies whether the minor ticks should be displayed.
-        
         mapper: pero.Scale, None or UNDEF
             Specifies the additional scale to initially map categorical data
             values into continuous range.
@@ -106,6 +91,9 @@ class Axis(OutGraphics):
         minor_tick_offset: int or float
             Specifies the shift of the minor ticks from the main line.
         
+        level: int
+            Specifies the dependency level on other plot axes.
+        
         static: bool
             Specifies whether the range should be fixed (True) or whether it
             should be changed by current data, zooming and panning.
@@ -138,13 +126,22 @@ class Axis(OutGraphics):
         tooltip_resaware: bool
             Specifies whether custom tooltip formatter domain and precision
             should be set automatically based on current axis resolution.
+        
+        show_title: bool
+            Specifies whether the title should be displayed.
+        
+        show_labels: bool
+            Specifies whether the labels should be displayed.
+        
+        show_line: bool
+            Specifies whether the major axis line should be displayed.
+        
+        show_major_ticks: bool
+            Specifies whether the major ticks should be displayed.
+        
+        show_minor_ticks: bool
+            Specifies whether the minor ticks should be displayed.
     """
-    
-    show_title = BoolProperty(True, dynamic=False)
-    show_labels = BoolProperty(True, dynamic=False)
-    show_line = BoolProperty(True, dynamic=False)
-    show_major_ticks = BoolProperty(True, dynamic=False)
-    show_minor_ticks = BoolProperty(True, dynamic=False)
     
     mapper = Property(UNDEF, types=(Scale,), dynamic=False, nullable=True)
     scale = Property(UNDEF, types=(ContinuousScale,), dynamic=False)
@@ -170,6 +167,7 @@ class Axis(OutGraphics):
     minor_tick_size = NumProperty(3, dynamic=False)
     minor_tick_offset = NumProperty(0, dynamic=False)
     
+    level = IntProperty(1, dynamic=False)
     static = BoolProperty(False, dynamic=False)
     autoscale = BoolProperty(False, dynamic=False)
     symmetric = BoolProperty(False, dynamic=False)
@@ -179,6 +177,12 @@ class Axis(OutGraphics):
     
     tooltip = Property(UNDEF, types=(Formatter,), dynamic=False, nullable=True)
     tooltip_resaware = BoolProperty(True, dynamic=False)
+    
+    show_title = BoolProperty(True, dynamic=False)
+    show_labels = BoolProperty(True, dynamic=False)
+    show_line = BoolProperty(True, dynamic=False)
+    show_major_ticks = BoolProperty(True, dynamic=False)
+    show_minor_ticks = BoolProperty(True, dynamic=False)
     
     
     def __init__(self, **overrides):
@@ -199,7 +203,7 @@ class Axis(OutGraphics):
         self._glyph = StraitAxis()
         
         # set defaults by position
-        self._update_position(overrides)
+        self._update_position(**overrides)
         
         # bind events
         self.bind(EVT_PROPERTY_CHANGED, self._on_axis_property_changed)
@@ -529,10 +533,17 @@ class Axis(OutGraphics):
             return
         
         # apply
-        self.title_text_align = title_text_align
-        self.title_text_base = title_text_base
-        self.label_text_align = label_text_align
-        self.label_text_base = label_text_base
+        if 'title_text_align' not in overrides:
+            self.title_text_align = title_text_align
+        
+        if 'title_text_base' not in overrides:
+            self.title_text_base = title_text_base
+        
+        if 'label_text_align' not in overrides:
+            self.label_text_align = label_text_align
+        
+        if 'label_text_base' not in overrides:
+            self.label_text_base = label_text_base
     
     
     def _on_axis_property_changed(self, evt):
