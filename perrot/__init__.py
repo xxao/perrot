@@ -2,7 +2,7 @@
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
 # set version
-version = (0, 15, 2)
+version = (0, 16, 0)
 
 # import enums
 from . enums import *
@@ -13,7 +13,6 @@ from pero import colors
 # import modules
 from . import chart
 from . import pie
-from . import plot
 from . import venn
 from . import interact
 
