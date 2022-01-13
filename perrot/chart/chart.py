@@ -102,7 +102,8 @@ class ChartBase(Graphics):
         super().__init__(**overrides)
         
         # init containers
-        self._graphics = {}
+        self._graphics = {}  # {tag, obj}
+        self._mapping = {}  # {dst_tag: {dst_prop: (src_tag, src_prop)}}
         
         # init data frame
         self._data_frame = Frame(0, 0, 1, 1)
@@ -262,8 +263,60 @@ class ChartBase(Graphics):
         # get object
         obj = self.get_obj(obj)
         
+        # check mapping
+        for mapping in self._mapping.values():
+            for src in mapping.values():
+                if obj.tag == src[0]:
+                    message = "Object '%s' is mapped by another object and cannot be removed!" % obj.tag
+                    raise ValueError(message)
+        
+        # remove mapping
+        if obj.tag in self._mapping:
+            del self._mapping[obj.tag]
+        
         # remove object
         del self._graphics[obj.tag]
+    
+    
+    def map(self, obj, obj_prop, src, src_prop):
+        """
+        Maps object property to specified property of the source. This method is
+        mainly used to synchronize scales between data and relevant axis.
+        
+        Args:
+            obj: str
+                Object's unique tag.
+            
+            obj_prop: str
+                Object's property name.
+            
+            src: str
+                Source object's unique tag.
+            
+            src_prop: str
+                Source object's property name.
+        """
+        
+        # skip if source undefined
+        if not src:
+            return
+        
+        # get objects
+        obj = self.get_obj(obj)
+        src = self.get_obj(src)
+        
+        # get mapping
+        obj_map = self._mapping.get(obj.tag, {})
+        
+        # check props
+        obj.get_property(obj_prop)
+        src.get_property(src_prop)
+        
+        # set prop
+        obj_map[obj_prop] = (src.tag, src_prop)
+        
+        # update mapping
+        self._mapping[obj.tag] = obj_map
     
     
     def draw(self, canvas, source=UNDEF, **overrides):
@@ -390,9 +443,15 @@ class ChartBase(Graphics):
     def init_objects(self, canvas, source=UNDEF, **overrides):
         """Prepares objects to be drawn."""
         
-        # get ant sort objects
+        # get and sort objects
         objects = list(self._graphics.values())
         objects.sort(key=lambda o: o.z_index)
+        
+        # set mapped properties
+        for obj in objects:
+            for name, mapping in self._mapping.get(obj.tag, {}).items():
+                src = self.get_obj(mapping[0])
+                obj.set_property(name, src.get_property(mapping[1]))
         
         # prepare objects
         for obj in objects:
