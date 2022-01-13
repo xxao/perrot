@@ -4,7 +4,10 @@
 from pero.properties import *
 from pero import colors
 from pero import OrdinalScale
-from pero import Path, MarkerLegend, Label, TextLabel
+from pero import Path
+from pero import MarkerLegend
+from pero import Label, TextLabel
+from pero import Tooltip, TextTooltip
 
 from .. enums import *
 from .. chart import InGraphics
@@ -36,11 +39,31 @@ class Venn(InGraphics):
             pero.Palette or palette name. This is used to automatically
             provide new color for main diagram circles.
         
-        legend: perrot.OutLegend, None or UNDEF
-            Specifies the legend display graphics.
+        legend: perrot.MarkerLegend, None or UNDEF
+            Specifies the explicit value for the legend or a template to create
+            it. When the actual legend is initialized, current region is
+            provided as a source, therefore properties can be dynamic to
+            retrieve the final value from the region.
         
         label: pero.TextLabel
-            Specifies the glyph to be used to draw labels.
+            Specifies a template to create regions labels. When the actual label
+            is initialized, current region is provided as a source, therefore
+            properties can be dynamic to retrieve the final value from the point.
+        
+        tooltip: pero.Tooltip, None or UNDEF
+            Specifies a template to create regions tooltips. When the actual
+            tooltip is initialized, current region is provided as a source,
+            therefore properties can be dynamic to retrieve the final value from
+            the region.
+        
+        show_legend: bool
+            Specifies whether the legend should be shown.
+        
+        show_labels: bool
+            Specifies whether the labels should be shown.
+        
+        show_tooltip: bool
+            Specifies whether the wedges tooltip should be shown.
     """
     
     mode = EnumProperty(VENN_SEMI, enum=VENN_MODE, dynamic=False, nullable=False)
@@ -60,6 +83,11 @@ class Venn(InGraphics):
     
     legend = Property(UNDEF, types=(MarkerLegend,), dynamic=False, nullable=True)
     label = Property(UNDEF, types=(Label,), dynamic=False, nullable=True)
+    tooltip = Property(UNDEF, types=(Tooltip,), dynamic=False, nullable=True)
+    
+    show_legend = BoolProperty(True, dynamic=False)
+    show_labels = BoolProperty(True, dynamic=False)
+    show_tooltip = BoolProperty(True, dynamic=False)
     
     
     def __init__(self, a, b, ab, c=0, ac=0, bc=0, abc=0, **overrides):
@@ -106,16 +134,21 @@ class Venn(InGraphics):
         if 'legend' not in overrides:
             overrides['legend'] = MarkerLegend(
                 text = lambda d: d.title,
-                marker = 'o',
+                marker = MARKER_CIRCLE,
                 marker_size = 12)
         
         # init label
         if 'label' not in overrides:
             overrides['label'] = TextLabel(
-                text = lambda d: d.value,
+                text = lambda d: str(d.value),
                 font_size = 14,
                 text_align = TEXT_ALIGN_CENTER,
                 text_base = TEXT_BASE_MIDDLE)
+        
+        # init tooltip
+        if 'tooltip' not in overrides:
+            overrides['tooltip'] = TextTooltip(
+                text = lambda d: str(d.value))
         
         # init base
         super().__init__(**overrides)
@@ -133,11 +166,14 @@ class Venn(InGraphics):
     
     
     def get_legends(self, canvas=None, source=UNDEF, **overrides):
-        """Returns all legend items of the object."""
+        """Gets circles legend items."""
         
         # get properties
+        show_legend = self.get_property('show_legend', source, overrides)
         legend = self.get_property('legend', source, overrides)
-        if not legend:
+        
+        # check legend
+        if not show_legend or not legend:
             return ()
         
         # get items
@@ -160,11 +196,14 @@ class Venn(InGraphics):
     
     
     def get_labels(self, canvas=None, source=UNDEF, **overrides):
-        """Returns all labels of the object."""
+        """Gets segments labels."""
         
         # get properties
+        show_labels = self.get_property('show_labels', source, overrides)
         label = self.get_property('label', source, overrides)
-        if not label:
+        
+        # check labels
+        if not show_labels or not label:
             return ()
         
         # update patches
@@ -273,7 +312,7 @@ class Venn(InGraphics):
     
     
     def _init_colors(self):
-        """Sets colors."""
+        """Sets colors to circles."""
         
         # init color scale
         color_scale = OrdinalScale(

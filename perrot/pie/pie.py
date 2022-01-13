@@ -7,7 +7,9 @@ import pero
 from pero.properties import *
 from pero import colors
 from pero import OrdinalScale
-from pero import MarkerLegend, Label, TextLabel
+from pero import MarkerLegend
+from pero import Label, TextLabel
+from pero import Tooltip, TextTooltip
 
 from .. enums import *
 from .. chart import InGraphics
@@ -47,11 +49,31 @@ class Pie(InGraphics):
         line properties:
             Includes pero.LineProperties to specify the wedges outline.
         
-        label: pero.MarkerLegend
-            Specifies the glyph to be used to draw legend items.
+        legend: perrot.MarkerLegend, None or UNDEF
+            Specifies the explicit value for the legend or a template to create
+            it. When the actual legend is initialized, current wedge is
+            provided as a source, therefore properties can be dynamic to
+            retrieve the final value from the wedge.
         
         label: pero.TextLabel
-            Specifies the glyph to be used to draw labels.
+            Specifies a template to create wedges labels. When the actual label
+            is initialized, current wedge is provided as a source, therefore
+            properties can be dynamic to retrieve the final value from the wedge.
+        
+        tooltip: pero.Tooltip, None or UNDEF
+            Specifies a template to create wedges tooltips. When the actual
+            tooltip is initialized, current wedge is provided as a source,
+            therefore properties can be dynamic to retrieve the final value from
+            the wedge.
+        
+        show_legend: bool
+            Specifies whether the legend should be shown.
+        
+        show_labels: bool
+            Specifies whether the labels should be shown.
+        
+        show_tooltip: bool
+            Specifies whether the wedges tooltip should be shown.
     """
     
     x = NumProperty(UNDEF, dynamic=False)
@@ -65,6 +87,11 @@ class Pie(InGraphics):
     
     legend = Property(UNDEF, types=(MarkerLegend,), dynamic=False, nullable=True)
     label = Property(UNDEF, types=(Label,), dynamic=False, nullable=True)
+    tooltip = Property(UNDEF, types=(Tooltip,), dynamic=False, nullable=True)
+    
+    show_legend = BoolProperty(True, dynamic=False)
+    show_labels = BoolProperty(True, dynamic=False)
+    show_tooltip = BoolProperty(True, dynamic=False)
     
     
     def __init__(self, values, titles=None, explode=None, **overrides):
@@ -86,16 +113,21 @@ class Pie(InGraphics):
         if 'legend' not in overrides:
             overrides['legend'] = MarkerLegend(
                 text = lambda d: d.title,
-                marker = 'o',
+                marker = MARKER_CIRCLE,
                 marker_size = 12)
         
         # init label
         if 'label' not in overrides:
             overrides['label'] = TextLabel(
-                text = lambda d: d.value,
+                text = lambda d: str(d.value),
                 font_size = 12,
                 text_align = TEXT_ALIGN_CENTER,
                 text_base = TEXT_BASE_MIDDLE)
+        
+        # init tooltip
+        if 'tooltip' not in overrides:
+            overrides['tooltip'] = TextTooltip(
+                text = lambda d: str(d.value))
         
         # init base
         super().__init__(**overrides)
@@ -118,11 +150,14 @@ class Pie(InGraphics):
     
     
     def get_legends(self, canvas=None, source=UNDEF, **overrides):
-        """Returns all legend items of the object."""
+        """Gets wedges legend items."""
         
         # get properties
+        show_legend = self.get_property('show_legend', source, overrides)
         legend = self.get_property('legend', source, overrides)
-        if not legend:
+        
+        # check legend
+        if not show_legend or not legend:
             return ()
         
         # get items
@@ -145,11 +180,14 @@ class Pie(InGraphics):
     
     
     def get_labels(self, canvas=None, source=UNDEF, **overrides):
-        """Returns all labels of the object."""
+        """Gets wedges labels."""
         
         # get properties
+        show_labels = self.get_property('show_labels', source, overrides)
         label = self.get_property('label', source, overrides)
-        if not label:
+        
+        # check labels
+        if not show_labels or not label:
             return ()
         
         # update wedges
@@ -273,7 +311,7 @@ class Pie(InGraphics):
     
     
     def _init_colors(self):
-        """Sets colors."""
+        """Sets colors to wedges."""
         
         # init color scale
         color_scale = OrdinalScale(
