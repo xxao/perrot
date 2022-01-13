@@ -4,7 +4,7 @@
 import pero
 import perrot
 
-# init simple chart
+# init chart
 chart = perrot.Chart(
     title_text = "Pie Chart")
 
