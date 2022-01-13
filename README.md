@@ -39,12 +39,12 @@ understand all the following images. Check the image name and find corresponding
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/axes.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/band.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/bars.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/heatmap.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/histogram.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/multiplot.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/profile.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/scatter.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/stacks.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/heatmap.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/venn.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/piechart.png" height="150"/>
 </p>
