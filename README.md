@@ -33,20 +33,20 @@ In the [examples](https://github.com/xxao/perrot/tree/master/examples) folder yo
 understand all the following images. Check the image name and find corresponding python draw file.
 
 <p>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_annotations.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_axes.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_band.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_bars.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_empty.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_heatmap.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_histogram.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_lines.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_multiplot.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_profile.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_scatter.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/plot_stacks.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/venn_diagram.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/pie_chart.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/annotations.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/arrows.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/assembly.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/axes.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/band.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/bars.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/heatmap.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/histogram.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/multiplot.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/profile.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/scatter.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/stacks.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/venn.png" height="150"/>
+    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/piechart.png" height="150"/>
 </p>
 
 
