@@ -60,4 +60,4 @@ series = plot.rects(
 
 # show plot
 plot.zoom()
-plot.show("Heatmap Plot", 600, 500)
+plot.view("Heatmap Plot", 600, 500)

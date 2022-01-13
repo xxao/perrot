@@ -42,4 +42,4 @@ series2 = plot.scatter(
 
 # show plot
 plot.zoom()
-plot.show("Scatter Series")
+plot.view("Scatter Series")

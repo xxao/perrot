@@ -96,6 +96,7 @@ class Plot(ChartBase):
             overrides['x_axis'] = Axis(
                 tag = 'x_axis',
                 position = POS_BOTTOM,
+                level = 1,
                 margin = 0)
         
         # init x-axis gridlines
@@ -120,6 +121,7 @@ class Plot(ChartBase):
             overrides['y_axis'] = Axis(
                 tag = 'y_axis',
                 position = POS_LEFT,
+                level = 2,
                 margin = 0)
         
         # init y-axis gridlines
@@ -189,6 +191,35 @@ class Plot(ChartBase):
         """
         
         return tuple(obj for obj in self.graphics if isinstance(obj, Annotation))
+    
+    
+    def get_limits(self, axis, x_range=None, y_range=None, exact=False):
+        """
+        Gets minimum and maximum value from all visible series connected to
+        specified axis. The range can be used to crop data in particular
+        dimension (e.g. provide x_range to get minimum and maximum values of the
+        cropped data in y dimension).
+        
+        Args:
+            axis: str or perrot.plot.Axis
+                Axis's unique tag or the axis itself.
+            
+            x_range: (float, float) or None
+                X-range limits.
+            
+            y_range: (float, float) or None
+                Y-range limits.
+            
+            exact: bool
+                If set to True, the limits are retrieved for data only, i.e. any
+                additional space like margin is ignored.
+        
+        Returns:
+            (float, float)
+                Minimum and maximum value of the axis from related series.
+        """
+        
+        return self._get_series_limits(axis, x_range, y_range, exact)
     
     
     def grid(self, axis, **overrides):
@@ -980,6 +1011,47 @@ class Plot(ChartBase):
         
         # apply to axis
         axis.scale.in_range = (start, end)
+    
+    
+    def view(self, title=None, width=None, height=None, backend=None, **options):
+        """
+        Shows current plot as interactive viewer app.
+        
+        Note that is just a convenient scripting shortcut and this method cannot
+        be used if the plot is already part of any UI app.
+        
+        Args:
+            title: str or None
+                Viewer frame title. If set to None, current plot title is used.
+            
+            width: float or None
+                Image width in device units. If set to None, current plot width
+                is used.
+            
+            height: float or None
+                Image height in device units. If set to None, current plot
+                height is used.
+            
+            backend: pero.BACKEND or None
+                Specific backend to be used. The value must be an item from the
+                pero.BACKEND enum.
+            
+            options: str:any pairs
+                Additional parameters for specific backend.
+        """
+        
+        # get size
+        if width is None:
+            width = self.width
+        if height is None:
+            height = self.height
+        
+        # init control
+        from .. interact import PlotControl
+        control = PlotControl(graphics=self)
+        
+        # show viewer
+        control.show(title, width, height, backend, **options)
     
     
     def _get_related_axes(self, obj):

@@ -70,4 +70,4 @@ series3 = plot.vbars(
 
 # show plot
 plot.zoom()
-plot.show("VBars Series")
+plot.view("VBars Series")

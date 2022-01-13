@@ -15,6 +15,7 @@ from . import chart
 from . import pie
 from . import plot
 from . import venn
+from . import interact
 
 # import main objects
 from . chart import *
@@ -31,3 +32,6 @@ from . venn import Venn
 # import pre-build charts
 from . prebuilds import Chart
 from . prebuilds import Plot
+
+# import interactivity tools
+from . interact import *

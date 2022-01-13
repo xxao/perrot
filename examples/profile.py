@@ -28,4 +28,4 @@ series = plot.profile(
 
 # show plot
 plot.zoom()
-plot.show("Profile Series")
+plot.view("Profile Series")

@@ -33,4 +33,4 @@ series = plot.lines(
 
 # show plot
 plot.zoom()
-plot.show("Lines Series")
+plot.view("Lines Series")

@@ -123,4 +123,4 @@ plot.add(color_axis)
 plot.add(color_bar)
 
 # show plot
-plot.show("Multiple Axes")
+plot.view("Multiple Axes")

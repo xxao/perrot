@@ -27,4 +27,4 @@ series = plot.band(
 
 # show plot
 plot.zoom()
-plot.show("Band Series")
+plot.view("Band Series")

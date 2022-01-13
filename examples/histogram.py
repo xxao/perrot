@@ -48,4 +48,4 @@ cumulative = plot.profile(
 
 # show plot
 plot.zoom()
-plot.show("Histogram")
+plot.view("Histogram")

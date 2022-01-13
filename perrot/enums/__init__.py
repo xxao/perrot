@@ -32,6 +32,15 @@ MINOR = 'minor'
 FULL = 'full'
 SEMI = 'semi'
 
+ZOOM_X = 'x'
+ZOOM_Y = 'y'
+ZOOM_XY = 'xy'
+ZOOM_AUTO = 'auto'
+
+MEASURE_X = 'x'
+MEASURE_Y = 'y'
+MEASURE_AUTO = 'auto'
+
 # define gridlines modes
 GRID_MAJOR = MAJOR
 GRID_MINOR = MINOR
@@ -49,3 +58,16 @@ VENN_MODE = Enum(
     NONE = VENN_NONE,
     SEMI = VENN_SEMI,
     FULL = VENN_FULL)
+
+# define zoom tool modes
+ZOOM_MODE = Enum(
+    X = ZOOM_X,
+    Y = ZOOM_Y,
+    XY = ZOOM_XY,
+    AUTO = ZOOM_AUTO)
+
+# define measurement tool mode
+MEASURE_MODE = Enum(
+    X = MEASURE_X,
+    Y = MEASURE_Y,
+    AUTO = MEASURE_AUTO)

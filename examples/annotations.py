@@ -103,4 +103,4 @@ right_text = pero.Textbox(
 plot.annotate(right_text, x_props=('x',), y_props=('y',), x_offset=5)
 
 # show chart
-plot.show("Plot Annotations", width=600, height=400)
+plot.view("Plot Annotations", width=600, height=400)

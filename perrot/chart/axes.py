@@ -167,7 +167,7 @@ class Axis(OutGraphics):
     minor_tick_size = NumProperty(3, dynamic=False)
     minor_tick_offset = NumProperty(0, dynamic=False)
     
-    level = IntProperty(1, dynamic=False)
+    level = IntProperty(2, dynamic=False)
     static = BoolProperty(False, dynamic=False)
     autoscale = BoolProperty(False, dynamic=False)
     symmetric = BoolProperty(False, dynamic=False)
