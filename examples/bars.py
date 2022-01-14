@@ -5,7 +5,7 @@ import pero
 import perrot
 
 # prepare data
-categories = ("one", 'two', "three", "four", "five")
+categories = ("Category A", 'Category B', "Category C", "Category D", "Category E")
 y_data1 = (5, 10, 7, 3, 4)
 y_data2 = (7, 5, 9, 1, 5)
 y_data3 = (2, 1, 3, 5, 4)
@@ -31,6 +31,8 @@ plot = perrot.Plot(
 
 # init labels
 label = lambda d: str(d[1])
+
+# init tooltip
 tooltip = lambda d: "%s (%s)" % (d[1], d[0])
 
 # add series

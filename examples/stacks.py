@@ -6,7 +6,7 @@ import pero
 import perrot
 
 # prepare data
-categories = ("one", 'two', "three", "four", "five")
+categories = ("Category A", 'Category B', "Category C", "Category D", "Category E")
 y_data1 = numpy.array((5, 10, 7, 3, 4))
 y_data2 = numpy.array((7, 5, 9, 1, 5))
 y_data3 = numpy.array((2, 1, 3, 5, 4))
@@ -24,6 +24,7 @@ x_axis = perrot.OrdinalAxis(
 plot = perrot.Plot(
     x_axis = x_axis,
     y_axis_title = "count",
+    y_axis_autoscale = True,
     x_major_grid = None)
 
 # init labels
@@ -72,4 +73,4 @@ series3 = plot.vbars(
 
 # show plot
 plot.zoom()
-plot.show("Stacked Series")
+plot.view("Stacked Series")
