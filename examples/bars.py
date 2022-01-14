@@ -26,6 +26,7 @@ x_axis = perrot.OrdinalAxis(
 plot = perrot.Plot(
     x_axis = x_axis,
     y_axis_title = "count",
+    y_axis_autoscale = True,
     x_major_grid = None)
 
 # init labels

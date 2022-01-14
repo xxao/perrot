@@ -931,7 +931,7 @@ class Plot(ChartBase):
                 start, end = self._get_series_limits(child, x_range, y_range, exact=False)
                 
                 # finalize axis
-                self.finalize_axis(axis, start, end)
+                self.finalize_axis(child, start, end)
     
     
     def finalize_axis(self, axis, start, end):
