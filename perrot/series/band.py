@@ -85,7 +85,7 @@ class Band(Series):
     y1 = Property(UNDEF)
     y2 = Property(UNDEF)
     
-    marker = MarkerProperty('o', nullable=True)
+    marker = MarkerProperty(UNDEF, nullable=True)
     spacing = NumProperty(20, dynamic=False)
     
     line = Include(LineProperties, line_color=UNDEF, dynamic=False)
@@ -94,6 +94,10 @@ class Band(Series):
     
     def __init__(self, **overrides):
         """Initializes a new instance of the Band series."""
+        
+        # init marker
+        if 'marker' not in overrides:
+            overrides['marker'] = MARKER_CIRCLE
         
         super().__init__(**overrides)
         

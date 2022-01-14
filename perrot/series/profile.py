@@ -95,7 +95,7 @@ class Profile(Series):
     base = NumProperty(UNDEF, dynamic=False, nullable=True)
     
     steps = EnumProperty(None, enum=LINE_STEP, nullable=True)
-    marker = MarkerProperty(MARKER_CIRCLE, nullable=True)
+    marker = MarkerProperty(UNDEF, nullable=True)
     spacing = NumProperty(20, dynamic=False)
     
     line = Include(LineProperties, line_color=UNDEF, dynamic=False)
@@ -104,6 +104,10 @@ class Profile(Series):
     
     def __init__(self, **overrides):
         """Initializes a new instance of Profile series."""
+        
+        # init marker
+        if 'marker' not in overrides:
+            overrides['marker'] = MARKER_CIRCLE
         
         super().__init__(**overrides)
         

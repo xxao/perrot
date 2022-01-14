@@ -50,11 +50,15 @@ class Scatter(Series):
     x = Property(lambda d: d[0])
     y = Property(lambda d: d[1])
     
-    marker = MarkerProperty(MARKER_CIRCLE)
+    marker = MarkerProperty(UNDEF)
     
     
     def __init__(self, **overrides):
         """Initializes a new instance of the Scatter series."""
+        
+        # init marker
+        if 'marker' not in overrides:
+            overrides['marker'] = MARKER_CIRCLE
         
         super().__init__(**overrides)
         
@@ -212,31 +216,3 @@ class Scatter(Series):
                 
                 # draw marker
                 marker.draw(canvas, data, **marker_overrides_fin)
-
-
-class Asterisks(Scatter):
-    marker = MarkerProperty(MARKER.ASTERISK)
-
-
-class Circles(Scatter):
-    marker = MarkerProperty(MARKER.CIRCLE)
-
-
-class Crosses(Scatter):
-    marker = MarkerProperty(MARKER.CROSS)
-
-
-class Diamonds(Scatter):
-    marker = MarkerProperty(MARKER.DIAMOND)
-
-
-class Pluses(Scatter):
-    marker = MarkerProperty(MARKER.PLUS)
-
-
-class Triangles(Scatter):
-    marker = MarkerProperty(MARKER.TRIANGLE)
-
-
-class Squares(Scatter):
-    marker = MarkerProperty(MARKER.SQUARE)
