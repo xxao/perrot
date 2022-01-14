@@ -216,3 +216,31 @@ class Scatter(Series):
                 
                 # draw marker
                 marker.draw(canvas, data, **marker_overrides_fin)
+
+
+class Asterisks(Scatter):
+    marker = MarkerProperty(MARKER_ASTERISK)
+
+
+class Circles(Scatter):
+    marker = MarkerProperty(MARKER_CIRCLE)
+
+
+class Crosses(Scatter):
+    marker = MarkerProperty(MARKER_CROSS)
+
+
+class Diamonds(Scatter):
+    marker = MarkerProperty(MARKER_DIAMOND)
+
+
+class Pluses(Scatter):
+    marker = MarkerProperty(MARKER_PLUS)
+
+
+class Triangles(Scatter):
+    marker = MarkerProperty(MARKER_TRIANGLE)
+
+
+class Squares(Scatter):
+    marker = MarkerProperty(MARKER.SQUARE)

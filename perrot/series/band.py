@@ -3,6 +3,7 @@
 
 import numpy
 
+from pero.enums import *
 from pero.properties import *
 from pero import Band as BandGlyph
 
