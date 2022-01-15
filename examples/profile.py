@@ -2,7 +2,6 @@
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
 import numpy
-import pero
 import perrot
 
 # prepare data
@@ -21,9 +20,9 @@ series = plot.profile(
     y = y_data,
     base = 0,
     title = "sin(x)",
-    steps = pero.LINE_STEP.NONE,
+    steps = perrot.LINE_STEP.NONE,
     show_area = True,
-    show_points = pero.UNDEF,
+    show_points = perrot.UNDEF,
     marker_line_color = "white")
 
 # show plot

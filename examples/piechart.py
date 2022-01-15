@@ -1,7 +1,6 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-import pero
 import perrot
 
 # init chart
@@ -12,7 +11,7 @@ chart = perrot.Chart(
 values_1 = [40, 17, 4]
 titles_1 = ["I", "II", "III"]
 explode_1 = [0, 0, 0]
-palette_1 = pero.colors.Dark
+palette_1 = perrot.colors.Dark
 
 pie_1 = chart.pie(values_1, titles_1, explode_1,
     inner_radius = 0.25,

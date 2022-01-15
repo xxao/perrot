@@ -20,8 +20,8 @@ size_fn = lambda d: size_scale.scale(d[0])
 plot = perrot.Plot(
     x_axis_title = "x-value",
     y_axis_title = "random",
-    legend_position = pero.NE,
-    legend_orientation = pero.VERTICAL)
+    legend_position = perrot.NE,
+    legend_orientation = perrot.VERTICAL)
 
 # add series
 series1 = plot.scatter(

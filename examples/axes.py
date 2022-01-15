@@ -1,14 +1,13 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-import pero
 import perrot
 
 # init axes
 left_axis = perrot.LogAxis(
     title = "Left Axis (log10)",
     tag = "left_axis",
-    position = pero.LEFT,
+    position = perrot.LEFT,
     margin = 0,
     z_index = perrot.AXIS_Z,
     scale_in_range = (1, 1.e5),
@@ -17,7 +16,7 @@ left_axis = perrot.LogAxis(
 bottom_axis = perrot.LinAxis(
     title = "Bottom Axis (lin)",
     tag = "bottom_axis",
-    position = pero.BOTTOM,
+    position = perrot.BOTTOM,
     margin = 0,
     z_index = perrot.AXIS_Z,
     scale_in_range = (-200, 555),
@@ -27,7 +26,7 @@ bottom_axis = perrot.LinAxis(
 right_axis = perrot.LinAxis(
     title = "Right Axis",
     tag = "right_axis",
-    position = pero.RIGHT,
+    position = perrot.RIGHT,
     margin = 0,
     z_index = perrot.AXIS_Z,
     ticker_formatter_hide_suffix = True,
@@ -37,18 +36,18 @@ right_axis = perrot.LinAxis(
 top_axis = perrot.LinAxis(
     title = "Top Axis",
     tag = "top_axis",
-    position = pero.TOP,
+    position = perrot.TOP,
     margin = 0,
     z_index = perrot.AXIS_Z,
     scale_in_range = (0.1, 1500),
     label_angle = -45,
-    label_text_align = pero.LEFT,
+    label_text_align = perrot.LEFT,
     level = 1)
 
 ordinal_axis = perrot.OrdinalAxis(
     title = "Ordinal Axis",
     tag = "ordinal_axis",
-    position = pero.BOTTOM,
+    position = perrot.BOTTOM,
     margin = (20, 0, 0, 0),
     z_index = perrot.AXIS_Z+1,
     labels = ("one", 'two', "three", "four", "five"),
@@ -59,7 +58,7 @@ ordinal_axis = perrot.OrdinalAxis(
 color_axis = perrot.LinAxis(
     title = "Color Axis",
     tag = "color_axis",
-    position = pero.RIGHT,
+    position = perrot.RIGHT,
     margin = 0,
     z_index = perrot.AXIS_Z+2,
     scale_in_range = (0, 1),
@@ -68,42 +67,42 @@ color_axis = perrot.LinAxis(
 
 color_bar = perrot.ColorBar(
     tag = "color_bar",
-    position = pero.RIGHT,
+    position = perrot.RIGHT,
     margin = (0, 0, 0, 20),
     z_index = perrot.AXIS_Z+1,
-    gradient = pero.colors.YlOrRd)
+    gradient = perrot.colors.YlOrRd)
 
 # init grids
 h_major_grid = perrot.Grid(
     mode = perrot.MAJOR,
-    orientation = pero.HORIZONTAL,
+    orientation = perrot.HORIZONTAL,
     scale = left_axis.scale,
     ticker = left_axis.ticker,
-    line_color = pero.colors.LightGrey,
+    line_color = perrot.colors.LightGrey,
     z_index = perrot.GRID_MAJOR_Z)
 
 h_minor_grid = perrot.Grid(
     mode = perrot.MINOR,
-    orientation = pero.HORIZONTAL,
+    orientation = perrot.HORIZONTAL,
     scale = left_axis.scale,
     ticker = left_axis.ticker,
-    line_color = pero.colors.LightGrey.lighter(0.7),
+    line_color = perrot.colors.LightGrey.lighter(0.7),
     z_index = perrot.GRID_MINOR_Z)
 
 v_major_grid = perrot.Grid(
     mode = perrot.MAJOR,
-    orientation = pero.VERTICAL,
+    orientation = perrot.VERTICAL,
     scale = bottom_axis.scale,
     ticker = bottom_axis.ticker,
-    line_color = pero.colors.LightGrey,
+    line_color = perrot.colors.LightGrey,
     z_index = perrot.GRID_MAJOR_Z)
 
 v_minor_grid = perrot.Grid(
     mode = perrot.MINOR,
-    orientation = pero.VERTICAL,
+    orientation = perrot.VERTICAL,
     scale = bottom_axis.scale,
     ticker = bottom_axis.ticker,
-    line_color = pero.colors.LightGrey.lighter(0.7),
+    line_color = perrot.colors.LightGrey.lighter(0.7),
     z_index = perrot.GRID_MINOR_Z)
 
 # init plot

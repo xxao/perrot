@@ -2,7 +2,6 @@
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
 import numpy
-import pero
 import perrot
 
 # prepare data
@@ -22,7 +21,7 @@ series = plot.band(
     y1 = y1_data,
     y2 = y2_data,
     title = "Band",
-    show_points = pero.UNDEF,
+    show_points = perrot.UNDEF,
     marker_line_color = "white")
 
 # show plot

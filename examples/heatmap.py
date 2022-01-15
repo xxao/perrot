@@ -2,7 +2,6 @@
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
 import numpy
-import pero
 import perrot
 
 # prepare data
@@ -27,14 +26,14 @@ plot = perrot.Plot(
 
 # init color bar
 color_bar = perrot.ColorBar(
-    position = pero.RIGHT,
-    gradient = pero.colors.YlOrBr,
+    position = perrot.RIGHT,
+    gradient = perrot.colors.YlOrBr,
     margin = (0, 0, 0, 15))
 
 # init z-axis
 z_axis = perrot.LinAxis(
     title = "sin(x) + sin(y)",
-    position = pero.RIGHT,
+    position = perrot.RIGHT,
     scale_in_range = (z_min, z_max),
     level = 3,
     margin = 0,

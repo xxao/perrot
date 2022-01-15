@@ -76,7 +76,7 @@ chart.add(y_minor_grid)
 c_bar = perrot.ColorBar(
     position = perrot.RIGHT,
     z_index = perrot.COLOR_BAR_Z,
-    gradient = pero.colors.YlOrBr,
+    gradient = perrot.colors.YlOrBr,
     margin = (0, 0, 0, 10))
 
 c_axis = perrot.LinAxis(

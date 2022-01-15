@@ -1,7 +1,6 @@
 #  Created byMartin.cz
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
-import pero
 import perrot
 
 # prepare data
@@ -15,7 +14,7 @@ spacing = 0.05
 
 # init ordinal x-axis
 x_axis = perrot.OrdinalAxis(
-    position = pero.BOTTOM,
+    position = perrot.BOTTOM,
     margin = 0,
     labels = categories,
     major_tick_size = 0,

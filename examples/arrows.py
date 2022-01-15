@@ -2,7 +2,6 @@
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
 import numpy
-import pero
 import perrot
 
 # prepare data
@@ -16,7 +15,7 @@ y2_data = y1_data-x1_data**2/10 + 0.5
 plot = perrot.Plot(
     x_axis_title = "x-value",
     y_axis_title = "y-value",
-    legend_position = pero.N)
+    legend_position = perrot.N)
 
 # add series
 series = plot.lines(
@@ -24,7 +23,7 @@ series = plot.lines(
     y1 = y1_data,
     x2 = x2_data,
     y2 = y2_data,
-    anchor = pero.START,
+    anchor = perrot.START,
     start_head = 'o',
     start_head_size = 8,
     end_head = '|>',

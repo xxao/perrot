@@ -13,7 +13,7 @@ y_data3 = numpy.array((2, 1, 3, 5, 4))
 
 # init ordinal x-axis
 x_axis = perrot.OrdinalAxis(
-    position = pero.BOTTOM,
+    position = perrot.BOTTOM,
     margin = 0,
     labels = categories,
     major_tick_size = 0,
@@ -30,10 +30,10 @@ plot = perrot.Plot(
 # init labels
 label = pero.TextLabel(
     text = lambda d: str(d),
-    text_color = pero.colors.White,
-    text_base = pero.MIDDLE,
+    text_color = perrot.colors.White,
+    text_base = perrot.MIDDLE,
     font_size = 13,
-    font_weight = pero.BOLD)
+    font_weight = perrot.BOLD)
 
 # add series
 series1 = plot.vbars(
@@ -42,7 +42,7 @@ series1 = plot.vbars(
     x = categories,
     top = y_data1,
     x_mapper = x_axis.mapper,
-    anchor = pero.CENTER,
+    anchor = perrot.CENTER,
     show_labels = True,
     label = label,
     x_axis = x_axis)
@@ -54,7 +54,7 @@ series2 = plot.vbars(
     top = y_data2,
     y_offset = y_data1,
     x_mapper = x_axis.mapper,
-    anchor = pero.CENTER,
+    anchor = perrot.CENTER,
     show_labels = True,
     label = label,
     x_axis = x_axis)
@@ -66,7 +66,7 @@ series3 = plot.vbars(
     top = y_data3,
     y_offset = y_data1 + y_data2,
     x_mapper = x_axis.mapper,
-    anchor = pero.CENTER,
+    anchor = perrot.CENTER,
     show_labels = True,
     label = label,
     x_axis = x_axis)
