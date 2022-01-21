@@ -99,7 +99,7 @@ class Profile(Series):
     spacing = NumProperty(20, dynamic=False)
     
     line = Include(LineProperties, line_color=UNDEF, dynamic=False)
-    fill = Include(FillProperties, fill_color=UNDEF, dynamic=False)
+    fill = Include(FillProperties, fill_color=UNDEF, fill_alpha=150, dynamic=False)
     
     
     def __init__(self, **overrides):
@@ -211,7 +211,7 @@ class Profile(Series):
         color = self.get_property('color', source, overrides)
         
         # set overrides to ignore
-        ignore = {'x', 'y', 'base', 'line_color', 'fill_color'}
+        ignore = {'x', 'y', 'base'}
         
         # crop data
         i1, i2 = utils.crop_indices(self._x_data, x_scale.in_range, True)
