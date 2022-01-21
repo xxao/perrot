@@ -400,8 +400,14 @@ class Plot(ChartBase):
         
         # set z-index
         if annotation.z_index is UNDEF:
-            current = [obj.z_index for obj in self.annotations]
-            annotation.z_index = 1 + max([ANNOTS_Z]+current)
+            
+            # get from glyph
+            annotation.z_index = annotation.glyph.z_index
+            
+            # get next
+            if annotation.z_index is UNDEF:
+                current = [obj.z_index for obj in self.annotations]
+                annotation.z_index = 1 + max([ANNOTS_Z]+current)
         
         # get axes
         x_axis = self.get_obj(x_axis) if x_axis else UNDEF
