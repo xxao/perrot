@@ -5,6 +5,7 @@
 from pero.enums import *
 
 # define constants
+CHART_FRAME = 'chart_frame'
 DATA_FRAME = 'data_frame'
 
 GRID_MAJOR_Z = 20

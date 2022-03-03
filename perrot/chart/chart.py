@@ -105,7 +105,8 @@ class ChartBase(Graphics):
         self._graphics = {}  # {tag, obj}
         self._mapping = {}  # {dst_tag: {dst_prop: (src_tag, src_prop)}}
         
-        # init data frame
+        # init frames
+        self._chart_frame = Frame(0, 0, 1, 1)
         self._data_frame = Frame(0, 0, 1, 1)
     
     
@@ -139,7 +140,10 @@ class ChartBase(Graphics):
                 Bounding box of specified object or None if object not known.
         """
         
-        # data frame
+        # main frames
+        if tag == CHART_FRAME:
+            return self._chart_frame
+        
         if tag == DATA_FRAME:
             return self._data_frame
         
@@ -561,6 +565,8 @@ class ChartBase(Graphics):
         if frame_y2 is UNDEF:
             frame_y2 = y - padding[2] + height - sum(bottom_extents) - sum(bottom_margins[:-1])
         
+        # set frames
+        self._chart_frame = Frame(x, y, width, height)
         self._data_frame = Frame(
             frame_x1,
             frame_y1,
