@@ -533,7 +533,7 @@ class NavigatorTool(Tool):
             return
         
         # get factor
-        factor = - self.scale_factor * direction
+        factor = self.scale_factor * direction
         
         # scale axes
         for axis in axes:
