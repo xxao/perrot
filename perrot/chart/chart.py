@@ -238,9 +238,12 @@ class ChartBase(Graphics):
             raise TypeError(message)
         
         # check tag
-        if not obj.tag or obj.tag in self._graphics or obj.tag == DATA_FRAME:
+        if not obj.tag or obj.tag in self._graphics or obj.tag == DATA_FRAME or obj.tag == CHART_FRAME:
             message = "Object must have unique tag specified."
             raise ValueError(message)
+        
+        # freeze tag
+        obj.lock_property('tag')
         
         # set z-index
         if obj.z_index is UNDEF:
