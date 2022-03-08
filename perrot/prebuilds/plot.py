@@ -655,7 +655,7 @@ class Plot(ChartBase):
         return series
     
     
-    def vline(self, x, axis='x_axis', **overrides):
+    def vline(self, x, axis='x_axis', tag=UNDEF, **overrides):
         """
         This method provides a convenient way to add a vertical line annotation
         to current chart and assign specified axes scales, so that the
@@ -667,6 +667,9 @@ class Plot(ChartBase):
             
             axis: str or perrot.Axis
                 X-axis tag or the axis itself.
+            
+            tag: str
+                Unique tag to be assigned to the annotation.
             
             overrides: key:value pairs
                 Specific properties to be set additionally to the line.
@@ -688,13 +691,13 @@ class Plot(ChartBase):
             **overrides)
         
         # init annotation
-        annotation = Annotation(glyph=glyph, x_props=('x1', 'x2'))
+        annotation = Annotation(glyph=glyph, x_props=('x1', 'x2'), tag=tag)
         
         # add annotation
         return self.annotate(annotation, x_axis=axis, y_axis=UNDEF)
     
     
-    def hline(self, y, axis='y_axis', **overrides):
+    def hline(self, y, axis='y_axis', tag=UNDEF, **overrides):
         """
         This method provides a convenient way to add a horizontal line
         annotation to current chart and assign specified axes scales, so that
@@ -706,6 +709,9 @@ class Plot(ChartBase):
             
             axis: str or perrot.Axis
                 Y-axis tag or the axis itself.
+            
+            tag: str
+                Unique tag to be assigned to the annotation.
             
             overrides: key:value pairs
                 Specific properties to be set additionally to the line.
@@ -727,13 +733,13 @@ class Plot(ChartBase):
             **overrides)
         
         # init annotation
-        annotation = Annotation(glyph=glyph, y_props=('y1', 'y2'))
+        annotation = Annotation(glyph=glyph, y_props=('y1', 'y2'), tag=tag)
         
         # add annotation
         return self.annotate(annotation, x_axis=UNDEF, y_axis=axis)
     
     
-    def vband(self, left, right, axis='x_axis', **overrides):
+    def vband(self, left, right, axis='x_axis', tag=UNDEF, **overrides):
         """
         This method provides a convenient way to add a vertical band annotation
         to current chart and assign specified axes scales, so that the
@@ -748,6 +754,9 @@ class Plot(ChartBase):
             
             axis: str or perrot.Axis
                 X-axis tag or the axis itself.
+            
+            tag: str
+                Unique tag to be assigned to the annotation.
             
             overrides: key:value pairs
                 Specific properties to be set additionally to the band.
@@ -773,13 +782,13 @@ class Plot(ChartBase):
             **overrides)
         
         # init annotation
-        annotation = Annotation(glyph=glyph, x_props=('left', 'right'))
+        annotation = Annotation(glyph=glyph, x_props=('left', 'right'), tag=tag)
         
         # add annotation
         return self.annotate(annotation, x_axis=axis, y_axis=UNDEF)
     
     
-    def hband(self, top, bottom, axis='y_axis', **overrides):
+    def hband(self, top, bottom, axis='y_axis', tag=UNDEF, **overrides):
         """
         This method provides a convenient way to add a vertical band annotation
         to current chart and assign specified axes scales, so that the
@@ -794,6 +803,9 @@ class Plot(ChartBase):
             
             axis: str or perrot.Axis
                 Y-axis tag or the axis itself.
+            
+            tag: str
+                Unique tag to be assigned to the annotation.
             
             overrides: key:value pairs
                 Specific properties to be set additionally to the band.
@@ -819,7 +831,7 @@ class Plot(ChartBase):
             **overrides)
         
         # init annotation
-        annotation = Annotation(glyph=glyph, x_props=('top', 'bottom'))
+        annotation = Annotation(glyph=glyph, x_props=('top', 'bottom'), tag=tag)
         
         # add annotation
         return self.annotate(annotation, x_axis=axis, y_axis=UNDEF)

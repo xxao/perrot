@@ -2,7 +2,7 @@
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
 # set version
-version = (0, 17, 1)
+version = (0, 17, 2)
 
 # import enums
 from . enums import *
