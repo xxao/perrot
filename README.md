@@ -5,9 +5,6 @@ to make simple plots and charts. Please see the [examples](https://github.com/xx
 or in-code documentation of classes and functions to learn more about the *perrot* library capabilities.
 I also strongly recommend to check details of the [*pero*](https://github.com/xxao/pero/) itself.
 
-*Please note that the library is currently under heavy development and significant changes are made regularly. Feel free
-to try the library but please do not expect it to be stable.*
-
 ## Requirements
 
 - [Python 3.6+](https://www.python.org)
