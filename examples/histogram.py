@@ -6,8 +6,7 @@ import perrot
 
 # prepare data
 data = numpy.random.normal(size=1000)
-bins, hist, cumsum = perrot.calc_histogram(data, 50)
-cumsum = cumsum / len(data) * 100
+bins = 50
 
 # init plot
 plot = perrot.Plot(
@@ -25,22 +24,14 @@ right_axis = perrot.LinAxis(
 plot.add(right_axis)
 
 # add bars
-bars = plot.bars(
+bars = plot.histogram(data, bins,
     title = "Histogram",
-    top = hist,
-    left = bins[:-1],
-    right = bins[1:],
-    bottom = 0,
-    anchor = perrot.TOP,
     margin = (0.05, 0, 0, 0))
 
 # add cumulative
-cumulative = plot.profile(
+cumulative = plot.cumsum(data, bins,
     title = "Cumulative Sum",
-    x = 0.5*(bins[:-1] + bins[1:]),
-    y = cumsum,
     line_width = 2,
-    steps = perrot.MIDDLE,
     margin = 0,
     color = "o",
     y_axis = right_axis)

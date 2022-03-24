@@ -11,6 +11,7 @@ from .. chart import ChartBase, Axis, Grid, Labels, Annotation
 from .. chart import Title, InLegend, OutLegend, PositionBar
 from .. series import Series, Scatter, Profile, Band, Lines
 from .. series import Rects, Bars, HBars, VBars
+from .. series.utils import calc_histogram
 
 
 class Plot(ChartBase):
@@ -474,6 +475,111 @@ class Plot(ChartBase):
         
         # init series
         series = Profile(**overrides)
+        
+        # add series
+        self.plot(series, x_axis=x_axis, y_axis=y_axis)
+        
+        return series
+    
+    
+    def histogram(self, values, bins, x_axis='x_axis', y_axis='y_axis', **overrides):
+        """
+        This method provides a convenient way to calculate and plot histogram
+        bars from given data using perrot.Bars series.
+        
+        Args:
+            values: (float,)
+                Data from which to calculate the histogram.
+            
+            bins: int or (float,)
+                If integer value is provided, it specifies number of equal bins to
+                create using specified range or given data range. If a collection
+                of values is provided, it specifies the ranges of individual bins.
+                
+            x_axis: str or perrot.plot.Axis
+                X-axis tag or the axis itself.
+            
+            y_axis: str or perrot.plot.Axis
+                Y-axis tag or the axis itself.
+            
+            overrides: key:value pairs
+                Specific properties to be set to the series.
+        
+        Returns:
+            perrot.Bars
+                Final series object.
+        """
+        
+        # calc histogram
+        bins, hist, cumsum = calc_histogram(values, bins)
+        
+        # init series
+        series = Bars(
+            top = hist,
+            left = bins[:-1],
+            right = bins[1:],
+            bottom = 0,
+            anchor = TOP,
+            **overrides)
+        
+        # add series
+        self.plot(series, x_axis=x_axis, y_axis=y_axis)
+        
+        return series
+    
+    
+    def cumsum(self, values, bins, normalize=True, x_axis='x_axis', y_axis='y_axis', **overrides):
+        """
+        This method provides a convenient way to calculate and plot histogram
+        cumulative sum from given data using perrot.Profile series.
+        
+        Args:
+            values: (float,)
+                Data from which to calculate the histogram.
+            
+            bins: int or (float,)
+                If integer value is provided, it specifies number of equal bins to
+                create using specified range or given data range. If a collection
+                of values is provided, it specifies the ranges of individual bins.
+            
+            normalize: bool
+                If set to True, the histogram will be normalized to 100 %.
+            
+            x_axis: str or perrot.plot.Axis
+                X-axis tag or the axis itself.
+            
+            y_axis: str or perrot.plot.Axis
+                Y-axis tag or the axis itself.
+            
+            overrides: key:value pairs
+                Specific properties to be set to the series.
+        
+        Returns:
+            perrot.Profile
+                Final series object.
+        """
+        
+        # calc histogram
+        bins, hist, cumsum = calc_histogram(values, bins)
+        
+        # normalize
+        if normalize:
+            cumsum = cumsum / len(values) * 100
+        
+        # set default steps
+        if "steps" not in overrides:
+            overrides["steps"] = BEFORE
+        
+        # set data according to steps
+        x = bins[1:]
+        if overrides["steps"] == MIDDLE:
+            x = 0.5*(bins[:-1] + bins[1:])
+        
+        # init series
+        series = Profile(
+            x = x,
+            y = cumsum,
+            **overrides)
         
         # add series
         self.plot(series, x_axis=x_axis, y_axis=y_axis)
