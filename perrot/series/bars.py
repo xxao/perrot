@@ -39,6 +39,11 @@ class Rectangles(Series):
         y_offset: tuple, list, numpy.ndarray or UNDEF
             Specifies the sequence of the y-offsets in data units.
         
+        spacing: int, float or tuple
+            Specifies the absolute spacing added around each rectangle in
+            device units, as a single value or values for individual sides
+            starting from top.
+        
         width_limit: int or float
             Specifies the minimum display width of the rectangle.
         
@@ -57,6 +62,7 @@ class Rectangles(Series):
     
     x_offset = Property(UNDEF, dynamic=False)
     y_offset = Property(UNDEF, dynamic=False)
+    spacing = QuadProperty(0, dynamic=False)
     
     width_limit = NumProperty(1, dynamic=False)
     height_limit = NumProperty(1, dynamic=False)
@@ -256,6 +262,7 @@ class Rectangles(Series):
         tag = self.get_property('tag', source, overrides)
         x_scale = self.get_property('x_scale', source, overrides)
         y_scale = self.get_property('y_scale', source, overrides)
+        spacing = self.get_property('spacing', source, overrides)
         width_limit = self.get_property('width_limit', source, overrides)
         height_limit = self.get_property('height_limit', source, overrides)
         frame = self.get_property('frame', source, overrides)
@@ -268,6 +275,7 @@ class Rectangles(Series):
         bottom_data = self._bottom_data
         raw_data = self._raw_data
         
+        spacing = spacing or (0, 0, 0, 0)
         width_limit = width_limit or 0
         height_limit = height_limit or 0
         
@@ -292,10 +300,10 @@ class Rectangles(Series):
             for i, data in enumerate(raw_data):
                 
                 # get coords
-                x = left_data[i]
-                y = top_data[i]
-                width = right_data[i] - x
-                height = bottom_data[i] - y
+                x = left_data[i] + spacing[3]
+                y = top_data[i] + spacing[0]
+                width = right_data[i] - spacing[1] - x
+                height = bottom_data[i] - spacing[2] - y
                 
                 if width < 0:
                     width *= -1
