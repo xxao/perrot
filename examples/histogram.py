@@ -25,11 +25,16 @@ plot.add(right_axis)
 
 # add bars
 bars = plot.histogram(data, bins,
+    minimum = -5,
+    maximum = 5,
     title = "Histogram",
+    spacing = (0, 2),
     margin = (0.05, 0, 0, 0))
 
 # add cumulative
 cumulative = plot.cumsum(data, bins,
+    minimum = -5,
+    maximum = 5,
     title = "Cumulative Sum",
     line_width = 2,
     margin = 0,

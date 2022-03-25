@@ -482,7 +482,7 @@ class Plot(ChartBase):
         return series
     
     
-    def histogram(self, values, bins, x_axis='x_axis', y_axis='y_axis', **overrides):
+    def histogram(self, values, bins, minimum=None, maximum=None, base=None, x_axis='x_axis', y_axis='y_axis', **overrides):
         """
         This method provides a convenient way to calculate and plot histogram
         bars from given data using perrot.Bars series.
@@ -495,6 +495,20 @@ class Plot(ChartBase):
                 If integer value is provided, it specifies number of equal bins to
                 create using specified range or given data range. If a collection
                 of values is provided, it specifies the ranges of individual bins.
+            
+            minimum: float or None
+                Specifies the minimum value to be used for bins calculation. If set
+                to None, minimum of given data is used. This value is ignored if
+                exact bins definitions is provided.
+            
+            maximum: float or None
+                Specifies the maximum value to be used for bins calculation. If set
+                to None, maximum of given data is used. This value is ignored if
+                exact bins definitions is provided.
+            
+            base: int or None
+                Specifies logarithm base to create logarithmic bins. This value is
+                ignored if exact bins definitions is provided.
                 
             x_axis: str or perrot.plot.Axis
                 X-axis tag or the axis itself.
@@ -511,7 +525,7 @@ class Plot(ChartBase):
         """
         
         # calc histogram
-        bins, hist, cumsum = calc_histogram(values, bins)
+        bins, hist, cumsum = calc_histogram(values, bins, minimum, maximum, base)
         
         # init series
         series = Bars(
@@ -528,7 +542,7 @@ class Plot(ChartBase):
         return series
     
     
-    def cumsum(self, values, bins, normalize=True, x_axis='x_axis', y_axis='y_axis', **overrides):
+    def cumsum(self, values, bins, minimum=None, maximum=None, base=None, normalize=True, x_axis='x_axis', y_axis='y_axis', **overrides):
         """
         This method provides a convenient way to calculate and plot histogram
         cumulative sum from given data using perrot.Profile series.
@@ -541,6 +555,20 @@ class Plot(ChartBase):
                 If integer value is provided, it specifies number of equal bins to
                 create using specified range or given data range. If a collection
                 of values is provided, it specifies the ranges of individual bins.
+            
+            minimum: float or None
+                Specifies the minimum value to be used for bins calculation. If set
+                to None, minimum of given data is used. This value is ignored if
+                exact bins definitions is provided.
+            
+            maximum: float or None
+                Specifies the maximum value to be used for bins calculation. If set
+                to None, maximum of given data is used. This value is ignored if
+                exact bins definitions is provided.
+            
+            base: int or None
+                Specifies logarithm base to create logarithmic bins. This value is
+                ignored if exact bins definitions is provided.
             
             normalize: bool
                 If set to True, the histogram will be normalized to 100 %.
@@ -560,7 +588,7 @@ class Plot(ChartBase):
         """
         
         # calc histogram
-        bins, hist, cumsum = calc_histogram(values, bins)
+        bins, hist, cumsum = calc_histogram(values, bins, minimum, maximum, base)
         
         # normalize
         if normalize:
@@ -571,14 +599,18 @@ class Plot(ChartBase):
             overrides["steps"] = BEFORE
         
         # set data according to steps
-        x = bins[1:]
         if overrides["steps"] == MIDDLE:
             x = 0.5*(bins[:-1] + bins[1:])
+            y = cumsum
+        
+        else:
+            x = bins
+            y = [0] + list(cumsum)
         
         # init series
         series = Profile(
             x = x,
-            y = cumsum,
+            y = y,
             **overrides)
         
         # add series
