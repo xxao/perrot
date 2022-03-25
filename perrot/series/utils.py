@@ -515,11 +515,11 @@ def calc_histogram(x, bins, minimum=None, maximum=None, base=None):
         if base is not None:
             minimum = math.log(minimum, base)
             maximum = math.log(maximum, base)
-            bins = numpy.logspace(minimum, maximum, num=bins, endpoint=True, base=base)
+            bins = numpy.logspace(minimum, maximum, num=bins+1, endpoint=True, base=base)
         
         # use lin scale
         else:
-            bins = numpy.linspace(minimum, maximum, num=bins, endpoint=True)
+            bins = numpy.linspace(minimum, maximum, num=bins+1, endpoint=True)
     
     # calc histogram
     hist, bins = numpy.histogram(x, bins=bins)
