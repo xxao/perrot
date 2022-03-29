@@ -10,6 +10,7 @@ bins = 50
 
 # init plot
 plot = perrot.Plot(
+    title_text = "Histogram for numpy.random.normal()",
     x_axis_title = 'random',
     y_axis_title = 'count',
     legend_position = perrot.NW)
@@ -18,7 +19,6 @@ plot = perrot.Plot(
 right_axis = perrot.LinAxis(
     title = '%',
     position = perrot.RIGHT,
-    z_index = 1,
     margin = 0)
 
 plot.add(right_axis)
