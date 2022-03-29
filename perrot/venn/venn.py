@@ -186,8 +186,8 @@ class Venn(InGraphics):
             
             # init item
             item = legend.clone(obj, deep=True)
-            item.marker.set_properties_from(obj, 'line_', 'line_')
-            item.marker.set_properties_from(obj, 'fill_', 'fill_')
+            item.set_properties_from(obj, 'line_', 'marker_line_')
+            item.set_properties_from(obj, 'fill_', 'marker_fill_')
             
             # add item
             items.append(item)

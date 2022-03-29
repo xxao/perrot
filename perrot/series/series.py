@@ -160,10 +160,11 @@ class Series(InGraphics):
         # get properties
         show_legend = self.get_property('show_legend', source, overrides)
         legend = self.get_property('legend', source, overrides)
+        title = self.get_property('title', source, overrides)
         
         # check legend
-        if not show_legend or not legend:
-            return ()
+        if not show_legend or legend is None or not title:
+            return []
         
         # init item
         item = legend.clone(self, deep=True)
