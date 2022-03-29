@@ -77,18 +77,6 @@ class Scatter(Series):
         self.lock_property('y')
     
     
-    def get_labels(self, canvas, source=UNDEF, **overrides):
-        """Gets series labels."""
-        
-        return self.prepare_labels(self._x_data, self._y_data, self._raw_data)
-    
-    
-    def get_tooltip(self, x, y, limit):
-        """Gets nearest data point tooltip."""
-        
-        return self.prepare_tooltip(self._x_data, self._y_data, self._raw_data, x, y, limit)
-    
-    
     def get_limits(self, x_range=None, y_range=None, exact=False):
         """Gets current data limits using whole range or specified crops."""
         
@@ -109,6 +97,18 @@ class Scatter(Series):
         
         # finalize limits
         return self.finalize_limits(limits, exact)
+    
+    
+    def get_labels(self, canvas, source=UNDEF, **overrides):
+        """Gets series labels."""
+        
+        return self.prepare_labels(self._x_data, self._y_data, self._raw_data)
+    
+    
+    def get_tooltip(self, x, y, limit):
+        """Gets nearest data point tooltip."""
+        
+        return self.prepare_tooltip(self._x_data, self._y_data, self._raw_data, x, y, limit)
     
     
     def extract_data(self):

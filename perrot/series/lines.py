@@ -106,8 +106,36 @@ class Lines(Series):
         self.lock_property('y1')
         self.lock_property('y2')
         self.lock_property('anchor')
-    
-    
+
+
+    def get_limits(self, x_range=None, y_range=None, exact=False):
+        """Gets current data limits using whole range or specified crops."""
+
+        # check data
+        if self._limits is None:
+            return None
+
+        # init limits
+        limits = self._limits
+
+        # apply crop
+        if x_range or y_range:
+            limits_start = utils.calc_limits_unsorted(
+                data=(self._x1_data, self._y1_data),
+                crops=(x_range, y_range),
+                extend=False)
+
+            limits_end = utils.calc_limits_unsorted(
+                data=(self._x2_data, self._y2_data),
+                crops=(x_range, y_range),
+                extend=False)
+
+            limits = utils.combine_limits(limits_start, limits_end)
+
+        # finalize limits
+        return self.finalize_limits(limits, exact)
+
+
     def get_labels(self, canvas=None, source=UNDEF, **overrides):
         """Gets series labels."""
         
@@ -118,35 +146,6 @@ class Lines(Series):
         """Gets nearest data point tooltip."""
         
         return self.prepare_tooltip(self._x_data, self._y_data, self._raw_data, x, y, limit)
-    
-    
-    def get_limits(self, x_range=None, y_range=None, exact=False):
-        """Gets current data limits using whole range or specified crops."""
-        
-        # check data
-        if self._limits is None:
-            return None
-        
-        # init limits
-        limits = self._limits
-        
-        # apply crop
-        if x_range or y_range:
-            
-            limits_start = utils.calc_limits_unsorted(
-                data = (self._x1_data, self._y1_data),
-                crops = (x_range, y_range),
-                extend = False)
-            
-            limits_end = utils.calc_limits_unsorted(
-                data = (self._x2_data, self._y2_data),
-                crops = (x_range, y_range),
-                extend = False)
-            
-            limits = utils.combine_limits(limits_start, limits_end)
-        
-        # finalize limits
-        return self.finalize_limits(limits, exact)
     
     
     def extract_data(self):

@@ -103,8 +103,36 @@ class Rectangles(Series):
         self.lock_property('right', raise_error=False)
         self.lock_property('top', raise_error=False)
         self.lock_property('bottom', raise_error=False)
-    
-    
+
+
+    def get_limits(self, x_range=None, y_range=None, exact=False):
+        """Gets current data limits using whole range or specified crops."""
+
+        # check data
+        if self._limits is None:
+            return None
+
+        # init limits
+        limits = self._limits
+
+        # apply crop
+        if x_range or y_range:
+            limits_top_left = utils.calc_limits_unsorted(
+                data=(self._left_data, self._top_data),
+                crops=(x_range, y_range),
+                extend=False)
+
+            limits_bottom_right = utils.calc_limits_unsorted(
+                data=(self._right_data, self._bottom_data),
+                crops=(x_range, y_range),
+                extend=False)
+
+            limits = utils.combine_limits(limits_top_left, limits_bottom_right)
+
+        # finalize limits
+        return self.finalize_limits(limits, exact)
+
+
     def get_labels(self, canvas=None, source=UNDEF, **overrides):
         """Gets series labels."""
         
@@ -115,35 +143,6 @@ class Rectangles(Series):
         """Gets nearest data point tooltip."""
         
         return self.prepare_tooltip(self._x_data, self._y_data, self._raw_data, x, y, limit)
-    
-    
-    def get_limits(self, x_range=None, y_range=None, exact=False):
-        """Gets current data limits using whole range or specified crops."""
-        
-        # check data
-        if self._limits is None:
-            return None
-        
-        # init limits
-        limits = self._limits
-        
-        # apply crop
-        if x_range or y_range:
-            
-            limits_top_left = utils.calc_limits_unsorted(
-                data = (self._left_data, self._top_data),
-                crops = (x_range, y_range),
-                extend = False)
-            
-            limits_bottom_right = utils.calc_limits_unsorted(
-                data = (self._right_data, self._bottom_data),
-                crops = (x_range, y_range),
-                extend = False)
-            
-            limits = utils.combine_limits(limits_top_left, limits_bottom_right)
-        
-        # finalize limits
-        return self.finalize_limits(limits, exact)
     
     
     def extract_data(self):

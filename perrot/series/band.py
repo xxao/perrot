@@ -122,33 +122,6 @@ class Band(Series):
         self.lock_property('y2')
     
     
-    def get_labels(self, canvas=None, source=UNDEF, **overrides):
-        """Gets series labels."""
-        
-        labels = self.prepare_labels(self._x_data, self._y1_data, self._raw_data)
-        labels += self.prepare_labels(self._x_data, self._y2_data, self._raw_data)
-        
-        return labels
-    
-    
-    def get_tooltip(self, x, y, limit):
-        """Gets nearest data point tooltip."""
-        
-        tooltip1 = self.prepare_tooltip(self._x_data, self._y1_data, self._raw_data, x, y, limit)
-        tooltip2 = self.prepare_tooltip(self._x_data, self._y2_data, self._raw_data, x, y, limit)
-        
-        if not tooltip1:
-            return tooltip2
-        
-        if not tooltip2:
-            return tooltip1
-        
-        if tooltip1.z_index >= tooltip2.z_index:
-            return tooltip1
-        
-        return tooltip2
-    
-    
     def get_limits(self, x_range=None, y_range=None, exact=False):
         """Gets current data limits using whole range or specified crops."""
         
@@ -178,6 +151,33 @@ class Band(Series):
         
         # finalize limits
         return self.finalize_limits(limits, exact)
+    
+    
+    def get_labels(self, canvas=None, source=UNDEF, **overrides):
+        """Gets series labels."""
+        
+        labels = self.prepare_labels(self._x_data, self._y1_data, self._raw_data)
+        labels += self.prepare_labels(self._x_data, self._y2_data, self._raw_data)
+        
+        return labels
+    
+    
+    def get_tooltip(self, x, y, limit):
+        """Gets nearest data point tooltip."""
+        
+        tooltip1 = self.prepare_tooltip(self._x_data, self._y1_data, self._raw_data, x, y, limit)
+        tooltip2 = self.prepare_tooltip(self._x_data, self._y2_data, self._raw_data, x, y, limit)
+        
+        if not tooltip1:
+            return tooltip2
+        
+        if not tooltip2:
+            return tooltip1
+        
+        if tooltip1.z_index >= tooltip2.z_index:
+            return tooltip1
+        
+        return tooltip2
     
     
     def extract_data(self):

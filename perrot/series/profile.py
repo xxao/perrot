@@ -122,8 +122,35 @@ class Profile(Series):
         
         # extract data
         self.extract_data()
-    
-    
+
+
+    def get_limits(self, x_range=None, y_range=None, exact=False):
+        """Gets current data limits using whole range or specified crops."""
+
+        # check data
+        if self._limits is None:
+            return None
+
+        # init limits
+        limits = self._limits
+
+        # apply crop
+        if x_range:
+
+            limits = utils.calc_limits_sorted(
+                data=(self._x_data, self._y_data),
+                crop=x_range,
+                extend=False,
+                interpolate=True)
+
+            if self.base not in (UNDEF, None) and limits[1] is not None:
+                limits[1][0] = min(self.base, limits[1][0])
+                limits[1][1] = max(self.base, limits[1][1])
+
+        # finalize limits
+        return self.finalize_limits(limits, exact)
+
+
     def get_labels(self, canvas=None, source=UNDEF, **overrides):
         """Gets series labels."""
         
@@ -134,33 +161,6 @@ class Profile(Series):
         """Gets nearest data point tooltip."""
         
         return self.prepare_tooltip(self._x_data, self._y_data, self._raw_data, x, y, limit)
-    
-    
-    def get_limits(self, x_range=None, y_range=None, exact=False):
-        """Gets current data limits using whole range or specified crops."""
-        
-        # check data
-        if self._limits is None:
-            return None
-        
-        # init limits
-        limits = self._limits
-        
-        # apply crop
-        if x_range:
-            
-            limits = utils.calc_limits_sorted(
-                data = (self._x_data, self._y_data),
-                crop = x_range,
-                extend = False,
-                interpolate = True)
-            
-            if self.base not in (UNDEF, None) and limits[1] is not None:
-                limits[1][0] = min(self.base, limits[1][0])
-                limits[1][1] = max(self.base, limits[1][1])
-        
-        # finalize limits
-        return self.finalize_limits(limits, exact)
     
     
     def extract_data(self):
