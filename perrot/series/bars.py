@@ -6,6 +6,7 @@ import numpy
 from pero.enums import *
 from pero.properties import *
 from pero import Frame
+from pero import MarkerLegend
 
 from . series import Series
 from . import utils
@@ -74,6 +75,17 @@ class Rectangles(Series):
     def __init__(self, **overrides):
         """Initializes a new instance of the Rectangles series base."""
         
+        # init legend
+        if 'legend' not in overrides:
+            overrides['legend'] = MarkerLegend(
+                text = lambda d: d.title,
+                show_marker = True,
+                show_line = False,
+                marker = MARKER_SQUARE,
+                marker_line_color = lambda d: d.color.darker(0.2),
+                marker_fill_color = lambda d: d.color)
+        
+        # init base
         super().__init__(**overrides)
         
         # init buffers

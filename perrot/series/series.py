@@ -108,8 +108,9 @@ class Series(InGraphics):
         if 'legend' not in overrides:
             overrides['legend'] = MarkerLegend(
                 text = lambda d: d.title,
+                show_marker = True,
+                show_line = False,
                 marker = MARKER_CIRCLE,
-                marker_size = 8,
                 marker_line_color = lambda d: d.color.darker(0.2),
                 marker_fill_color = lambda d: d.color)
         
@@ -168,10 +169,6 @@ class Series(InGraphics):
         
         # init item
         item = legend.clone(self, deep=True)
-        
-        # set title
-        if item.text is UNDEF:
-            item.text = self.title
         
         return [item]
     

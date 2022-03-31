@@ -69,6 +69,16 @@ class Scatter(Series):
     def __init__(self, **overrides):
         """Initializes a new instance of the Scatter series."""
         
+        # init legend
+        if 'legend' not in overrides:
+            overrides['legend'] = MarkerLegend(
+                text = lambda d: d.title,
+                show_marker = True,
+                show_line = False,
+                marker = lambda d: d.marker,
+                marker_line_color = lambda d: d.color.darker(0.2),
+                marker_fill_color = lambda d: d.color)
+        
         # init base
         super().__init__(**overrides)
         
