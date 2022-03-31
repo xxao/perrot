@@ -6,6 +6,7 @@ import numpy
 from pero.enums import *
 from pero.properties import *
 from pero import Profile as ProfileGlyph
+from pero import Path, Marker
 
 from . series import Series
 from . import utils
@@ -65,14 +66,23 @@ class Profile(Series):
         base: int, float, None or UNDEF
             Specifies the area base value in real data units.
         
+        marker: pero.MARKER, pero.Path, callable, None or UNDEF
+            Specifies the marker to draw actual data points with. The value
+            can be specified by any item from the pero.MARKER enum or as
+            pero.Path.
+        
+        marker_size: int, float or callable
+            Specifies the marker size.
+        
+        marker_line properties:
+            Includes pero.LineProperties to specify the marker line.
+        
+        marker_fill properties:
+            Includes pero.FillProperties to specify the marker fill.
+        
         steps: pero.LINE_STEP
             Specifies the way stepped profile should be drawn as any item from
             the pero.LINE_STEP enum.
-        
-        marker: pero.Marker, pero.MARKER, callable, None or UNDEF
-            Specifies the marker glyph to draw actual data points with. The
-            value can be specified by any item from the pero.MARKER enum or
-            as an pero.Marker instance.
         
         spacing: int, float
             Specifies the minimum x-distance between points in device units to
@@ -94,8 +104,12 @@ class Profile(Series):
     y = Property(UNDEF)
     base = NumProperty(UNDEF, dynamic=False, nullable=True)
     
+    marker = Property(MARKER_CIRCLE, types=(str, Path, Marker), nullable=True)
+    marker_size = NumProperty(6)
+    marker_line = Include(LineProperties, prefix='marker_', line_color=UNDEF)
+    marker_fill = Include(FillProperties, prefix='marker_', fill_color=UNDEF)
+    
     steps = EnumProperty(None, enum=LINE_STEP, nullable=True)
-    marker = MarkerProperty(UNDEF, nullable=True)
     spacing = NumProperty(20, dynamic=False)
     
     line = Include(LineProperties, line_color=UNDEF, dynamic=False)
@@ -105,10 +119,7 @@ class Profile(Series):
     def __init__(self, **overrides):
         """Initializes a new instance of Profile series."""
         
-        # init marker
-        if 'marker' not in overrides:
-            overrides['marker'] = MARKER_CIRCLE
-        
+        # init base
         super().__init__(**overrides)
         
         # init profile glyph
@@ -149,8 +160,8 @@ class Profile(Series):
 
         # finalize limits
         return self.finalize_limits(limits, exact)
-
-
+    
+    
     def get_labels(self, canvas=None, source=UNDEF, **overrides):
         """Gets series labels."""
         
@@ -234,7 +245,7 @@ class Profile(Series):
         with canvas.group(tag, "series"):
             
             # update glyph
-            self._glyph.set_properties_from(self, source=source, overrides=overrides, ignore=ignore)
+            self._glyph.set_properties_from(self, source=source, overrides=overrides, ignore=ignore, native=True)
             
             # get glyph colors
             line_color = self._glyph.get_property('line_color')

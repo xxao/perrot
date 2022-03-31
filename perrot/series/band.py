@@ -6,6 +6,7 @@ import numpy
 from pero.enums import *
 from pero.properties import *
 from pero import Band as BandGlyph
+from pero import Path, Marker
 
 from . series import Series
 from . import utils
@@ -61,10 +62,19 @@ class Band(Series):
             Specifies the sequence of low y-coordinates in real data units or a
             function to retrieve the coordinates from the raw data.
         
-        marker: pero.Marker, pero.MARKER, callable, None or UNDEF
-            Specifies the marker glyph to draw actual data points with. The
-            value can be specified by any item from the pero.MARKER enum or
-            as an pero.Marker instance.
+        marker: pero.MARKER, pero.Path, callable, None or UNDEF
+            Specifies the marker to draw actual data points with. The value
+            can be specified by any item from the pero.MARKER enum or as
+            pero.Path.
+        
+        marker_size: int, float or callable
+            Specifies the marker size.
+        
+        marker_line properties:
+            Includes pero.LineProperties to specify the marker line.
+        
+        marker_fill properties:
+            Includes pero.FillProperties to specify the marker fill.
         
         spacing: int, float
             Specifies the minimum x-distance between points in device units to
@@ -86,8 +96,12 @@ class Band(Series):
     y1 = Property(UNDEF)
     y2 = Property(UNDEF)
     
-    marker = MarkerProperty(UNDEF, nullable=True)
     spacing = NumProperty(20, dynamic=False)
+    
+    marker = Property(MARKER_CIRCLE, types=(str, Path, Marker), nullable=True)
+    marker_size = NumProperty(6)
+    marker_line = Include(LineProperties, prefix='marker_', line_color=UNDEF)
+    marker_fill = Include(FillProperties, prefix='marker_', fill_color=UNDEF)
     
     line = Include(LineProperties, line_color=UNDEF, dynamic=False)
     fill = Include(FillProperties, fill_color=UNDEF, fill_alpha=150, dynamic=False)
@@ -100,6 +114,7 @@ class Band(Series):
         if 'marker' not in overrides:
             overrides['marker'] = MARKER_CIRCLE
         
+        # init base
         super().__init__(**overrides)
         
         # init band glyph
