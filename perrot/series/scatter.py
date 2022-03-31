@@ -5,7 +5,8 @@ import numpy
 
 from pero.enums import *
 from pero.properties import *
-from pero import Frame
+from pero import Frame, Path, Marker
+from pero import MarkerLegend
 
 from . series import Series
 from . import utils
@@ -39,10 +40,20 @@ class Scatter(Series):
             Specifies the sequence of y-coordinates in real data units or a
             function to retrieve the coordinates from the raw data.
         
-        marker: pero.Marker, pero.MARKER, callable, None or UNDEF
-            Specifies the marker glyph to draw actual data points with. The
-            value can be specified by any item from the pero.MARKER enum or
-            as an pero.Marker instance.
+        marker: pero.MARKER, pero.Path, callable, None or UNDEF
+            Specifies the marker to draw actual data points with. The value
+            can be specified by any item from the pero.MARKER enum or as
+            pero.Path.
+        
+        marker_size: int, float or callable
+            Specifies the marker size.
+        
+        marker_line properties:
+            Includes pero.LineProperties to specify the marker line.
+        
+        marker_fill properties:
+            Includes pero.FillProperties to specify the marker fill.
+        
     """
     
     data = SequenceProperty(UNDEF, dynamic=False)
@@ -50,16 +61,15 @@ class Scatter(Series):
     x = Property(lambda d: d[0])
     y = Property(lambda d: d[1])
     
-    marker = MarkerProperty(UNDEF)
-    
+    marker = Property(MARKER_CIRCLE, types=(str, Path))
+    marker_size = NumProperty(8)
+    marker_line = Include(LineProperties, prefix='marker_', line_color=UNDEF)
+    marker_fill = Include(FillProperties, prefix='marker_', fill_color=UNDEF)
     
     def __init__(self, **overrides):
         """Initializes a new instance of the Scatter series."""
         
-        # init marker
-        if 'marker' not in overrides:
-            overrides['marker'] = MARKER_CIRCLE
-        
+        # init base
         super().__init__(**overrides)
         
         # init buffers
@@ -181,8 +191,10 @@ class Scatter(Series):
             # draw points
             for i, data in enumerate(raw_data):
                 
-                # get marker
-                marker = self.get_property('marker', data)
+                # init marker
+                marker = self.get_property('marker', data, marker_overrides)
+                marker = Marker.create(marker)
+                marker.set_properties_from(self, src_prefix='marker_', overrides=marker_overrides, native=True)
                 
                 # check visibility
                 if not marker or not marker.is_visible(data, marker_overrides):
@@ -219,28 +231,28 @@ class Scatter(Series):
 
 
 class Asterisks(Scatter):
-    marker = MarkerProperty(MARKER_ASTERISK)
+    marker = MARKER_ASTERISK
 
 
 class Circles(Scatter):
-    marker = MarkerProperty(MARKER_CIRCLE)
+    marker = MARKER_CIRCLE
 
 
 class Crosses(Scatter):
-    marker = MarkerProperty(MARKER_CROSS)
+    marker = MARKER_CROSS
 
 
 class Diamonds(Scatter):
-    marker = MarkerProperty(MARKER_DIAMOND)
+    marker = MARKER_DIAMOND
 
 
 class Pluses(Scatter):
-    marker = MarkerProperty(MARKER_PLUS)
+    marker = MARKER_PLUS
 
 
 class Triangles(Scatter):
-    marker = MarkerProperty(MARKER_TRIANGLE)
+    marker = MARKER_TRIANGLE
 
 
 class Squares(Scatter):
-    marker = MarkerProperty(MARKER.SQUARE)
+    marker = MARKER.SQUARE
