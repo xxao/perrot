@@ -113,7 +113,7 @@ class Profile(Series):
     spacing = NumProperty(20, dynamic=False)
     
     line = Include(LineProperties, line_color=UNDEF, dynamic=False)
-    fill = Include(FillProperties, fill_color=UNDEF, fill_alpha=150, dynamic=False)
+    fill = Include(FillProperties, fill_color=UNDEF, dynamic=False)
     
     
     def __init__(self, **overrides):
@@ -261,22 +261,11 @@ class Profile(Series):
             # update glyph
             self._glyph.set_properties_from(self, source=source, overrides=overrides, ignore=ignore, native=True)
             
-            # get glyph colors
-            line_color = self._glyph.get_property('line_color')
-            if line_color is UNDEF:
-                line_color = color
-            
-            fill_color = self._glyph.get_property('fill_color')
-            if fill_color is UNDEF:
-                fill_color = color.trans(0.4)
-            
             # set overrides
             glyph_overrides = overrides.copy()
             glyph_overrides['x'] = x_data
             glyph_overrides['y'] = y_data
             glyph_overrides['base'] = base
-            glyph_overrides['line_color'] = line_color
-            glyph_overrides['fill_color'] = fill_color
             
             # draw profile
             self._glyph.draw(canvas, raw_data, **glyph_overrides)
