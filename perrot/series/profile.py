@@ -103,14 +103,13 @@ class Profile(Series):
     x = Property(UNDEF)
     y = Property(UNDEF)
     base = NumProperty(UNDEF, dynamic=False, nullable=True)
+    steps = EnumProperty(None, enum=LINE_STEP, nullable=True)
+    spacing = NumProperty(20, dynamic=False)
     
     marker = Property(MARKER_CIRCLE, types=(str, Path, Marker), nullable=True)
     marker_size = NumProperty(6)
     marker_line = Include(LineProperties, prefix='marker_', line_color=UNDEF)
     marker_fill = Include(FillProperties, prefix='marker_', fill_color=UNDEF)
-    
-    steps = EnumProperty(None, enum=LINE_STEP, nullable=True)
-    spacing = NumProperty(20, dynamic=False)
     
     line = Include(LineProperties, line_color=UNDEF, dynamic=False)
     fill = Include(FillProperties, fill_color=UNDEF, dynamic=False)

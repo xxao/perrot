@@ -95,7 +95,6 @@ class Band(Series):
     x = Property(UNDEF)
     y1 = Property(UNDEF)
     y2 = Property(UNDEF)
-    
     spacing = NumProperty(20, dynamic=False)
     
     marker = Property(MARKER_CIRCLE, types=(str, Path, Marker), nullable=True)
