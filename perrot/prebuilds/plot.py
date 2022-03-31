@@ -9,7 +9,7 @@ from pero import OrdinalScale
 from .. enums import *
 from .. chart import ChartBase, Axis, Grid, Labels, Annotation
 from .. chart import Title, InLegend, OutLegend, PositionBar
-from .. series import Series, Scatter, Profile, Band, Lines
+from .. series import Series, Scatter, Profile, Band
 from .. series import Rects, Bars, HBars, VBars
 from .. series.utils import calc_histogram
 
@@ -757,35 +757,6 @@ class Plot(ChartBase):
         
         # init series
         series = VBars(**overrides)
-        
-        # add series
-        self.plot(series, x_axis=x_axis, y_axis=y_axis)
-        
-        return series
-    
-    
-    def lines(self, x_axis='x_axis', y_axis='y_axis', **overrides):
-        """
-        This method provides a convenient way to automatically initialize and
-        plot data using perrot.Lines series.
-        
-        Args:
-            x_axis: str or perrot.plot.Axis
-                X-axis tag or the axis itself.
-            
-            y_axis: str or perrot.plot.Axis
-                Y-axis tag or the axis itself.
-            
-            overrides: key:value pairs
-                Specific properties to be set to the series.
-        
-        Returns:
-            perrot.Scatter
-                Final series object.
-        """
-        
-        # init series
-        series = Lines(**overrides)
         
         # add series
         self.plot(series, x_axis=x_axis, y_axis=y_axis)

@@ -31,7 +31,6 @@ understand all the following images. Check the image name and find corresponding
 
 <p>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/annotations.png" height="150"/>
-    <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/arrows.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/assembly.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/axes.png" height="150"/>
     <img src="https://raw.githubusercontent.com/xxao/perrot/master/examples/images/band.png" height="150"/>
