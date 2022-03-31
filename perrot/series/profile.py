@@ -6,7 +6,7 @@ import numpy
 from pero.enums import *
 from pero.properties import *
 from pero import Profile as ProfileGlyph
-from pero import Path, Marker
+from pero import Path, Marker, MarkerLegend
 
 from . series import Series
 from . import utils
@@ -118,6 +118,20 @@ class Profile(Series):
     
     def __init__(self, **overrides):
         """Initializes a new instance of Profile series."""
+        
+        # init legend
+        if 'legend' not in overrides:
+            overrides['legend'] = MarkerLegend(
+                text = lambda d: d.title,
+                show_marker = lambda d: d.show_points,
+                show_line = lambda d: d.show_line,
+                marker = lambda d: d.marker,
+                marker_line_color = lambda d: d.color.darker(0.2),
+                marker_fill_color = lambda d: d.color,
+                line_color = lambda d: d.color,
+                line_width = lambda d: d.line_width,
+                line_style = lambda d: d.line_style,
+                line_dash = lambda d: d.line_dash)
         
         # init base
         super().__init__(**overrides)
