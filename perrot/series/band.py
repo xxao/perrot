@@ -104,15 +104,11 @@ class Band(Series):
     marker_fill = Include(FillProperties, prefix='marker_', fill_color=UNDEF)
     
     line = Include(LineProperties, line_color=UNDEF, dynamic=False)
-    fill = Include(FillProperties, fill_color=UNDEF, fill_alpha=150, dynamic=False)
+    fill = Include(FillProperties, fill_color=UNDEF, dynamic=False)
     
     
     def __init__(self, **overrides):
         """Initializes a new instance of the Band series."""
-        
-        # init marker
-        if 'marker' not in overrides:
-            overrides['marker'] = MARKER_CIRCLE
         
         # init base
         super().__init__(**overrides)
@@ -271,11 +267,11 @@ class Band(Series):
             # get glyph colors
             line_color = self._glyph.get_property('line_color')
             if line_color is UNDEF:
-                line_color = color
+                line_color = color.darker(0.2)
             
             fill_color = self._glyph.get_property('fill_color')
             if fill_color is UNDEF:
-                fill_color = color.trans(0.4)
+                fill_color = color
             
             # set overrides
             glyph_overrides = overrides.copy()
