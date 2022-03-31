@@ -334,10 +334,10 @@ class Rectangles(Series):
                 canvas.set_brush_by(self, source=data, overrides=overrides)
                 
                 # set default colors
-                if self.get_property('line_color', overrides=overrides, native=True) is UNDEF:
+                if self.get_property('line_color', source=data, overrides=overrides) is UNDEF:
                     canvas.line_color = default_line_color
                 
-                if self.get_property('fill_color', overrides=overrides, native=True) is UNDEF:
+                if self.get_property('fill_color', source=data, overrides=overrides) is UNDEF:
                     canvas.fill_color = default_fill_color
                 
                 # draw rectangle

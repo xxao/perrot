@@ -235,8 +235,8 @@ class Profile(Series):
         base = self.get_property('base', source, overrides)
         color = self.get_property('color', source, overrides)
         
-        # set overrides to ignore
-        ignore = {'x', 'y', 'base'}
+        # set overrides to skip
+        skip = {'x', 'y', 'base'}
         
         # crop data
         i1, i2 = utils.crop_indices(self._x_data, x_scale.in_range, True)
@@ -259,13 +259,34 @@ class Profile(Series):
         with canvas.group(tag, "series"):
             
             # update glyph
-            self._glyph.set_properties_from(self, source=source, overrides=overrides, ignore=ignore, native=True)
+            self._glyph.set_properties_from(self, source=source, overrides=overrides, skip=skip)
+            
+            # get glyph colors
+            line_color = self._glyph.get_property('line_color')
+            if line_color is UNDEF:
+                line_color = color
+            
+            fill_color = self._glyph.get_property('fill_color')
+            if fill_color is UNDEF:
+                fill_color = color.trans(0.4)
+            
+            marker_line_color = self._glyph.get_property('marker_line_color')
+            if marker_line_color is UNDEF:
+                marker_line_color = color.darker(0.2)
+            
+            marker_fill_color = self._glyph.get_property('marker_fill_color')
+            if marker_fill_color is UNDEF:
+                marker_fill_color = color
             
             # set overrides
             glyph_overrides = overrides.copy()
             glyph_overrides['x'] = x_data
             glyph_overrides['y'] = y_data
             glyph_overrides['base'] = base
+            glyph_overrides['line_color'] = line_color
+            glyph_overrides['fill_color'] = fill_color
+            glyph_overrides['marker_line_color'] = marker_line_color
+            glyph_overrides['marker_fill_color'] = marker_fill_color
             
             # draw profile
             self._glyph.draw(canvas, raw_data, **glyph_overrides)

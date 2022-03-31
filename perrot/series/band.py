@@ -240,8 +240,8 @@ class Band(Series):
         y_scale = self.get_property('y_scale', source, overrides)
         color = self.get_property('color', source, overrides)
         
-        # set overrides to ignore
-        ignore = {'x', 'y1', 'y2'}
+        # set overrides to skip
+        skip = {'x', 'y1', 'y2'}
         
         # crop data
         i1, i2 = utils.crop_indices(self._x_data, x_scale.in_range, True)
@@ -262,7 +262,7 @@ class Band(Series):
         with canvas.group(tag, "series"):
             
             # update glyph
-            self._glyph.set_properties_from(self, source=source, overrides=overrides, ignore=ignore)
+            self._glyph.set_properties_from(self, source=source, overrides=overrides, skip=skip)
             
             # get glyph colors
             line_color = self._glyph.get_property('line_color')
@@ -273,6 +273,14 @@ class Band(Series):
             if fill_color is UNDEF:
                 fill_color = color
             
+            marker_line_color = self._glyph.get_property('marker_line_color')
+            if marker_line_color is UNDEF:
+                marker_line_color = color.darker(0.2)
+            
+            marker_fill_color = self._glyph.get_property('marker_fill_color')
+            if marker_fill_color is UNDEF:
+                marker_fill_color = color
+            
             # set overrides
             glyph_overrides = overrides.copy()
             glyph_overrides['x'] = x_data
@@ -280,6 +288,8 @@ class Band(Series):
             glyph_overrides['y2'] = y2_data
             glyph_overrides['line_color'] = line_color
             glyph_overrides['fill_color'] = fill_color
+            glyph_overrides['marker_line_color'] = marker_line_color
+            glyph_overrides['marker_fill_color'] = marker_fill_color
             
             # draw band
             self._glyph.draw(canvas, raw_data, **glyph_overrides)

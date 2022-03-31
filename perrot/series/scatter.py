@@ -65,6 +65,7 @@ class Scatter(Series):
     marker_line = Include(LineProperties, prefix='marker_', line_color=UNDEF)
     marker_fill = Include(FillProperties, prefix='marker_', fill_color=UNDEF)
     
+    
     def __init__(self, **overrides):
         """Initializes a new instance of the Scatter series."""
         
@@ -225,11 +226,11 @@ class Scatter(Series):
                     continue
                 
                 # get marker color
-                line_color = marker.get_property('line_color', overrides=marker_overrides, native=True)
+                line_color = marker.get_property('line_color', point_data, overrides=marker_overrides)
                 if line_color is UNDEF:
                     line_color = default_line_color
                 
-                fill_color = marker.get_property('fill_color', overrides=marker_overrides, native=True)
+                fill_color = marker.get_property('fill_color', point_data, overrides=marker_overrides)
                 if fill_color is UNDEF:
                     fill_color = default_fill_color
                 
