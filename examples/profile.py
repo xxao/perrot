@@ -22,8 +22,7 @@ series = plot.profile(
     title = "sin(x)",
     steps = perrot.LINE_STEP.NONE,
     show_area = True,
-    show_points = perrot.UNDEF,
-    marker_line_color = "white")
+    show_points = True)
 
 # show plot
 plot.zoom()
