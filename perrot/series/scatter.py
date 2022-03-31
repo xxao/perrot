@@ -40,7 +40,7 @@ class Scatter(Series):
             Specifies the sequence of y-coordinates in real data units or a
             function to retrieve the coordinates from the raw data.
         
-        marker: pero.MARKER, pero.Path, callable, None or UNDEF
+        marker: pero.MARKER, pero.Path, callable
             Specifies the marker to draw actual data points with. The value
             can be specified by any item from the pero.MARKER enum or as
             pero.Path.
@@ -53,7 +53,6 @@ class Scatter(Series):
         
         marker_fill properties:
             Includes pero.FillProperties to specify the marker fill.
-        
     """
     
     data = SequenceProperty(UNDEF, dynamic=False)
@@ -199,21 +198,26 @@ class Scatter(Series):
         with canvas.group(tag, "series"):
             
             # draw points
-            for i, data in enumerate(raw_data):
+            for i, point_data in enumerate(raw_data):
                 
-                # init marker
-                marker = self.get_property('marker', data, marker_overrides)
-                marker = Marker.create(marker)
-                marker.set_properties_from(self, src_prefix='marker_', overrides=marker_overrides, native=True)
+                # get marker
+                marker = self.get_property('marker', point_data, marker_overrides)
+                if not marker:
+                    continue
+                
+                # init glyph
+                if not isinstance(marker, Marker):
+                    marker = Marker.create(marker)
+                    marker.set_properties_from(self, src_prefix='marker_', overrides=marker_overrides, native=True)
                 
                 # check visibility
-                if not marker or not marker.is_visible(data, marker_overrides):
+                if not marker or not marker.is_visible(point_data, marker_overrides):
                     continue
                 
                 # get coords
                 x = x_data[i]
                 y = y_data[i]
-                size = marker.get_property('size', data, marker_overrides)
+                size = marker.get_property('size', point_data, marker_overrides)
                 
                 # apply clipping
                 bbox = Frame(x-0.5*size, y-0.5*size, size, size)
@@ -237,7 +241,7 @@ class Scatter(Series):
                 marker_overrides_fin['fill_color'] = fill_color
                 
                 # draw marker
-                marker.draw(canvas, data, **marker_overrides_fin)
+                marker.draw(canvas, point_data, **marker_overrides_fin)
 
 
 class Asterisks(Scatter):
