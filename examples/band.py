@@ -21,8 +21,9 @@ series = plot.band(
     y1 = y1_data,
     y2 = y2_data,
     title = "Band",
-    show_points = perrot.UNDEF,
-    marker_line_color = "white")
+    color = "royalblue",
+    line_width = 2,
+    show_points = perrot.UNDEF)
 
 # show plot
 plot.zoom()
