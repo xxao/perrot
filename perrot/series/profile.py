@@ -162,10 +162,10 @@ class Profile(Series):
         if x_range:
             
             limits = utils.calc_limits_sorted(
-                data=(self._x_data, self._y_data),
-                crop=x_range,
-                extend=False,
-                interpolate=True)
+                data = (self._x_data, self._y_data),
+                crop = x_range,
+                extend = False,
+                interpolate = True)
             
             if self.base not in (UNDEF, None) and limits[1] is not None:
                 limits[1][0] = min(self.base, limits[1][0])
@@ -258,27 +258,28 @@ class Profile(Series):
         with canvas.group(tag, "series"):
             
             # update glyph
-            self._glyph.set_properties_from(self, source=source, overrides=overrides, skip=skip)
+            self._glyph.set_properties_from(self, source=source, overrides=overrides, skip=skip, native=True)
             
             # get glyph colors
-            line_color = self._glyph.get_property('line_color')
+            line_color = self._glyph.get_property('line_color', native=True)
             if line_color is UNDEF:
                 line_color = color
             
-            fill_color = self._glyph.get_property('fill_color')
+            fill_color = self._glyph.get_property('fill_color', native=True)
             if fill_color is UNDEF:
                 fill_color = color.trans(0.4)
             
-            marker_line_color = self._glyph.get_property('marker_line_color')
+            marker_line_color = self._glyph.get_property('marker_line_color', native=True)
             if marker_line_color is UNDEF:
                 marker_line_color = color.darker(0.2)
             
-            marker_fill_color = self._glyph.get_property('marker_fill_color')
+            marker_fill_color = self._glyph.get_property('marker_fill_color', native=True)
             if marker_fill_color is UNDEF:
                 marker_fill_color = color
             
             # set overrides
             glyph_overrides = overrides.copy()
+            glyph_overrides['data'] = raw_data
             glyph_overrides['x'] = x_data
             glyph_overrides['y'] = y_data
             glyph_overrides['base'] = base
