@@ -647,6 +647,9 @@ class OrdinalAxis(Axis):
     
     labels = TupleProperty(UNDEF, intypes=(str,), dynamic=False)
     
+    major_tick_size = NumProperty(0, dynamic=False)
+    minor_tick_size = NumProperty(6, dynamic=False)
+    
     
     def __init__(self, **overrides):
         """Initializes a new instance of the OrdinalAxis."""
