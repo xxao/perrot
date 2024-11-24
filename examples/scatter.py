@@ -38,7 +38,10 @@ series2 = plot.scatter(
     y = y_data_2,
     marker = 'd',
     marker_size = size_fn,
-    marker_fill_alpha = 150)
+    marker_fill_alpha = 150,
+    show_line = True,
+    line_width = 2,
+    line_style = perrot.DOTTED)
 
 # show plot
 plot.zoom()

@@ -29,6 +29,13 @@ class Scatter(Series):
     
     Properties:
         
+        show_points: bool or UNDEF
+            Specifies whether individual points should be displayed.
+        
+        show_line: bool
+            Specifies whether the connection line should be displayed between
+            points.
+        
         data: tuple, list, numpy.ndarray or UNDEF
             Specifies the sequence of the raw data points.
         
@@ -53,7 +60,13 @@ class Scatter(Series):
         
         marker_fill properties:
             Includes pero.FillProperties to specify the marker fill.
+        
+        line properties:
+            Includes pero.LineProperties to specify the points connection line.
     """
+    
+    show_points = BoolProperty(True, dynamic=False)
+    show_line = BoolProperty(False, dynamic=False)
     
     data = SequenceProperty(UNDEF, dynamic=False)
     
@@ -65,6 +78,8 @@ class Scatter(Series):
     marker_line = Include(LineProperties, prefix='marker_', line_color=UNDEF)
     marker_fill = Include(FillProperties, prefix='marker_', fill_color=UNDEF)
     
+    line = Include(LineProperties, line_color=UNDEF, dynamic=False)
+    
     
     def __init__(self, **overrides):
         """Initializes a new instance of the Scatter series."""
@@ -73,8 +88,8 @@ class Scatter(Series):
         if 'legend' not in overrides:
             overrides['legend'] = MarkerLegend(
                 text = lambda d: d.title,
-                show_marker = True,
-                show_line = False,
+                show_marker = lambda d: d.show_points,
+                show_line = lambda d: d.show_line,
                 marker = lambda d: d.marker,
                 marker_line_color = lambda d: d.color.darker(0.2),
                 marker_fill_color = lambda d: d.color)
@@ -169,10 +184,13 @@ class Scatter(Series):
         
         # get properties
         tag = self.get_property('tag', source, overrides)
+        show_points = self.get_property('show_points', source, overrides)
+        show_line = self.get_property('show_line', source, overrides)
         x_scale = self.get_property('x_scale', source, overrides)
         y_scale = self.get_property('y_scale', source, overrides)
         frame = self.get_property('frame', source, overrides)
         color = self.get_property('color', source, overrides)
+        line_color = self.get_property('line_color', source, overrides)
         
         # get marker overrides
         marker_overrides = self.get_child_overrides('marker', overrides)
@@ -198,51 +216,69 @@ class Scatter(Series):
         # start drawing group
         with canvas.group(tag, "series"):
             
-            # draw points
-            for i, point_data in enumerate(raw_data):
+            # draw line
+            if show_line:
                 
-                # get marker
-                marker = self.get_property('marker', point_data, marker_overrides)
-                if not marker:
-                    continue
+                # set pen and brush
+                canvas.fill_color = None
+                canvas.set_pen_by(self, source=source, overrides=overrides)
                 
-                # init glyph
-                if not isinstance(marker, Marker):
-                    marker = Marker.create(marker)
-                    marker.set_properties_from(self, src_prefix='marker_', overrides=marker_overrides, native=True)
-                
-                # check visibility
-                if not marker or not marker.is_visible(point_data, marker_overrides):
-                    continue
-                
-                # get coords
-                x = x_data[i]
-                y = y_data[i]
-                size = marker.get_property('size', point_data, marker_overrides)
-                
-                # apply clipping
-                bbox = Frame(x-0.5*size, y-0.5*size, size, size)
-                if not frame.overlaps(bbox):
-                    continue
-                
-                # get marker color
-                line_color = marker.get_property('line_color', point_data, overrides=marker_overrides)
+                # use default line color
                 if line_color is UNDEF:
-                    line_color = default_line_color
+                    canvas.line_color = color
                 
-                fill_color = marker.get_property('fill_color', point_data, overrides=marker_overrides)
-                if fill_color is UNDEF:
-                    fill_color = default_fill_color
+                # init points
+                points = numpy.stack((x_data, y_data), axis=1)
                 
-                # set overrides
-                marker_overrides_fin['x'] = x
-                marker_overrides_fin['y'] = y
-                marker_overrides_fin['size'] = size
-                marker_overrides_fin['line_color'] = line_color
-                marker_overrides_fin['fill_color'] = fill_color
-                
-                # draw marker
-                marker.draw(canvas, point_data, **marker_overrides_fin)
+                # draw line
+                canvas.draw_lines(points)
+            
+            # draw points
+            if show_points:
+                for i, point_data in enumerate(raw_data):
+                    
+                    # get marker
+                    marker = self.get_property('marker', point_data, marker_overrides)
+                    if not marker:
+                        continue
+                    
+                    # init glyph
+                    if not isinstance(marker, Marker):
+                        marker = Marker.create(marker)
+                        marker.set_properties_from(self, src_prefix='marker_', overrides=marker_overrides, native=True)
+                    
+                    # check visibility
+                    if not marker or not marker.is_visible(point_data, marker_overrides):
+                        continue
+                    
+                    # get coords
+                    x = x_data[i]
+                    y = y_data[i]
+                    size = marker.get_property('size', point_data, marker_overrides)
+                    
+                    # apply clipping
+                    bbox = Frame(x-0.5*size, y-0.5*size, size, size)
+                    if not frame.overlaps(bbox):
+                        continue
+                    
+                    # get marker color
+                    line_color = marker.get_property('line_color', point_data, overrides=marker_overrides)
+                    if line_color is UNDEF:
+                        line_color = default_line_color
+                    
+                    fill_color = marker.get_property('fill_color', point_data, overrides=marker_overrides)
+                    if fill_color is UNDEF:
+                        fill_color = default_fill_color
+                    
+                    # set overrides
+                    marker_overrides_fin['x'] = x
+                    marker_overrides_fin['y'] = y
+                    marker_overrides_fin['size'] = size
+                    marker_overrides_fin['line_color'] = line_color
+                    marker_overrides_fin['fill_color'] = fill_color
+                    
+                    # draw marker
+                    marker.draw(canvas, point_data, **marker_overrides_fin)
 
 
 class Asterisks(Scatter):

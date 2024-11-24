@@ -117,7 +117,7 @@ def crop_sorted(data, crop, master, extend=False):
         if d is not None and not isinstance(d, numpy.ndarray):
             data[i] = numpy.array(d)
     
-    # get crop indices from first item
+    # get crop indices from master item
     i1, i2 = crop_indices(data[master], crop, extend)
     
     # apply crop
