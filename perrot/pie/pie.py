@@ -7,6 +7,7 @@ import pero
 from pero.properties import *
 from pero import colors
 from pero import OrdinalScale
+from pero import Text
 from pero import MarkerLegend
 from pero import Label, TextLabel
 from pero import Tooltip, TextTooltip
@@ -40,6 +41,11 @@ class Pie(InGraphics):
         
         angle properties:
             Includes pero.AngleProperties to specify the start angle.
+        
+        anchor: float
+            Specifies the relative position within wedges to be used to display
+            labels and tooltip. The value should be between 0 and 1, where 0
+            equals inner radius and 1 equals outer radius.
         
         palette: pero.Palette, tuple, str
             Specifies the default color palette as a sequence of colors,
@@ -81,14 +87,17 @@ class Pie(InGraphics):
     inner_radius = NumProperty(UNDEF, dynamic=False)
     outer_radius = NumProperty(UNDEF, dynamic=False)
     angle = Include(AngleProperties, dynamic=False, angle=-0.5*math.pi)
+    anchor = NumProperty(0.5, dynamic=False)
     
     outline = Include(LineProperties, line_width=1, line_color="w")
     palette = PaletteProperty(colors.Dark, dynamic=False, nullable=False)
     
+    title = Property(UNDEF, types=(Text,), dynamic=False)
     legend = Property(UNDEF, types=(MarkerLegend,), dynamic=False, nullable=True)
     label = Property(UNDEF, types=(Label,), dynamic=False, nullable=True)
     tooltip = Property(UNDEF, types=(Tooltip,), dynamic=False, nullable=True)
     
+    show_title = BoolProperty(True, dynamic=False)
     show_legend = BoolProperty(True, dynamic=False)
     show_labels = BoolProperty(True, dynamic=False)
     show_tooltip = BoolProperty(True, dynamic=False)
@@ -108,6 +117,15 @@ class Pie(InGraphics):
             explode: (float,) or None
                 Relative offsets for individual wedges.
         """
+        
+        # init title
+        if 'title' not in overrides:
+            overrides['title'] = Text(
+                tag = 'title',
+                font_size = 12,
+                font_weight = FONT_WEIGHT_BOLD,
+                text_align = TEXT_ALIGN_CENTER,
+                text_base = TEXT_BASE_MIDDLE,)
         
         # init legend
         if 'legend' not in overrides:
@@ -165,7 +183,7 @@ class Pie(InGraphics):
         for obj in self._wedges:
             
             # skip empty
-            if not obj.visible or not obj.value or not obj.title:
+            if not obj.visible or not obj.title:
                 continue
             
             # init item
@@ -219,12 +237,30 @@ class Pie(InGraphics):
         if not self.is_visible(source, overrides):
             return
         
+        # get properties
+        frame = self.get_property('frame', source, overrides)
+        x = self.get_property('x', source, overrides)
+        y = self.get_property('y', source, overrides)
+        title = self.get_property('title', source, overrides)
+        show_title = self.get_property('show_title', source, overrides)
+        
         # update wedges
         self._update_wedges(canvas, source, **overrides)
         
         # draw wedges
         for obj in self._wedges:
             obj.draw(canvas)
+        
+        # draw title
+        if show_title:
+            
+            # get center
+            if x is UNDEF:
+                x = frame.cx
+            if y is UNDEF:
+                y = frame.cy
+            
+            title.draw(canvas, x=x, y=y)
     
     
     def _update_wedges(self, canvas=None, source=UNDEF, **overrides):
@@ -237,6 +273,7 @@ class Pie(InGraphics):
         inner_radius = self.get_property('inner_radius', source, overrides)
         outer_radius = self.get_property('outer_radius', source, overrides)
         angle = AngleProperties.get_angle(self, '', ANGLE_RAD, source, overrides)
+        anchor = self.get_property('anchor', source, overrides)
         
         # get center
         if x is UNDEF:
@@ -263,7 +300,7 @@ class Pie(InGraphics):
         # init values
         start_angle = angle or 0
         total = float(sum(self._values))
-        label_x = x + 0.5 * (outer_radius + inner_radius)
+        label_x = x + inner_radius + anchor * (outer_radius - inner_radius)
         label_y = y
         
         # update wedges
