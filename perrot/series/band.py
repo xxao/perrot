@@ -210,7 +210,7 @@ class Band(Series):
         
         # set raw data
         if self.data is not UNDEF:
-            self._raw_data = numpy.array(self.data)
+            self._raw_data = numpy.array(self.data, dtype=object)
         else:
             self._raw_data = numpy.array([x_raw, y1_raw, y2_raw]).T
         

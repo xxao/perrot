@@ -164,7 +164,7 @@ class Scatter(Series):
         
         # set raw data
         if self.data is not UNDEF:
-            self._raw_data = numpy.array(self.data)
+            self._raw_data = numpy.array(self.data, dtype=object)
         else:
             self._raw_data = numpy.array([x_raw, y_raw]).T
         
