@@ -3,7 +3,7 @@
 
 from pero.properties import *
 from pero import colors
-from pero import Line, Bar
+from pero import Line, Bar, Textbox
 from pero import OrdinalScale
 
 from .. enums import *
@@ -762,6 +762,167 @@ class Plot(ChartBase):
         self.plot(series, x_axis=x_axis, y_axis=y_axis)
         
         return series
+    
+    
+    def text(self, text, x, y, x_offset=5, y_offset=-5, x_axis='x_axis', y_axis='y_axis', tag=UNDEF, **overrides):
+        """
+        This method provides a convenient way to add a text box annotation
+        to current chart and assign specified axes scales, so that the
+        annotation is automatically scaled/positioned to device coordinates.
+        
+        Args:
+            text: str
+                Text to show.
+            
+            x: float
+                X-coordinate of the text box anchor in data units.
+            
+            y: float
+                Y-coordinate of the text box anchor in data units.
+            
+            x_offset: int or float
+                Specifies the additional shift in device units to be applied to
+                x-coordinate.
+            
+            y_offset: int or float
+                Specifies the additional shift in device units to be applied to
+                y-coordinate.
+            
+            x_axis: str or perrot.Axis
+                X-axis tag or the axis itself.
+            
+            y_axis: str or perrot.Axis
+                Y-axis tag or the axis itself.
+            
+            tag: str
+                Unique tag to be assigned to the annotation.
+            
+            overrides: key:value pairs
+                Specific properties to be set additionally to the text box.
+        
+        Returns:
+            perrot.Annotation
+                Final annotation object.
+        """
+        
+        # clone overrides
+        overrides = overrides.copy()
+        
+        # set defaults
+        if 'text_color' not in overrides:
+            overrides['text_color'] = 'k'
+        
+        if 'text_align' not in overrides:
+            overrides['text_align'] = LEFT
+        
+        if 'text_base' not in overrides:
+            overrides['text_base'] = BOTTOM
+        
+        if 'line_color' not in overrides:
+            overrides['line_color'] = 'lightgrey'
+        
+        if 'fill_color' not in overrides:
+            overrides['fill_color'] = 'lightgrey'
+        
+        if 'fill_alpha' not in overrides:
+            overrides['fill_alpha'] = 100
+        
+        if 'radius' not in overrides:
+            overrides['radius'] = 3
+        
+        # init glyph
+        glyph = Textbox(
+            x = x,
+            y = y,
+            text = text,
+            **overrides)
+        
+        # init annotation
+        annotation = Annotation(
+            glyph = glyph,
+            x_props = ('x',),
+            y_props = ('y',),
+            x_offset = x_offset,
+            y_offset = y_offset,
+            tag = tag)
+        
+        # add annotation
+        return self.annotate(annotation, x_axis=x_axis, y_axis=y_axis)
+    
+    
+    def line(self, p1, p2, full_scale=False, x_axis='x_axis', y_axis='y_axis', tag=UNDEF, **overrides):
+        """
+        This method provides a convenient way to add a line annotation
+        to current chart and assign specified axes scales, so that the
+        annotation is automatically scaled/positioned to device coordinates.
+        
+        Args:
+            p1: (float, float)
+                Coordinates of the first line point in data units.
+            
+            p2: (float, float)
+                Coordinates of the second line point in data units.
+            
+            full_scale: bool
+                If set to True, the line will always be drawn using full axes
+                range. If set to False, only the line between specified points
+                will be drawn.
+            
+            x_axis: str or perrot.Axis
+                X-axis tag or the axis itself.
+            
+            y_axis: str or perrot.Axis
+                Y-axis tag or the axis itself.
+            
+            tag: str
+                Unique tag to be assigned to the annotation.
+            
+            overrides: key:value pairs
+                Specific properties to be set additionally to the line.
+        
+        Returns:
+            perrot.Annotation
+                Final annotation object.
+        """
+        
+        # get axes
+        x_axis = self.get_obj(x_axis)
+        y_axis = self.get_obj(y_axis)
+        
+        # draw line between points
+        if not full_scale:
+            
+            # init glyph
+            glyph = Line(
+                x1 = p1[0],
+                x2 = p2[0],
+                y1 = p1[1],
+                y2 = p2[1],
+                **overrides)
+            
+            # init annotation
+            annotation = Annotation(glyph=glyph, x_props=('x1', 'x2'), y_props=('y1', 'y2'), tag=tag)
+        
+        # draw line full range
+        else:
+            
+            # calc line
+            a = (p2[1] - p1[1]) / (p2[0] - p1[0])
+            b = p1[1] - a * p1[0]
+            
+            # init glyph
+            glyph = Line(
+                x1 = lambda _: self._data_frame.x1,
+                x2 = lambda _: self._data_frame.x2,
+                y1 = lambda _: a*x_axis.scale.in_range[0] + b,
+                y2 = lambda _: a*x_axis.scale.in_range[1] + b,
+                **overrides)
+            
+            # init annotation
+            annotation = Annotation(glyph=glyph, y_props=('y1', 'y2'), tag=tag)
+        
+        # add annotation
+        return self.annotate(annotation, x_axis=x_axis, y_axis=y_axis)
     
     
     def vline(self, x, axis='x_axis', tag=UNDEF, **overrides):

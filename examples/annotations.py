@@ -64,6 +64,29 @@ rect = pero.Bar(
 
 plot.annotate(rect, x_props=('left', 'right'), y_props=('top', 'bottom'))
 
+# add text annotations
+left_text = plot.text(
+    x = -.5,
+    y = 1,
+    text = "-pi/2",
+    text_align = pero.RIGHT,
+    text_base = pero.MIDDLE,
+    line_color = pero.colors.Green,
+    fill_color = pero.colors.LightGreen.lighter(0.5),
+    x_offset = -5,
+    y_offset = 0)
+
+right_text = plot.text(
+    x = .5,
+    y = -1,
+    text = "+pi/2",
+    text_align = pero.LEFT,
+    text_base = pero.MIDDLE,
+    line_color = pero.colors.Red,
+    fill_color = pero.colors.Red.lighter(0.5),
+    x_offset = 5,
+    y_offset = 0)
+
 # add arrow annotation
 arrow = pero.Arrow.create(
     '<|s|>',
@@ -76,31 +99,6 @@ arrow = pero.Arrow.create(
     line_style = pero.DASHDOTTED)
 
 plot.annotate(arrow, x_props=('x1', 'x2'), y_props=('y1', 'y2'))
-
-# add text annotations
-left_text = pero.Textbox(
-    x = -.5,
-    y = 1,
-    text = "-pi/2",
-    text_align = pero.RIGHT,
-    text_base = pero.MIDDLE,
-    line_color = pero.colors.Green,
-    fill_color = pero.colors.LightGreen.lighter(0.5),
-    radius = 3)
-
-plot.annotate(left_text, x_props=('x',), y_props=('y',), x_offset=-5)
-
-right_text = pero.Textbox(
-    x = .5,
-    y = -1,
-    text = "+pi/2",
-    text_align = pero.LEFT,
-    text_base = pero.MIDDLE,
-    line_color = pero.colors.Red,
-    fill_color = pero.colors.Red.lighter(0.5),
-    radius = 3)
-
-plot.annotate(right_text, x_props=('x',), y_props=('y',), x_offset=5)
 
 # show chart
 plot.view("Plot Annotations", width=600, height=400)
