@@ -3,7 +3,7 @@
 
 from pero.properties import *
 from pero import colors
-from pero import Line, Bar, Textbox
+from pero import Line, Bar, Textbox, Marker
 from pero import OrdinalScale
 
 from .. enums import *
@@ -805,12 +805,9 @@ class Plot(ChartBase):
                 Final annotation object.
         """
         
-        # clone overrides
-        overrides = overrides.copy()
-        
         # set defaults
         if 'text_color' not in overrides:
-            overrides['text_color'] = 'k'
+            overrides['text_color'] = colors.Gray
         
         if 'text_align' not in overrides:
             overrides['text_align'] = LEFT
@@ -819,13 +816,13 @@ class Plot(ChartBase):
             overrides['text_base'] = BOTTOM
         
         if 'line_color' not in overrides:
-            overrides['line_color'] = 'lightgrey'
+            overrides['line_color'] = colors.DarkGray
         
         if 'fill_color' not in overrides:
-            overrides['fill_color'] = 'lightgrey'
+            overrides['fill_color'] = colors.White
         
         if 'fill_alpha' not in overrides:
-            overrides['fill_alpha'] = 100
+            overrides['fill_alpha'] = 200
         
         if 'radius' not in overrides:
             overrides['radius'] = 3
@@ -844,6 +841,64 @@ class Plot(ChartBase):
             y_props = ('y',),
             x_offset = x_offset,
             y_offset = y_offset,
+            tag = tag)
+        
+        # add annotation
+        return self.annotate(annotation, x_axis=x_axis, y_axis=y_axis)
+    
+    
+    def marker(self, x, y, marker='o', x_axis='x_axis', y_axis='y_axis', tag=UNDEF, **overrides):
+        """
+        This method provides a convenient way to add a marker annotation
+        to current chart and assign specified axes scales, so that the
+        annotation is automatically scaled/positioned to device coordinates.
+        
+        Args:
+            x: float
+                X-coordinate of the marker in data units.
+            
+            y: float
+                Y-coordinate of the marker in data units.
+            
+            x_axis: str or perrot.Axis
+                X-axis tag or the axis itself.
+            
+            y_axis: str or perrot.Axis
+                Y-axis tag or the axis itself.
+            
+            tag: str
+                Unique tag to be assigned to the annotation.
+            
+            overrides: key:value pairs
+                Specific properties to be set additionally to the marker.
+        
+        Returns:
+            perrot.Annotation
+                Final annotation object.
+        """
+        
+        # set defaults
+        if 'size' not in overrides:
+            overrides['size'] = 7
+        
+        if 'line_color' not in overrides:
+            overrides['line_color'] = colors.DarkGray
+        
+        if 'fill_color' not in overrides:
+            overrides['fill_color'] = colors.DarkGray
+        
+        # init glyph
+        glyph = Marker.create(
+            marker,
+            x = x,
+            y = y,
+            **overrides)
+        
+        # init annotation
+        annotation = Annotation(
+            glyph = glyph,
+            x_props = ('x',),
+            y_props = ('y',),
             tag = tag)
         
         # add annotation
@@ -884,6 +939,9 @@ class Plot(ChartBase):
             perrot.Annotation
                 Final annotation object.
         """
+        
+        if 'line_color' not in overrides:
+            overrides['line_color'] = colors.DarkGray
         
         # get axes
         x_axis = self.get_obj(x_axis)
