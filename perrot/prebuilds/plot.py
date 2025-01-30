@@ -827,6 +827,27 @@ class Plot(ChartBase):
         if 'radius' not in overrides:
             overrides['radius'] = 3
         
+        # init props
+        x_props = ('x',)
+        y_props = ('y',)
+        
+        # set coordinates by constants
+        if x == POS_LEFT:
+            x = lambda _: self._data_frame.x1 + x_offset
+            x_props = UNDEF
+        
+        elif x == POS_RIGHT:
+            x = lambda _: self._data_frame.x2 + x_offset
+            x_props = UNDEF
+        
+        if y == POS_TOP:
+            y = lambda _: self._data_frame.y1 + y_offset
+            y_props = UNDEF
+        
+        elif y == POS_BOTTOM:
+            y = lambda _: self._data_frame.y2 + y_offset
+            y_props = UNDEF
+        
         # init glyph
         glyph = Textbox(
             x = x,
@@ -837,8 +858,8 @@ class Plot(ChartBase):
         # init annotation
         annotation = Annotation(
             glyph = glyph,
-            x_props = ('x',),
-            y_props = ('y',),
+            x_props = x_props,
+            y_props = y_props,
             x_offset = x_offset,
             y_offset = y_offset,
             tag = tag)
