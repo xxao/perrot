@@ -223,6 +223,7 @@ class Pie(InGraphics):
             item = label.clone(obj, deep=True)
             item.x = obj.label_x
             item.y = obj.label_y
+            item.z_index = obj.value
             
             # add item
             items.append(item)
@@ -329,12 +330,16 @@ class Pie(InGraphics):
         # init container
         self._wedges = []
         
+        # get sum
+        total = sum(self._values)
+        
         # init wedges
         for i in range(len(self._values)):
             
             # init wedge
             wedge = PieWedge(
                 value = self._values[i],
+                total = total,
                 title = self._titles[i])
             
             # lock value

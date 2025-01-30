@@ -17,7 +17,7 @@ pie_1 = chart.pie(values_1, titles_1, explode_1,
     inner_radius = 0.25,
     outer_radius = 0.5,
     palette = palette_1,
-    label_text = lambda d: f"{d.value/sum(values_1):.0%}",
+    label_text = lambda d: f"{d.value/d.total:.0%}",
     label_font_weight = perrot.BOLD,
     label_text_color = "w")
 

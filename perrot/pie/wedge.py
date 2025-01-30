@@ -14,6 +14,9 @@ class PieWedge(Wedge):
         value: int or float
             Specifies the wedge value.
         
+        total: int or float
+            Specifies the summed value of all wedges.
+        
         title: str or callable
             Specifies the wedge title.
         
@@ -25,6 +28,7 @@ class PieWedge(Wedge):
     """
     
     value = NumProperty(0, dynamic=False)
+    total = NumProperty(0, dynamic=False)
     title = StringProperty(UNDEF)
     
     label_x = NumProperty(0, dynamic=False)
