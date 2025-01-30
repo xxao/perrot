@@ -292,15 +292,25 @@ class Venn(InGraphics):
     def _init_graphics(self):
         """Initializes and registers required graphics."""
         
+        # get sum
+        total = sum(self._values.values())
+        
         # set regions values
         for key in _REGIONS:
             self.get_property(key).value = self._values[key]
+            self.get_property(key).total = total
         
         # set circles values
         a, b, ab, c, ac, bc, abc = [self._values[k] for k in _REGIONS]
+        
         self.get_property(_CIRCLES[0]).value = a + ab + ac + abc
+        self.get_property(_CIRCLES[0]).total = total
+        
         self.get_property(_CIRCLES[1]).value = b + ab + bc + abc
+        self.get_property(_CIRCLES[1]).total = total
+        
         self.get_property(_CIRCLES[2]).value = c + ac + bc + abc
+        self.get_property(_CIRCLES[2]).total = total
         
         # set circles fill
         self._init_colors()

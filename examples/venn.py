@@ -18,7 +18,7 @@ venn = chart.venn(*data,
     A_title = "Series A",
     B_title = "Series B",
     C_title = "Series C",
-    label_text = lambda d: f"{d.value}\n{d.value/sum(data):.0%}")
+    label_text = lambda d: f"{d.value}\n{d.value/d.total:.0%}")
 
 # show chart
 chart.show("Venn Diagram", width=450, height=400)

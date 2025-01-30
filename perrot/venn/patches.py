@@ -18,6 +18,9 @@ class VennPatch(InGraphics):
         value: int or float
             Specifies the region value.
         
+        total: int or float
+            Specifies the total diagram value.
+        
         title: str or callable
             Specifies the region title.
         
@@ -38,8 +41,9 @@ class VennPatch(InGraphics):
     """
     
     value = NumProperty(0, dynamic=False)
-    path = Property(UNDEF, types=(Path,))
+    total = NumProperty(0, dynamic=False)
     
+    path = Property(UNDEF, types=(Path,))
     line = Include(LineProperties)
     fill = Include(FillProperties)
     
