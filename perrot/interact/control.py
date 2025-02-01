@@ -67,6 +67,10 @@ class PlotControl(Control):
         # init right tool
         if self.right_tool is UNDEF:
             self.right_tool = MeasureTool()
+        
+        # init touch tool
+        if self.touch_tool is UNDEF:
+            self.touch_tool = ZoomTool()
     
     
     def on_zoom(self, evt):
