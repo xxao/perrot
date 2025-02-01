@@ -65,6 +65,39 @@ class CrossTool(Tool):
         evt.cancel()
     
     
+    def on_touch_move(self, evt):
+        """Handles touch-move event."""
+        
+        # check keys
+        if self.keys:
+            return
+        
+        # check buttons
+        if evt.left_down or evt.right_down or evt.middle_down:
+            return
+        
+        # check control
+        if not evt.control:
+            return
+        
+        # get plot
+        plot = evt.control.graphics
+        
+        # get location
+        obj = plot.get_obj_below(evt.x_pos, evt.y_pos)
+        
+        # cancel event
+        if obj != DATA_FRAME:
+            evt.control.clear_overlay()
+            return
+        
+        # draw position
+        evt.control.draw_overlay(self._draw_position, evt=evt)
+        
+        # stop event propagation
+        evt.cancel()
+    
+    
     def _get_axes(self, evt):
         """Gets relevant axes."""
         
