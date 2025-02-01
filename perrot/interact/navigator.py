@@ -272,6 +272,91 @@ class NavigatorTool(Tool):
         evt.cancel()
     
     
+    def on_touch_move(self, evt):
+        """Handles touch-move event."""
+        
+        # no event set
+        if not self._event:
+            self._set_cursor_by_location(evt)
+            return
+        
+        # shift axes
+        if self._event == _EVT_SHIFT:
+            self._shift_axes_by_dragging(evt, self._event_obj)
+            self._dragging = (evt.x_pos, evt.y_pos)
+        
+        # pan axes
+        elif self._event == _EVT_PAN and KEY_SPACE in self.keys:
+            self._shift_axes_by_dragging(evt, self._event_obj)
+            self._dragging = (evt.x_pos, evt.y_pos)
+        
+        # scale axes
+        elif self._event == _EVT_SCALE:
+            self._scale_axes_by_dragging(evt, self._event_obj)
+            self._dragging = (evt.x_pos, evt.y_pos)
+        
+        # stop event propagation
+        evt.cancel()
+    
+    
+    def on_touch_start(self, evt):
+        """Handles touch-start event."""
+        
+        # check control
+        if not evt.control:
+            return
+        
+        # get plot
+        plot = evt.control.graphics
+        
+        # get location
+        obj = plot.get_obj_below(evt.x_pos, evt.y_pos)
+        
+        # check location
+        if obj != DATA_FRAME and not isinstance(obj, Axis):
+            return
+        
+        # remember dragging origin
+        self._dragging = (evt.x_pos, evt.y_pos)
+        
+        # start axis shift
+        if isinstance(obj, Axis) and obj.position in (POS_TOP, POS_BOTTOM):
+            self._event = _EVT_SHIFT
+            self._event_obj = obj
+        
+        # start axis scale
+        elif isinstance(obj, Axis) and obj.position in (POS_LEFT, POS_RIGHT):
+            self._event = _EVT_SCALE
+            self._event_obj = obj
+        
+        # pan axes
+        elif KEY_SPACE in self.keys:
+            self._event = _EVT_PAN
+            self._event_obj = DATA_FRAME
+            evt.control.set_cursor(CURSOR_HAND)
+        
+        # no event to start
+        else:
+            return
+        
+        # stop event propagation
+        evt.cancel()
+    
+    
+    def on_touch_end(self, evt):
+        """Handles touch-end event."""
+        
+        # check if active
+        if not self._event:
+            return
+        
+        # cancel event
+        self._escape_event(evt)
+        
+        # stop event propagation
+        evt.cancel()
+    
+    
     def _set_cursor_by_location(self, evt):
         """Sets cursor according to position within plot."""
         
