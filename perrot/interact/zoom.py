@@ -154,6 +154,73 @@ class ZoomTool(Tool):
         evt.cancel()
     
     
+    def on_touch_move(self, evt):
+        """Handles touch-move event."""
+        
+        # check if active
+        if not self._is_active:
+            return
+        
+        # check control
+        if not evt.control:
+            return
+        
+        # draw zoom box
+        evt.control.draw_overlay(self._draw_zoom_box, evt=evt)
+        
+        # stop event propagation
+        evt.cancel()
+    
+    
+    def on_touch_start(self, evt):
+        """Handles touch-start event."""
+        
+        # check keys
+        if self.keys:
+            return
+        
+        # check control
+        if not evt.control:
+            return
+        
+        # get plot
+        plot = evt.control.graphics
+        
+        # check location
+        obj = plot.get_obj_below(evt.x_pos, evt.y_pos)
+        if obj != DATA_FRAME:
+            return
+        
+        # set as active
+        self._is_active = True
+        
+        # remember dragging origin
+        self._dragging = (evt.x_pos, evt.y_pos)
+        
+        # draw zoom box
+        evt.control.draw_overlay(self._draw_zoom_box, evt=evt)
+        
+        # stop event propagation
+        evt.cancel()
+    
+    
+    def on_touch_end(self, evt):
+        """Handles touch-end event."""
+        
+        # check if active
+        if not self._is_active:
+            return
+        
+        # zoom axes
+        self._zoom_axes(evt)
+        
+        # cancel event
+        self._escape_event(evt)
+        
+        # stop event propagation
+        evt.cancel()
+    
+    
     def _get_zoom_mode(self, evt, min_x, min_y, max_x, max_y):
         """Gets zoom mode according to settings and current selection."""
         
