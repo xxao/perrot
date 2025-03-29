@@ -76,9 +76,14 @@ def calc_venn(a, b, ab, c=0., ac=0., bc=0., abc=0., mode=FULL, spacing=0.1):
         d_ac = max(r_a, r_c)
         d_bc = max(r_b, r_c)
     
-    # make non-proportional
-    else:
+    # make non-proportional with c
+    elif r_c:
         r_a = r_b = r_c = max(r_a, r_b, r_c)
+        d_ab = d_ac = d_bc = r_a
+    
+    # make non-proportional without c
+    else:
+        r_a = r_b = max(r_a, r_b)
         d_ab = d_ac = d_bc = r_a
     
     # calc coords of circles center
