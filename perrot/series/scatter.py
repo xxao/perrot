@@ -90,6 +90,9 @@ class Scatter(Series):
                 text = lambda d: d.title,
                 show_marker = lambda d: d.show_points,
                 show_line = lambda d: d.show_line,
+                line_color = lambda d: d.color.darker(0.2),
+                line_width = lambda d: d.line_width,
+                line_style = lambda d: d.line_style,
                 marker = lambda d: d.marker,
                 marker_line_color = lambda d: d.color.darker(0.2),
                 marker_fill_color = lambda d: d.color)
