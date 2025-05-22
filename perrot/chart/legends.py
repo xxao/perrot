@@ -77,6 +77,31 @@ class OutLegend(OutGraphics):
         super().__init__(**overrides)
     
     
+    def add(self, legend):
+        """
+        Adds legend item to current legend. This method is only available for
+        static legends.
+        
+        Args:
+            legend: pero.Legend
+                Legend item to add.
+        """
+        
+        # check if static
+        static = self.get_property('static')
+        if not static:
+            raise ValueError("Cannot add legend item to non-static legend!")
+        
+        # check type
+        if not isinstance(legend, Legend):
+            raise TypeError("Legend item must be of type pero.Legend! -> %s" % type(legend))
+        
+        # set new items
+        items = self.get_property('items') or []
+        items = list(items) + [legend]
+        self.set_property('items', items)
+    
+    
     def get_extent(self, canvas, source=UNDEF, **overrides):
         """
         This method is automatically called by parent chart to get amount of
@@ -255,6 +280,31 @@ class InLegend(InGraphics):
         
         # init base
         super().__init__(**overrides)
+    
+    
+    def add(self, legend):
+        """
+        Adds legend item to current legend. This method is only available for
+        static legends.
+        
+        Args:
+            legend: pero.Legend
+                Legend item to add.
+        """
+        
+        # check if static
+        static = self.get_property('static')
+        if not static:
+            raise ValueError("Cannot add legend item to non-static legend!")
+        
+        # check type
+        if not isinstance(legend, Legend):
+            raise TypeError("Legend item must be of type pero.Legend! -> %s" % type(legend))
+        
+        # set new items
+        items = self.get_property('items') or []
+        items = list(items) + [legend]
+        self.set_property('items', items)
     
     
     def prepare(self, chart, canvas, source=UNDEF, **overrides):
