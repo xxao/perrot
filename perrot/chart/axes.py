@@ -5,7 +5,7 @@ from pero.properties import *
 from pero import StraitAxis
 from pero import Scale, ContinuousScale, LinScale, LogScale, OrdinalScale
 from pero import Ticker, LinTicker, LogTicker, FixTicker, TimeTicker
-from pero import Formatter, IndexFormatter, BytesFormatter, SecondsFormatter
+from pero import Formatter, IndexFormatter
 
 from .. enums import *
 from . graphics import OutGraphics
