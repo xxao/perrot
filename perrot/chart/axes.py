@@ -5,7 +5,7 @@ from pero.properties import *
 from pero import StraitAxis
 from pero import Scale, ContinuousScale, LinScale, LogScale, OrdinalScale
 from pero import Ticker, LinTicker, LogTicker, FixTicker, TimeTicker
-from pero import Formatter, IndexFormatter
+from pero import Formatter, IndexFormatter, BytesFormatter
 
 from .. enums import *
 from . graphics import OutGraphics
@@ -734,6 +734,28 @@ class TimeAxis(Axis):
         
         if 'ticker' not in overrides:
             overrides['ticker'] = TimeTicker()
+        
+        # init base
+        super().__init__(**overrides)
+        
+        # lock scale and ticker
+        self.lock_property('scale')
+        self.lock_property('ticker')
+
+
+class BytesAxis(Axis):
+    """Predefined axis with linear scale and bytes formatter."""
+    
+    
+    def __init__(self, **overrides):
+        """Initializes a new instance of the BytesAxis."""
+        
+        # init defaults
+        if 'scale' not in overrides:
+            overrides['scale'] = LinScale(in_range=(0., 1.))
+        
+        if 'ticker' not in overrides:
+            overrides['ticker'] = LinTicker(formatter=BytesFormatter(hide_suffix=True))
         
         # init base
         super().__init__(**overrides)
