@@ -6,7 +6,7 @@ from . graphics import ChartGraphics, InGraphics, OutGraphics
 from . chart import ChartBase
 from . title import Title
 from . legends import InLegend, OutLegend
-from . axes import Axis, LinAxis, LogAxis, OrdinalAxis, TimeAxis, BytesAxis
+from . axes import Axis, LinAxis, LogAxis, OrdinalAxis, TimeAxis, BytesAxis, SecondsAxis
 from . grid import Grid
 from . labels import Labels
 from . annotation import Annotation
