@@ -357,6 +357,30 @@ class NavigatorTool(Tool):
         evt.cancel()
     
     
+    def on_touch_dtap(self, evt):
+        """Handles touch-double-tap event."""
+        
+        # check control
+        if not evt.control:
+            return
+        
+        # get plot
+        plot = evt.control.graphics
+        
+        # get location
+        obj = plot.get_obj_below(evt.x_pos, evt.y_pos)
+        
+        # check location
+        if obj != DATA_FRAME and not isinstance(obj, Axis):
+            return
+        
+        # set full range on axes
+        self._scale_axes_full(evt, obj)
+        
+        # stop event propagation
+        evt.cancel()
+    
+    
     def _set_cursor_by_location(self, evt):
         """Sets cursor according to position within plot."""
         
