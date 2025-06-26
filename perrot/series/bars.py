@@ -61,8 +61,8 @@ class Rectangles(Series):
     data = SequenceProperty(UNDEF, dynamic=False)
     anchor = EnumProperty(POS_CENTER, enum=POSITION_LRTBC, dynamic=False)
     
-    x_offset = Property(UNDEF, dynamic=False)
-    y_offset = Property(UNDEF, dynamic=False)
+    x_offset = Property(UNDEF)
+    y_offset = Property(UNDEF)
     spacing = QuadProperty(0, dynamic=False)
     
     width_limit = NumProperty(1, dynamic=False)
@@ -115,36 +115,36 @@ class Rectangles(Series):
         self.lock_property('right', raise_error=False)
         self.lock_property('top', raise_error=False)
         self.lock_property('bottom', raise_error=False)
-
-
+    
+    
     def get_limits(self, x_range=None, y_range=None, exact=False):
         """Gets current data limits using whole range or specified crops."""
-
+        
         # check data
         if self._limits is None:
             return None
-
+        
         # init limits
         limits = self._limits
-
+        
         # apply crop
         if x_range or y_range:
             limits_top_left = utils.calc_limits_unsorted(
-                data=(self._left_data, self._top_data),
-                crops=(x_range, y_range),
-                extend=False)
-
+                data = (self._left_data, self._top_data),
+                crops = (x_range, y_range),
+                extend = False)
+            
             limits_bottom_right = utils.calc_limits_unsorted(
-                data=(self._right_data, self._bottom_data),
-                crops=(x_range, y_range),
-                extend=False)
-
+                data = (self._right_data, self._bottom_data),
+                crops = (x_range, y_range),
+                extend = False)
+            
             limits = utils.combine_limits(limits_top_left, limits_bottom_right)
-
+        
         # finalize limits
         return self.finalize_limits(limits, exact)
-
-
+    
+    
     def get_labels(self, canvas=None, source=UNDEF, **overrides):
         """Gets series labels."""
         
@@ -184,6 +184,9 @@ class Rectangles(Series):
         self._y_data, y_raw = utils.extract_data(self, 'y', self.data, size, self.y_mapper)
         width_data, width_raw = utils.extract_data(self, 'width', self.data, size)
         height_data, height_raw = utils.extract_data(self, 'height', self.data, size)
+        
+        x_offset, _ = utils.extract_data(self, 'x_offset', self.data, size, self.x_mapper)
+        y_offset, _ = utils.extract_data(self, 'y_offset', self.data, size, self.y_mapper)
         
         # calc missing data
         if not self.has_property('x'):
@@ -236,22 +239,14 @@ class Rectangles(Series):
         
         # apply offset
         if self.x_offset is not UNDEF:
-            
-            if isinstance(self.x_offset, (tuple, list)):
-                self.x_offset = numpy.array(self.x_offset)
-            
-            self._x_data = self._x_data + self.x_offset
-            self._left_data = self._left_data + self.x_offset
-            self._right_data = self._right_data + self.x_offset
+            self._x_data = self._x_data + x_offset
+            self._left_data = self._left_data + x_offset
+            self._right_data = self._right_data + x_offset
         
         if self.y_offset is not UNDEF:
-            
-            if isinstance(self.y_offset, (tuple, list)):
-                self.y_offset = numpy.array(self.y_offset)
-            
-            self._y_data = self._y_data + self.y_offset
-            self._top_data = self._top_data + self.y_offset
-            self._bottom_data = self._bottom_data + self.y_offset
+            self._y_data = self._y_data + y_offset
+            self._top_data = self._top_data + y_offset
+            self._bottom_data = self._bottom_data + y_offset
         
         # init full limits
         if len(self._raw_data) > 0:

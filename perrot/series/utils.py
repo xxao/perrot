@@ -433,6 +433,8 @@ def extract_data(series, name, source=UNDEF, size=None, mapper=None, dtype=numpy
     
     # get property
     prop = series.get_property(name, native=True)
+    if prop is UNDEF:
+        return data, raw
     
     # extract raw data
     if isinstance(prop, (int, float)) and size:
