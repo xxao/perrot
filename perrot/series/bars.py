@@ -34,10 +34,10 @@ class Rectangles(Series):
             Specifies the position within rectangles to be used to display
             labels and tooltip as any item from the pero.POSITION_LRTBC enum.
         
-        x_offset: tuple, list, numpy.ndarray or UNDEF
+        x_offset: tuple, list, numpy.ndarray, callable or UNDEF
             Specifies the sequence of the x-offsets in data units.
         
-        y_offset: tuple, list, numpy.ndarray or UNDEF
+        y_offset: tuple, list, numpy.ndarray, callable or UNDEF
             Specifies the sequence of the y-offsets in data units.
         
         spacing: int, float or tuple
@@ -129,6 +129,7 @@ class Rectangles(Series):
         
         # apply crop
         if x_range or y_range:
+            
             limits_top_left = utils.calc_limits_unsorted(
                 data = (self._left_data, self._top_data),
                 crops = (x_range, y_range),
