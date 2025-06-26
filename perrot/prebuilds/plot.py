@@ -1180,6 +1180,86 @@ class Plot(ChartBase):
         return self.annotate(annotation, x_axis=UNDEF, y_axis=axis)
     
     
+    def bar(self, left, right, top, bottom, x_axis='x_axis', y_axis='y_axis', tag=UNDEF, **overrides):
+        """
+        This method provides a convenient way to add a bar annotation
+        to current chart and assign specified axes scales, so that the
+        annotation is automatically scaled/positioned to device coordinates.
+        
+        Args:
+            left: float
+                X-coordinate of the bar left position in data units.
+            
+            right: float
+                X-coordinate of the bar right position in data units.
+            
+            top: float
+                Y-coordinate of the bar top position in data units.
+            
+            bottom: float
+                Y-coordinate of the bar bottom position in data units.
+            
+            x_axis: str or perrot.Axis
+                X-axis tag or the axis itself.
+            
+            y_axis: str or perrot.Axis
+                Y-axis tag or the axis itself.
+            
+            tag: str
+                Unique tag to be assigned to the annotation.
+            
+            overrides: key:value pairs
+                Specific properties to be set additionally to the band.
+            
+        Returns:
+            perrot.Bar
+                Final annotation object.
+        """
+        
+        # update overrides
+        if 'line_color' not in overrides:
+            overrides['line_color'] = None
+        
+        # init props
+        x_props = ['left', 'right']
+        y_props = ['top', 'bottom']
+        
+        # set coordinates by constants
+        if left == POS_LEFT:
+            left = lambda _: self._data_frame.x1
+            x_props.remove('left')
+        
+        if right == POS_RIGHT:
+            right = lambda _: self._data_frame.x2
+            x_props.remove('right')
+        
+        if top == POS_TOP:
+            top = lambda _: self._data_frame.y1
+            y_props.remove('top')
+        
+        if bottom == POS_BOTTOM:
+            bottom = lambda _: self._data_frame.y2
+            y_props.remove('bottom')
+        
+        # init glyph
+        glyph = Bar(
+            left = left,
+            right = right,
+            top = top,
+            bottom = bottom,
+            **overrides)
+        
+        # init annotation
+        annotation = Annotation(
+            glyph = glyph,
+            x_props = x_props,
+            y_props = y_props,
+            tag = tag)
+        
+        # add annotation
+        return self.annotate(annotation, x_axis=x_axis, y_axis=y_axis)
+    
+    
     def vband(self, left, right, axis='x_axis', tag=UNDEF, **overrides):
         """
         This method provides a convenient way to add a vertical band annotation
@@ -1203,47 +1283,24 @@ class Plot(ChartBase):
                 Specific properties to be set additionally to the band.
         
         Returns:
-            perrot.Bar
+            perrot.Annotation
                 Final annotation object.
         """
         
-        # get axis
-        axis = self.get_obj(axis)
-        
-        # update overrides
-        if 'line_color' not in overrides:
-            overrides['line_color'] = None
-        
-        # init props
-        x_props = ['left', 'right']
-        
-        # set coordinates by constants
-        if left == POS_LEFT:
-            left = lambda _: self._data_frame.x1
-            x_props.remove('left')
-        
-        if right == POS_RIGHT:
-            right = lambda _: self._data_frame.x2
-            x_props.remove('right')
-        
-        # init glyph
-        glyph = Bar(
+        return self.bar(
             left = left,
             right = right,
-            top = lambda _: self._data_frame.y1,
-            bottom = lambda _: self._data_frame.y2,
+            top = POS_TOP,
+            bottom = POS_BOTTOM,
+            x_axis = axis,
+            y_axis = UNDEF,
+            tag = tag,
             **overrides)
-        
-        # init annotation
-        annotation = Annotation(glyph=glyph, x_props=x_props, tag=tag)
-        
-        # add annotation
-        return self.annotate(annotation, x_axis=axis, y_axis=UNDEF)
     
     
     def hband(self, top, bottom, axis='y_axis', tag=UNDEF, **overrides):
         """
-        This method provides a convenient way to add a vertical band annotation
+        This method provides a convenient way to add a horizontal band annotation
         to current chart and assign specified axes scales, so that the
         annotation is automatically scaled/positioned to device coordinates.
         
@@ -1264,42 +1321,19 @@ class Plot(ChartBase):
                 Specific properties to be set additionally to the band.
         
         Returns:
-            perrot.Bar
+            perrot.Annotation
                 Final annotation object.
         """
         
-        # get axis
-        axis = self.get_obj(axis)
-        
-        # update overrides
-        if 'line_color' not in overrides:
-            overrides['line_color'] = None
-        
-        # init props
-        y_props = ['top', 'bottom']
-        
-        # set coordinates by constants
-        if top == POS_TOP:
-            top = lambda _: self._data_frame.y1
-            y_props.remove('top')
-        
-        if bottom == POS_BOTTOM:
-            bottom = lambda _: self._data_frame.y2
-            y_props.remove('bottom')
-        
-        # init glyph
-        glyph = Bar(
-            left = lambda _: self._data_frame.x1,
-            right = lambda _: self._data_frame.x2,
+        return self.bar(
+            left = POS_LEFT,
+            right = POS_RIGHT,
             top = top,
             bottom = bottom,
+            x_axis = UNDEF,
+            y_axis = axis,
+            tag = tag,
             **overrides)
-        
-        # init annotation
-        annotation = Annotation(glyph=glyph, y_props=y_props, tag=tag)
-        
-        # add annotation
-        return self.annotate(annotation, x_axis=UNDEF, y_axis=axis)
     
     
     def zoom(self, axis=None, minimum=None, maximum=None, propagate=True):
