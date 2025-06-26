@@ -3,7 +3,7 @@
 
 from pero.properties import *
 from pero import colors
-from pero import Line, Bar, Textbox, Marker
+from pero import Line, Bar, Text, Textbox, Marker
 from pero import OrdinalScale
 
 from .. enums import *
@@ -764,7 +764,7 @@ class Plot(ChartBase):
         return series
     
     
-    def text(self, text, x, y, x_offset=5, y_offset=-5, x_axis='x_axis', y_axis='y_axis', tag=UNDEF, **overrides):
+    def textbox(self, text, x, y, x_offset=5, y_offset=-5, x_axis='x_axis', y_axis='y_axis', tag=UNDEF, **overrides):
         """
         This method provides a convenient way to add a text box annotation
         to current chart and assign specified axes scales, so that the
@@ -850,6 +850,98 @@ class Plot(ChartBase):
         
         # init glyph
         glyph = Textbox(
+            x = x,
+            y = y,
+            text = text,
+            **overrides)
+        
+        # init annotation
+        annotation = Annotation(
+            glyph = glyph,
+            x_props = x_props,
+            y_props = y_props,
+            x_offset = x_offset,
+            y_offset = y_offset,
+            tag = tag)
+        
+        # add annotation
+        return self.annotate(annotation, x_axis=x_axis, y_axis=y_axis)
+    
+    
+    def text(self, text, x, y, x_offset=5, y_offset=-5, x_axis='x_axis', y_axis='y_axis', tag=UNDEF, **overrides):
+        """
+        This method provides a convenient way to add a simple text annotation
+        to current chart and assign specified axes scales, so that the
+        annotation is automatically scaled/positioned to device coordinates.
+        
+        Args:
+            text: str
+                Text to show.
+            
+            x: float
+                X-coordinate of the text box anchor in data units.
+            
+            y: float
+                Y-coordinate of the text box anchor in data units.
+            
+            x_offset: int or float
+                Specifies the additional shift in device units to be applied to
+                x-coordinate.
+            
+            y_offset: int or float
+                Specifies the additional shift in device units to be applied to
+                y-coordinate.
+            
+            x_axis: str or perrot.Axis
+                X-axis tag or the axis itself.
+            
+            y_axis: str or perrot.Axis
+                Y-axis tag or the axis itself.
+            
+            tag: str
+                Unique tag to be assigned to the annotation.
+            
+            overrides: key:value pairs
+                Specific properties to be set additionally to the text.
+            
+        Returns:
+            perrot.Annotation
+                Final annotation object.
+        """
+        
+        # set defaults
+        if 'text_color' not in overrides:
+            overrides['text_color'] = colors.Gray
+        
+        if 'text_align' not in overrides:
+            overrides['text_align'] = LEFT
+        
+        if 'text_base' not in overrides:
+            overrides['text_base'] = BOTTOM
+        
+        # init props
+        x_props = ('x',)
+        y_props = ('y',)
+        
+        # set coordinates by constants
+        if x == POS_LEFT:
+            x = lambda _: self._data_frame.x1 + x_offset
+            x_props = UNDEF
+        
+        elif x == POS_RIGHT:
+            x = lambda _: self._data_frame.x2 + x_offset
+            x_props = UNDEF
+        
+        if y == POS_TOP:
+            y = lambda _: self._data_frame.y1 + y_offset
+            y_props = UNDEF
+        
+        elif y == POS_BOTTOM:
+            y = lambda _: self._data_frame.y2 + y_offset
+            y_props = UNDEF
+        
+        # init glyph
+        glyph = Text(
             x = x,
             y = y,
             text = text,
@@ -1122,6 +1214,18 @@ class Plot(ChartBase):
         if 'line_color' not in overrides:
             overrides['line_color'] = None
         
+        # init props
+        x_props = ['left', 'right']
+        
+        # set coordinates by constants
+        if left == POS_LEFT:
+            left = lambda _: self._data_frame.x1
+            x_props.remove('left')
+        
+        if right == POS_RIGHT:
+            right = lambda _: self._data_frame.x2
+            x_props.remove('right')
+        
         # init glyph
         glyph = Bar(
             left = left,
@@ -1131,7 +1235,7 @@ class Plot(ChartBase):
             **overrides)
         
         # init annotation
-        annotation = Annotation(glyph=glyph, x_props=('left', 'right'), tag=tag)
+        annotation = Annotation(glyph=glyph, x_props=x_props, tag=tag)
         
         # add annotation
         return self.annotate(annotation, x_axis=axis, y_axis=UNDEF)
@@ -1171,6 +1275,18 @@ class Plot(ChartBase):
         if 'line_color' not in overrides:
             overrides['line_color'] = None
         
+        # init props
+        y_props = ['top', 'bottom']
+        
+        # set coordinates by constants
+        if top == POS_TOP:
+            top = lambda _: self._data_frame.y1
+            y_props.remove('top')
+        
+        if bottom == POS_BOTTOM:
+            bottom = lambda _: self._data_frame.y2
+            y_props.remove('bottom')
+        
         # init glyph
         glyph = Bar(
             left = lambda _: self._data_frame.x1,
@@ -1180,10 +1296,10 @@ class Plot(ChartBase):
             **overrides)
         
         # init annotation
-        annotation = Annotation(glyph=glyph, x_props=('top', 'bottom'), tag=tag)
+        annotation = Annotation(glyph=glyph, y_props=y_props, tag=tag)
         
         # add annotation
-        return self.annotate(annotation, x_axis=axis, y_axis=UNDEF)
+        return self.annotate(annotation, x_axis=UNDEF, y_axis=axis)
     
     
     def zoom(self, axis=None, minimum=None, maximum=None, propagate=True):
