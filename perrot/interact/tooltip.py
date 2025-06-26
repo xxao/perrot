@@ -15,18 +15,27 @@ class TooltipTool(Tool):
     
     Properties:
         
+        distance: int or float
+            Specifies the maximum allowed distance between actual data point and
+            cursor in device units.
+        
         marker: pero.Marker, pero.MARKER, callable, None or UNDEF
             Specifies the marker glyph to highlight actual data point with. The
             value can be specified by any item from the pero.MARKER enum or
             as an pero.Marker instance.
         
-        distance: int or float
-            Specifies the maximum allowed distance between actual data point and
-            cursor in device units.
+        v_line properties:
+            Includes pero.LineProperties to specify the tooltip vertical line.
+        
+        h_line properties:
+            Includes pero.LineProperties to specify the tooltip horizontal line.
     """
     
-    marker = MarkerProperty(UNDEF, dynamic=False, nullable=True)
     distance = IntProperty(10, dynamic=False)
+    
+    marker = MarkerProperty(UNDEF, dynamic=False, nullable=True)
+    v_line = Include(LineProperties, prefix="v_", dynamic=False, line_color="#f003", line_width=0)
+    h_line = Include(LineProperties, prefix="h_", dynamic=False, line_color="#f003", line_width=0)
     
     
     def __init__(self, **overrides):
@@ -121,12 +130,29 @@ class TooltipTool(Tool):
         # get plot
         plot = evt.control.graphics
         
-        # get plot frame
+        # get coords
+        x, y = tooltip.x, tooltip.y
         frame = plot.get_frame(DATA_FRAME)
+        
+        # draw horizontal line
+        canvas.set_pen_by(self, prefix="h_")
+        canvas.draw_line(
+            x1 = frame.x1,
+            x2 = frame.x2,
+            y1 = y,
+            y2 = y)
+        
+        # draw vertical line
+        canvas.set_pen_by(self, prefix="v_")
+        canvas.draw_line(
+            x1 = x,
+            x2 = x,
+            y1 = frame.y1,
+            y2 = frame.y2)
         
         # draw marker
         if self.marker:
-            self.marker.draw(canvas, x=tooltip.x, y=tooltip.y)
+            self.marker.draw(canvas, x=x, y=y)
         
         # draw tooltip
         tooltip.draw(canvas, clip=frame)
