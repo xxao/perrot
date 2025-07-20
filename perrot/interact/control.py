@@ -5,7 +5,7 @@ import time
 
 from pero.enums import *
 from pero.properties import *
-from pero import Control
+from pero import ToolControl
 
 from .. prebuilds import Plot
 from . navigator import NavigatorTool
@@ -14,7 +14,7 @@ from . zoom import ZoomTool
 from . measure import MeasureTool
 
 
-class PlotControl(Control):
+class PlotControl(ToolControl):
     """
     Plot view control providing several convenient methods to apply zoom to
     specific axis, enable zoom undos and sets default interactivity tools.
