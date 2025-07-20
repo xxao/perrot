@@ -83,7 +83,7 @@ class TooltipTool(Tool):
         evt.control.set_cursor(CURSOR_ARROW)
         
         # draw tooltip
-        evt.view.draw_overlay(self._draw_tooltip, evt=evt)
+        evt.control.draw_overlay(self._draw_tooltip, evt=evt)
         
         # stop event propagation
         evt.cancel()
