@@ -16,25 +16,29 @@ settings = {
     "x_axis_title": "pi",
     "y_axis_title": "f(x)"}
 
-plot1 = perrot.Plot(**settings)
-plot2 = perrot.Plot(**settings)
-plot3 = perrot.Plot(**settings)
+# init plots
+p1 = perrot.Plot(tag="p1", **settings)
+p1.profile(x=x_data, y=sin_data, title="sin(x)", color="b")
+p1.profile(x=x_data, y=cos_data, title="cos(x)", color="g")
+p1.zoom()
 
-# add series
-plot1.profile(x=x_data, y=sin_data, title="sin(x)", color="b")
-plot1.profile(x=x_data, y=cos_data, title="cos(x)", color="g")
-plot1.zoom()
+p2 = perrot.Plot(tag="p2", **settings)
+p2.profile(x=x_data, y=sin_data, title="sin(x)", color="b")
+p2.zoom()
 
-plot2.profile(x=x_data, y=sin_data, title="sin(x)", color="b")
-plot2.zoom()
+p3 = perrot.Plot(tag="p3", **settings)
+p3.profile(x=x_data, y=cos_data, title="cos(x)", color="g")
+p3.zoom()
 
-plot3.profile(x=x_data, y=cos_data, title="cos(x)", color="g")
-plot3.zoom()
+# make controls
+c1 = perrot.PlotControl(graphics=p1)
+c2 = perrot.PlotControl(graphics=p2)
+c3 = perrot.PlotControl(graphics=p3)
 
 # make layout
-layout = pero.Layout()
-layout.add(plot1, 0, 0, col_span=2)
-layout.add(plot2, 1, 0)
-layout.add(plot3, 1, 1)
+sizer = pero.Sizer()
+sizer.add(c1, 0, 0, col_span=2)
+sizer.add(c2, 1, 0)
+sizer.add(c3, 1, 1)
 
-layout.show()
+sizer.show()
