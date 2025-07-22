@@ -16,7 +16,7 @@ from . measure import MeasureTool
 
 class PlotControl(ToolControl):
     """
-    Plot view control providing several convenient methods to apply zoom to
+    Plot view control provides several convenient methods to apply zoom to
     specific axis, enable zoom undos and sets default interactivity tools.
     
     Properties:

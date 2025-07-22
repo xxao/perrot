@@ -35,6 +35,13 @@ c1 = perrot.PlotControl(graphics=p1)
 c2 = perrot.PlotControl(graphics=p2)
 c3 = perrot.PlotControl(graphics=p3)
 
+# synchronize x-axes
+syncer = perrot.Syncer()
+syncer.sync_x(c1, c2)
+syncer.sync_x(c1, c3)
+syncer.sync_x(c2, c3)
+syncer.sync_x(c3, c2)
+
 # make layout
 sizer = pero.Sizer()
 sizer.add(c1, 0, 0, col_span=2)
