@@ -70,7 +70,7 @@ class Syncer(object):
         self._links.append((master, m_axis, slave, s_axis))
     
     
-    def sync_x(self, master, slave):
+    def sync_x(self, master, slave, mutual=False):
         """
         Registers link between two plots x-axes.
         
@@ -80,12 +80,20 @@ class Syncer(object):
             
             slave: perrot.PlotControl
                 Slave plot.
+            
+            mutual: bool
+                If set to True, reversed direction is registered too.
         """
         
+        # add main sync
         self.sync(master, master.graphics.x_axis, slave, slave.graphics.x_axis)
+        
+        # add reversed sync
+        if mutual:
+            self.sync(slave, slave.graphics.x_axis, master, master.graphics.x_axis)
     
     
-    def sync_y(self, master, slave):
+    def sync_y(self, master, slave, mutual=False):
         """
         Registers link between two plots y-axes.
         
@@ -95,9 +103,17 @@ class Syncer(object):
             
             slave: perrot.PlotControl
                 Slave plot.
+            
+            mutual: bool
+                If set to True, reversed direction is registered too.
         """
         
+        # add main sync
         self.sync(master, master.graphics.y_axis, slave, slave.graphics.y_axis)
+        
+        # add reversed sync
+        if mutual:
+            self.sync(slave, slave.graphics.y_axis, master, master.graphics.y_axis)
     
     
     def unsync(self, master, m_axis, slave, s_axis):
@@ -154,7 +170,7 @@ class Syncer(object):
                 master.unbind(EVT_ZOOM, self._on_zoom)
     
     
-    def unsync_x(self, master, slave):
+    def unsync_x(self, master, slave, mutual=False):
         """
         Removes link between two plots x-axes.
         
@@ -164,12 +180,20 @@ class Syncer(object):
             
             slave: perrot.PlotControl
                 Slave plot.
+            
+            mutual: bool
+                If set to True, reversed direction is removed too.
         """
         
+        # remove main sync
         self.unsync(master, master.graphics.x_axis, slave, slave.graphics.x_axis)
+        
+        # remove reversed sync
+        if mutual:
+            self.unsync(slave, slave.graphics.x_axis, master, master.graphics.x_axis)
     
     
-    def unsync_y(self, master, slave):
+    def unsync_y(self, master, slave, mutual=False):
         """
         Removes link between two plots y-axes.
         
@@ -179,13 +203,27 @@ class Syncer(object):
             
             slave: perrot.PlotControl
                 Slave plot.
+            
+            mutual: bool
+                If set to True, reversed direction is removed too.
         """
         
+        # remove main sync
         self.unsync(master, master.graphics.y_axis, slave, slave.graphics.y_axis)
+        
+        # remove reversed sync
+        if mutual:
+            self.unsync(slave, slave.graphics.y_axis, master, master.graphics.y_axis)
     
     
-    def _on_zoom(self, evt):
-        """Handles zoom events."""
+    def force(self, master):
+        """
+        Forces synchronization from given master.
+        
+        Args:
+            master: perrot.PlotControl
+                Master plot.
+        """
         
         # check active sync
         if self._in_sync:
@@ -195,15 +233,21 @@ class Syncer(object):
         self._in_sync = True
         
         # sync linked axes
-        for master, m_axis, slave, s_axis in self._links:
+        for m_ctrl, m_axis, s_ctrl, s_axis in self._links:
             
             # check master
-            if master is not evt.control:
+            if master is not m_ctrl:
                 continue
             
             # zoom slave
             rng = m_axis.scale.in_range
-            slave.zoom(s_axis, rng[0], rng[1], True)
+            s_ctrl.zoom(s_axis, rng[0], rng[1], True)
         
         # set sync inactive
         self._in_sync = False
+    
+    
+    def _on_zoom(self, evt):
+        """Handles zoom events."""
+        
+        self.force(evt.control)
