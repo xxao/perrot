@@ -5,6 +5,7 @@ import time
 
 from pero.enums import *
 from pero.properties import *
+from pero.events import ZoomEvt
 from pero import ToolControl
 
 from .. prebuilds import Plot
@@ -83,7 +84,7 @@ class PlotControl(ToolControl):
         self.refresh()
     
     
-    def zoom(self, axis_tag=None, minimum=None, maximum=None, save=True):
+    def zoom(self, axis_tag=None, minimum=None, maximum=None, save=True, silent=True):
         """
         Sets given range to specific plot axis.
         
@@ -93,9 +94,6 @@ class PlotControl(ToolControl):
         
         If minimum or maximum is set to None, the value will be set by maximum
         or minimum value to cover full range of connected data series.
-        
-        Note that this method does not fire the pero.EVENT.ZOOM event
-        automatically. It must be done manually if required.
         
         Args:
             axis_tag: str or None
@@ -109,6 +107,9 @@ class PlotControl(ToolControl):
             
             save: bool
                 If set to True the new zoom state is saved.
+            
+            silent: bool
+                If set to False, the pero.EVENT.ZOOM event is fired.
         """
         
         # check plot
@@ -121,6 +122,16 @@ class PlotControl(ToolControl):
         # save current zoom
         if save:
             self.save_zoom()
+        
+        # fire zoom event
+        if not silent:
+            
+            evt = ZoomEvt(
+                native = None,
+                view = self._parent,
+                control = self)
+            
+            self.graphics.fire(evt)
     
     
     def zoom_back(self):
