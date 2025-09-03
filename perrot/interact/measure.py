@@ -32,12 +32,16 @@ class MeasureTool(Tool):
             Specifies the measurement direction as any value from the
             perrot.MEASURE_MODE enum.
         
+        relative: bool
+            Specifies whether relative value should be displayed too.
+        
         line properties:
             Includes pero.LineProperties to specify the cursor lines.
     """
     
     axes = TupleProperty(UNDEF, intypes=(str,), dynamic=False)
     mode = EnumProperty(MEASURE_AUTO, enum=MEASURE_MODE, dynamic=False)
+    relative = BoolProperty(True, dynamic=False)
     line = Include(LineProperties, dynamic=False, line_color="#5559")
     
     
@@ -257,7 +261,7 @@ class MeasureTool(Tool):
             axes = [plot.get_obj(a) for a in self.axes]
         
         # remove invisible
-        axes = [a for a in axes if a.visible]
+        # axes = [a for a in axes if a.visible]
         
         # horizontal by mode
         if self.mode == MEASURE_X:
@@ -298,7 +302,7 @@ class MeasureTool(Tool):
                 continue
             
             # format relative distance
-            if not relative:
+            if not self.relative or not relative:
                 pass
             
             elif abs(relative) < 1e-7:
