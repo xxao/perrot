@@ -263,6 +263,8 @@ class Axis(OutGraphics):
         # use custom formatter
         else:
             formatter = self.tooltip
+            
+            # set resolution
             if self.tooltip_resaware:
                 in_range = self.scale.in_range[1] - self.scale.in_range[0]
                 out_range = self.scale.out_range[1] - self.scale.out_range[0]
