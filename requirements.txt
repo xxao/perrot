@@ -1,2 +1,2 @@
-numpy
-pero
+numpy >= 2.3
+pero >= 0.29
