@@ -148,6 +148,29 @@ class Profile(Series):
         self.extract_data()
     
     
+    def get_point(self, x, y, limit):
+        """
+        Gets nearest data point within limits from given coordinates.
+        
+        Args:
+            x: int or float
+                Cursor x-coordinate in device units.
+            
+            y: int or float
+                Cursor y-coordinate in device units.
+            
+            limit: int or float
+                Maximum allowed distance in device units.
+        
+        Returns:
+            (float, float, any, float) or None
+                Nearest data point info as (x, y, raw data, distance),
+                where coordinated are given in device units.
+        """
+        
+        return self.find_nearest_point(self._x_data, self._y_data, self._raw_data, x, y, limit)
+    
+    
     def get_limits(self, x_range=None, y_range=None, exact=False):
         """Gets current data limits using whole range or specified crops."""
         

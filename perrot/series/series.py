@@ -133,6 +133,29 @@ class Series(InGraphics):
         self.lock_property('y_mapper')
     
     
+    def get_point(self, x, y, limit):
+        """
+        Gets nearest data point within limits from given coordinates.
+        
+        Args:
+            x: int or float
+                Cursor x-coordinate in device units.
+            
+            y: int or float
+                Cursor y-coordinate in device units.
+            
+            limit: int or float
+                Maximum allowed distance in device units.
+        
+        Returns:
+            (float, float, any, float) or None
+                Nearest data point info as (x, y, raw data, distance),
+                where coordinated are given in device units.
+        """
+        
+        return None
+    
+    
     def get_limits(self, x_range=None, y_range=None, exact=False):
         """
         Gets current data limits using whole range or specified crop.
@@ -171,6 +194,69 @@ class Series(InGraphics):
         item = legend.clone(self, deep=True)
         
         return [item]
+    
+    
+    def find_nearest_point(self, x_data, y_data, raw_data, x, y, limit):
+        """
+        Finds nearest data point within limits from given coordinates.
+        
+        Args:
+            x_data: 1D numpy.ndarray
+                X-coordinate data.
+            
+            y_data: 1D numpy.ndarray
+                Y-coordinate data.
+            
+            raw_data: 1D numpy.ndarray
+                Original data points.
+            
+            x: int or float
+                Cursor x-coordinate in device units.
+            
+            y: int or float
+                Cursor y-coordinate in device units.
+            
+            limit: int or float
+                Maximum allowed distance in device units.
+        
+        Returns:
+            (float, float, any, float) or None
+                Nearest data point info as (x, y, raw data, distance),
+                where coordinated are given in device units.
+        """
+        
+        # calc limits
+        min_x = self.x_scale.invert(x - limit)
+        max_x = self.x_scale.invert(x + limit)
+        min_y = self.y_scale.invert(y + limit)
+        max_y = self.y_scale.invert(y - limit)
+        
+        # crop data
+        x_data, y_data, raw_data = utils.crop_unsorted(
+            data = (x_data, y_data, raw_data),
+            crops = ((min_x, max_x), (min_y, max_y)),
+            extend = False)
+        
+        # check data
+        if len(raw_data) == 0:
+            return None
+        
+        # scale coords
+        x_data = self.x_scale.scale(x_data)
+        y_data = self.y_scale.scale(y_data)
+        
+        # get nearest
+        x_dist = x_data - x
+        y_dist = y_data - y
+        dist = numpy.sqrt(x_dist * x_dist + y_dist * y_dist)
+        idx = numpy.argmin(dist)
+        
+        # check index
+        if idx is None:
+            return None
+        
+        # return raw point
+        return x_data[idx], y_data[idx], raw_data[idx], dist[idx]
     
     
     def prepare_labels(self, x_data, y_data, raw_data, v_flip=False, h_flip=False):
@@ -278,44 +364,22 @@ class Series(InGraphics):
         if not self.show_tooltip or not self.tooltip:
             return None
         
-        # calc limits
-        min_x = self.x_scale.invert(x-limit)
-        max_x = self.x_scale.invert(x+limit)
-        min_y = self.y_scale.invert(y+limit)
-        max_y = self.y_scale.invert(y-limit)
-        
-        # crop data
-        x_data, y_data, raw_data = utils.crop_unsorted(
-            data = (x_data, y_data, raw_data),
-            crops = ((min_x, max_x), (min_y, max_y)),
-            extend = False)
-        
-        # check data
-        if len(raw_data) == 0:
+        # get nearest point
+        raw_point = self.find_nearest_point(x_data, y_data, raw_data, x, y, limit)
+        if raw_point is None:
             return None
         
-        # scale coords
-        x_data = self.x_scale.scale(x_data)
-        y_data = self.y_scale.scale(y_data)
-        
-        # get nearest
-        x_dist = x_data - x
-        y_dist = y_data - y
-        dist = numpy.sqrt(x_dist*x_dist + y_dist*y_dist)
-        idx = numpy.argmin(dist)
-        
-        # check index
-        if idx is None:
-            return None
+        # split values
+        x_pos, y_pos, raw, dist = raw_point
         
         # get overrides
         overrides = {
-            'x': x_data[idx],
-            'y': y_data[idx],
-            'z_index': 1./dist[idx]}
+            'x': x_pos,
+            'y': y_pos,
+            'z_index': 1./dist}
         
         # make tooltip
-        return self.tooltip.clone(raw_data[idx], overrides)
+        return self.tooltip.clone(raw, overrides)
     
     
     def finalize_limits(self, limits, exact):
