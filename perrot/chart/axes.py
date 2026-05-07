@@ -264,12 +264,12 @@ class Axis(OutGraphics):
         else:
             formatter = self.tooltip
             
-            # set resolution
-            if self.tooltip_resaware:
-                in_range = self.scale.in_range[1] - self.scale.in_range[0]
-                out_range = self.scale.out_range[1] - self.scale.out_range[0]
-                formatter.domain = in_range
-                formatter.precision = in_range / out_range
+        # set resolution
+        if self.tooltip_resaware:
+            in_range = self.scale.in_range[1] - self.scale.in_range[0]
+            out_range = self.scale.out_range[1] - self.scale.out_range[0]
+            formatter.domain = in_range
+            formatter.precision = in_range / out_range
         
         # format value
         return formatter.format(value) + formatter.suffix()
