@@ -3,7 +3,7 @@
 
 import numpy
 
-from pero.drawing import utils
+from pero.geometry import utils
 from pero import Arch, Path
 
 
