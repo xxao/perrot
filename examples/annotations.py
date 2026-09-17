@@ -65,7 +65,7 @@ rect = pero.Bar(
 plot.annotate(rect, x_props=('left', 'right'), y_props=('top', 'bottom'))
 
 # add text annotations
-left_text = plot.text(
+left_text = plot.textbox(
     x = -.5,
     y = 1,
     text = "-pi/2",
@@ -76,7 +76,7 @@ left_text = plot.text(
     x_offset = -5,
     y_offset = 0)
 
-right_text = plot.text(
+right_text = plot.textbox(
     x = .5,
     y = -1,
     text = "+pi/2",
