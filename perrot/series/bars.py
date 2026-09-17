@@ -186,8 +186,8 @@ class Rectangles(Series):
         width_data, width_raw = utils.extract_data(self, 'width', self.data, size)
         height_data, height_raw = utils.extract_data(self, 'height', self.data, size)
         
-        x_offset, _ = utils.extract_data(self, 'x_offset', self.data, size, self.x_mapper)
-        y_offset, _ = utils.extract_data(self, 'y_offset', self.data, size, self.y_mapper)
+        x_offset, _ = utils.extract_data(self, 'x_offset', self.data, size)
+        y_offset, _ = utils.extract_data(self, 'y_offset', self.data, size)
         
         # calc missing data
         if not self.has_property('x'):
