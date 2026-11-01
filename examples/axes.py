@@ -55,6 +55,15 @@ ordinal_axis = perrot.OrdinalAxis(
     static = False,
     level = 3)
 
+time_axis = perrot.TimeAxis(
+    title = "Time Axis",
+    tag = "time_axis",
+    position = perrot.BOTTOM,
+    margin = (20, 0, 0, 0),
+    z_index = perrot.AXIS_Z+1,
+    scale_in_range = (1, 1000),
+    level = 3)
+
 color_axis = perrot.LinAxis(
     title = "Color Axis",
     tag = "color_axis",
@@ -118,6 +127,7 @@ plot = perrot.Plot(
 plot.add(right_axis)
 plot.add(top_axis)
 plot.add(ordinal_axis)
+plot.add(time_axis)
 plot.add(color_axis)
 plot.add(color_bar)
 
