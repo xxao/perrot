@@ -60,8 +60,17 @@ time_axis = perrot.TimeAxis(
     tag = "time_axis",
     position = perrot.BOTTOM,
     margin = (20, 0, 0, 0),
-    z_index = perrot.AXIS_Z+1,
+    z_index = perrot.AXIS_Z+2,
     scale_in_range = (1, 1000),
+    level = 3)
+
+symlog_axis = perrot.SymlogAxis(
+    title = "Symlog Axis",
+    tag = "symlog_axis",
+    position = perrot.BOTTOM,
+    margin = (20, 0, 0, 0),
+    z_index = perrot.AXIS_Z+3,
+    scale_in_range = (-500, 500),
     level = 3)
 
 color_axis = perrot.LinAxis(
@@ -128,8 +137,9 @@ plot.add(right_axis)
 plot.add(top_axis)
 plot.add(ordinal_axis)
 plot.add(time_axis)
+plot.add(symlog_axis)
 plot.add(color_axis)
 plot.add(color_bar)
 
 # show plot
-plot.view("Multiple Axes")
+plot.view("Multiple Axes", height=600)

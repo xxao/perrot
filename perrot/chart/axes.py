@@ -3,8 +3,8 @@
 
 from pero.properties import *
 from pero import StraitAxis
-from pero import Scale, ContinuousScale, LinScale, LogScale, OrdinalScale
-from pero import Ticker, LinTicker, LogTicker, FixTicker, TimeTicker
+from pero import Scale, ContinuousScale, LinScale, LogScale, SymlogScale, OrdinalScale
+from pero import Ticker, LinTicker, LogTicker, SymlogTicker, FixTicker, TimeTicker
 from pero import Formatter, IndexFormatter
 
 from .. enums import *
@@ -591,7 +591,7 @@ class LogAxis(Axis):
             Specifies the logarithm base.
     """
     
-    base = NumProperty(UNDEF, dynamic=False)
+    base = NumProperty(10, dynamic=False)
     
     
     def __init__(self, **overrides):
@@ -626,7 +626,6 @@ class LogAxis(Axis):
         """Updates ticker by current base."""
         
         self.ticker.base = self.base
-        self.ticker.formatter.base = self.base
     
     
     def _on_log_axis_property_changed(self, evt):
@@ -635,6 +634,83 @@ class LogAxis(Axis):
         # base changed
         if evt.name == 'base':
             self._update_base()
+
+
+class SymlogAxis(Axis):
+    """
+    Predefined axis with symmetric logarithmic scale and ticker. Ticks within
+    [-threshold, threshold] are linear. Logarithmic ticks outside this region
+    are anchored at threshold on both sides of zero. Ranges entirely within
+    the linear region use LinTicker.
+    
+    Properties:
+        
+        base: int or float
+            Specifies the logarithm base.
+        
+        threshold: int or float
+            Positive, finite threshold for linear region. Defaults to 1.
+            This value should match the threshold of the corresponding scale.
+    """
+    
+    base = NumProperty(UNDEF, dynamic=False)
+    threshold = NumProperty(UNDEF, dynamic=False)
+    
+    
+    def __init__(self, **overrides):
+        """Initializes a new instance of the LogAxis."""
+        
+        # init defaults
+        if 'scale' not in overrides:
+            overrides['scale'] = SymlogScale(in_range=(1., 10.))
+        
+        if 'ticker' not in overrides:
+            overrides['ticker'] = SymlogTicker()
+        
+        if 'empty_range' not in overrides:
+            overrides['empty_range'] = (1., 10.)
+        
+        # init base
+        super().__init__(**overrides)
+        
+        # lock scale and ticker
+        self.lock_property('scale')
+        self.lock_property('ticker')
+        
+        # bind events
+        self.bind(EVT_PROPERTY_CHANGED, self._on_symlog_axis_property_changed)
+        
+        # update base
+        if 'base' in overrides:
+            self._update_base()
+        
+        # update threshold
+        if 'threshold' in overrides:
+            self._update_threshold()
+    
+    
+    def _update_base(self):
+        """Updates ticker by current base."""
+        
+        self.ticker.base = self.base
+    
+    
+    def _update_threshold(self):
+        """Updates ticker by current threshold."""
+        
+        self.ticker.threshold = self.threshold
+    
+    
+    def _on_symlog_axis_property_changed(self, evt):
+        """Called after any property has changed."""
+        
+        # base changed
+        if evt.name == 'base':
+            self._update_ticker()
+        
+        # threshold changed
+        if evt.name == 'threshold':
+            self._update_threshold()
 
 
 class OrdinalAxis(Axis):
