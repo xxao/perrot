@@ -623,8 +623,9 @@ class LogAxis(Axis):
     
     
     def _update_base(self):
-        """Updates ticker by current base."""
+        """Updates scale and ticker by current base."""
         
+        self.scale.base = self.base
         self.ticker.base = self.base
     
     
@@ -690,14 +691,16 @@ class SymlogAxis(Axis):
     
     
     def _update_base(self):
-        """Updates ticker by current base."""
+        """Updates scale and ticker by current base."""
         
+        self.scale.base = self.base
         self.ticker.base = self.base
     
     
     def _update_threshold(self):
-        """Updates ticker by current threshold."""
+        """Updates scale and ticker by current threshold."""
         
+        self.scale.threshold = self.threshold
         self.ticker.threshold = self.threshold
     
     

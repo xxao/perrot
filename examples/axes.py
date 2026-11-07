@@ -71,6 +71,7 @@ symlog_axis = perrot.SymlogAxis(
     margin = (20, 0, 0, 0),
     z_index = perrot.AXIS_Z+3,
     scale_in_range = (-500, 500),
+    threshold = .01,
     level = 3)
 
 color_axis = perrot.LinAxis(
