@@ -10,6 +10,7 @@ from . zoom import ZoomTool
 
 # import controls
 from . control import PlotControl
+from . plot import PlotControl
 
 # import syncer
 from . syncer import Syncer

@@ -2,7 +2,7 @@
 #  Copyright (c) Martin Strohalm. All rights reserved.
 
 from pero.enums import *
-from . control import PlotControl
+from . plot import PlotControl
 from .. chart import Axis
 
 
