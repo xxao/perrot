@@ -39,6 +39,12 @@ class Axis(OutGraphics):
         ticker: pero.Ticker
             Specifies the ticks generator to provide ticks positions and labels.
         
+        x: int, float or callable
+            Specifies the x-coordinate of the origin.
+        
+        y: int, float or callable
+            Specifies the y-coordinate of the origin.
+        
         title: str, None or UNDEF
             Specifies the title to show.
         
@@ -151,6 +157,9 @@ class Axis(OutGraphics):
     mapper = Property(UNDEF, types=(Scale,), dynamic=False, nullable=True)
     scale = Property(UNDEF, types=(ContinuousScale,), dynamic=False)
     ticker = Property(UNDEF, types=(Ticker,), dynamic=False)
+    
+    x = NumProperty(0)
+    y = NumProperty(0)
     
     title = StringProperty(None, dynamic=False, nullable=True)
     title_text = Include(TextProperties, prefix="title_", dynamic=False, font_weight=FONT_WEIGHT_BOLD, font_size=12)
@@ -288,8 +297,8 @@ class Axis(OutGraphics):
         if not self.is_visible(source, overrides):
             return
         
-        # update scale
-        self._update_scale(canvas, source, **overrides)
+        # update scale and origin by frame
+        self._update_frame(canvas, source, **overrides)
         
         # update axis glyph
         self._update_glyph(canvas, source, **overrides)
@@ -408,7 +417,8 @@ class Axis(OutGraphics):
         """Updates axis glyph."""
         
         # get properties
-        frame = self.get_property('frame', source, overrides)
+        x = self.get_property('x', source, overrides)
+        y = self.get_property('y', source, overrides)
         position = self.get_property('position', source, overrides)
         scale = self.get_property('scale', source, overrides)
         ticker = self.get_property('ticker', source, overrides)
@@ -434,24 +444,16 @@ class Axis(OutGraphics):
         
         # get anchor
         if position == POS_LEFT:
-            x = frame.x2
-            y = frame.y1
+            y = scale.out_range[1]
         
         elif position == POS_RIGHT:
-            x = frame.x1
-            y = frame.y1
+            y = scale.out_range[1]
         
         elif position == POS_TOP:
-            x = frame.x1
-            y = frame.y2
+            x = scale.out_range[0]
         
         elif position == POS_BOTTOM:
-            x = frame.x1
-            y = frame.y1
-        
-        else:
-            x = frame.x1
-            y = frame.y1
+            x = scale.out_range[0]
         
         # get length
         length = abs(scale.out_range[1] - scale.out_range[0])
@@ -471,29 +473,50 @@ class Axis(OutGraphics):
         self._glyph.label_offset = label_offset
     
     
-    def _update_scale(self, canvas=None, source=UNDEF, **overrides):
-        """Updates scale according to current frame."""
+    def _update_frame(self, canvas=None, source=UNDEF, **overrides):
+        """Updates scale and origin according to current frame."""
         
         # get properties
         frame = self.get_property('frame', source, overrides)
         position = self.get_property('position', source, overrides)
         scale = self.get_property('scale', source, overrides)
         
-        # update scale
+        # check frame
+        if not frame:
+            return
+        
+        # update scale and anchor
         if position == POS_LEFT:
             scale.out_range = frame.y2, frame.y1
+            x = frame.x2
+            y = frame.y1
         
         elif position == POS_RIGHT:
             scale.out_range = frame.y2, frame.y1
+            x = frame.x1
+            y = frame.y1
         
         elif position == POS_TOP:
             scale.out_range = frame.x1, frame.x2
+            x = frame.x1
+            y = frame.y2
         
         elif position == POS_BOTTOM:
             scale.out_range = frame.x1, frame.x2
+            x = frame.x1
+            y = frame.y1
         
         else:
             scale.out_range = frame.x1, frame.x2
+            x = frame.x1
+            y = frame.y1
+        
+        # apply
+        if 'x' not in overrides:
+            self.x = x
+            
+        if 'y' not in overrides:
+            self.y = y
     
     
     def _update_position(self, canvas=None, source=UNDEF, **overrides):
@@ -558,7 +581,7 @@ class Axis(OutGraphics):
         """Called after any property has changed."""
         
         if evt.name == 'frame':
-            self._update_scale()
+            self._update_frame()
         
         # position changed
         if evt.name == 'position':
