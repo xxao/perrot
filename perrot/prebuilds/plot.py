@@ -1690,6 +1690,11 @@ class Plot(ChartBase):
         # get axis
         axis = self.get_obj(axis)
         
+        # get axis dimension
+        dim = axis.dim
+        if dim is UNDEF:
+            dim = 0 if axis.position in POSITION_TB else 1
+        
         # add series
         for series in self.series:
             
@@ -1708,7 +1713,7 @@ class Plot(ChartBase):
                 continue
             
             # get limits for correct dimension
-            limits = limits[0] if axis.position in POSITION_TB else limits[1]
+            limits = limits[dim] if dim < len(limits) else None
             if limits is None:
                 continue
             

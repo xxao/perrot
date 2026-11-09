@@ -35,6 +35,7 @@ z_axis = perrot.LinAxis(
     title = "sin(x) + sin(y)",
     position = perrot.RIGHT,
     scale_in_range = (z_min, z_max),
+    dim = 2,
     level = 3,
     margin = 0,
     show_line = False)

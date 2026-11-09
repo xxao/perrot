@@ -91,6 +91,11 @@ class Axis(OutGraphics):
         minor_tick_offset: int or float
             Specifies the shift of the minor ticks from the main line.
         
+        dim: int
+            When series returns data limits, the axis dim specifies index of
+            corresponding range. If not set, 0 is used for horizontal axes (x)
+            and 1 for vertical axes (y).
+        
         level: int
             Specifies the dependency level on other plot axes.
         
@@ -167,6 +172,7 @@ class Axis(OutGraphics):
     minor_tick_size = NumProperty(3, dynamic=False)
     minor_tick_offset = NumProperty(0, dynamic=False)
     
+    dim = IntProperty(UNDEF, dynamic=False)
     level = IntProperty(2, dynamic=False)
     static = BoolProperty(False, dynamic=False)
     autoscale = BoolProperty(False, dynamic=False)
