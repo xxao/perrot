@@ -110,4 +110,4 @@ plot.add(color_axis)
 plot.add(color_bar)
 
 # show plot
-plot.view("Multiple Axes", height=500)
+plot.view("Plot Axes", height=500)
