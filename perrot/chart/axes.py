@@ -689,8 +689,8 @@ class SymlogAxis(Axis):
             This value should match the threshold of the corresponding scale.
     """
     
-    base = NumProperty(UNDEF, dynamic=False)
-    threshold = NumProperty(UNDEF, dynamic=False)
+    base = NumProperty(10, dynamic=False)
+    threshold = NumProperty(1, dynamic=False)
     
     
     def __init__(self, **overrides):
